@@ -1,0 +1,495 @@
+@extends('layouts.shop')
+
+@section('title', $product->name . ' - ' . config('app.name'))
+
+@section('meta')
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{{ $product->marketing_description ?? $product->description }}">
+    <meta name="keywords" content="{{ $product->name }}, {{ $product->category->name ?? '' }}, moda praia, fitness">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="product">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $product->name }}">
+    <meta property="og:description" content="{{ $product->marketing_description ?? $product->description }}">
+    <meta property="og:image" content="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('logo.svg') }}">
+    <meta property="product:price:amount" content="{{ $product->price }}">
+    <meta property="product:price:currency" content="BRL">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="{{ $product->name }}">
+    <meta property="twitter:description" content="{{ $product->marketing_description ?? $product->description }}">
+    <meta property="twitter:image" content="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('logo.svg') }}">
+    
+    <!-- WhatsApp -->
+    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta property="og:locale" content="pt_BR">
+    
+    <!-- JSON-LD Schema.org para SEO e Google Shopping -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": "{{ $product->name }}",
+        "image": "{{ Str::startsWith($product->image, 'http') ? $product->image : asset('logo.svg') }}",
+        "description": "{{ $product->marketing_description ?? $product->description }}",
+        "sku": "{{ $product->sku ?? 'PROD-' . $product->id }}",
+        "brand": {
+            "@type": "Brand",
+            "name": "{{ $product->brand ?? config('app.name') }}"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": "{{ url()->current() }}",
+            "priceCurrency": "BRL",
+            "price": "{{ $product->price }}",
+            "priceValidUntil": "{{ now()->addMonths(3)->format('Y-m-d') }}",
+            "itemCondition": "https://schema.org/NewCondition",
+            "availability": "{{ $product->stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
+            "seller": {
+                "@type": "Organization",
+                "name": "{{ config('app.name') }}"
+            }
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.5",
+            "reviewCount": "128"
+        }
+    }
+    </script>
+@endsection
+
+@section('content')
+<div class="container py-4">
+    <!-- Breadcrumb Premium -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light p-3 rounded">
+            <li class="breadcrumb-item">
+                <a href="{{ route('shop.index') }}" class="text-decoration-none">
+                    <i class="bi bi-house-door me-1"></i>Início
+                </a>
+            </li>
+            @if($product->category)
+                <li class="breadcrumb-item">
+                    <a href="{{ route('shop.category', $product->category->slug) }}" class="text-decoration-none">
+                        {{ $product->category->name }}
+                    </a>
+                </li>
+            @endif
+            <li class="breadcrumb-item active">{{ $product->name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Galeria de Imagens do Produto -->
+        <div class="col-lg-6">
+            <div class="product-gallery sticky-top" style="top: 2rem;">
+                <!-- Imagem Principal -->
+                <div class="main-image mb-3">
+                    <div class="card border-0 shadow-sm overflow-hidden">
+                        <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : 'https://placehold.co/800x800/f0f8ff/1a1a1a?text='.urlencode($product->name) }}" 
+                             class="card-img" 
+                             alt="{{ $product->name }}"
+                             style="aspect-ratio: 1; object-fit: cover;">
+                        
+                        <!-- Badges sobre a imagem -->
+                        @if($product->is_offer && $product->old_price)
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge bg-danger fs-6 px-3 py-2 shadow">
+                                    <i class="bi bi-lightning-charge-fill me-1"></i>
+                                    OFERTA -{{ round((($product->old_price - $product->price) / $product->old_price) * 100) }}%
+                                </span>
+                            </div>
+                        @endif
+                        
+                        @if($product->stock <= 5 && $product->stock > 0)
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-warning text-dark fs-6 px-3 py-2 shadow">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                    Últimas {{ $product->stock }} unidades
+                                </span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Thumbnails (preparado para futuras múltiplas imagens) -->
+                <div class="d-flex gap-2">
+                    <div class="thumbnail active">
+                        <img src="https://placehold.co/100x100/f0f8ff/1a1a1a?text=1" 
+                             class="img-thumbnail" 
+                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;">
+                    </div>
+                    <div class="thumbnail opacity-50">
+                        <img src="https://placehold.co/100x100/f0f8ff/1a1a1a?text=2" 
+                             class="img-thumbnail" 
+                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;">
+                    </div>
+                    <div class="thumbnail opacity-50">
+                        <img src="https://placehold.co/100x100/f0f8ff/1a1a1a?text=3" 
+                             class="img-thumbnail" 
+                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações do Produto -->
+        <div class="col-lg-6">
+            <!-- Cabeçalho -->
+            <div class="mb-4">
+                @if($product->category)
+                    <div class="mb-2">
+                        <a href="{{ route('shop.category', $product->category->slug) }}" 
+                           class="badge bg-secondary text-decoration-none px-3 py-2">
+                            <i class="bi bi-tag-fill me-1"></i>{{ $product->category->name }}
+                        </a>
+                    </div>
+                @endif
+                
+                <h1 class="display-5 fw-bold mb-3">{{ $product->name }}</h1>
+                
+                <!-- Rating (preparado para futuro sistema de avaliações) -->
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="text-warning">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                    </div>
+                    <span class="text-muted">(4.5) • 128 avaliações</span>
+                </div>
+
+                <!-- Descrição de Marketing -->
+                @if($product->marketing_description)
+                    <div class="mb-3">
+                        <p class="fs-6 text-secondary" style="line-height: 1.6;">
+                            <i class="bi bi-stars text-warning me-1"></i>
+                            {{ $product->marketing_description }}
+                        </p>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Preço -->
+            <div class="card bg-light border-0 p-4 mb-4">
+                @if($product->is_offer && $product->old_price)
+                    <div class="d-flex align-items-end gap-3 mb-2">
+                        <h2 class="display-4 text-success fw-bold mb-0">
+                            R$ {{ number_format($product->price, 2, ',', '.') }}
+                        </h2>
+                        <h4 class="text-muted text-decoration-line-through mb-2">
+                            R$ {{ number_format($product->old_price, 2, ',', '.') }}
+                        </h4>
+                    </div>
+                    <p class="text-success mb-0">
+                        <i class="bi bi-piggy-bank-fill me-1"></i>
+                        Você economiza R$ {{ number_format($product->old_price - $product->price, 2, ',', '.') }}
+                    </p>
+                @else
+                    <h2 class="display-4 text-primary fw-bold mb-0">
+                        R$ {{ number_format($product->price, 2, ',', '.') }}
+                    </h2>
+                @endif
+                
+                <small class="text-muted mt-2 d-block">
+                    <i class="bi bi-credit-card me-1"></i>ou em até 12x de R$ {{ number_format($product->price / 12, 2, ',', '.') }} sem juros
+                </small>
+            </div>
+
+            <!-- Status do Estoque -->
+            <div class="alert {{ $product->stock > 0 ? 'alert-success' : 'alert-danger' }} d-flex align-items-center mb-4" role="alert">
+                @if($product->stock > 0)
+                    <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                    <div>
+                        <strong class="d-block">Produto Disponível</strong>
+                        <small>{{ $product->stock }} unidades em estoque • Envio imediato</small>
+                    </div>
+                @else
+                    <i class="bi bi-x-circle-fill fs-4 me-3"></i>
+                    <div>
+                        <strong class="d-block">Produto Esgotado</strong>
+                        <small>Cadastre-se para ser avisado quando chegar</small>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Seletor de Quantidade e Ações (Livewire Component) -->
+            @if($product->stock > 0)
+                <div class="card border-primary mb-4">
+                    <div class="card-body p-4">
+                        <div x-data="{ quantity: 1 }">
+                            <!-- Quantidade -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Quantidade:</label>
+                                <div class="input-group input-group-lg" style="width: 150px;">
+                                    <button class="btn btn-outline-secondary" 
+                                            type="button" 
+                                            @click="quantity = Math.max(1, quantity - 1)">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+                                    <input type="text" 
+                                           class="form-control text-center" 
+                                           x-model="quantity" 
+                                           readonly>
+                                    <button class="btn btn-outline-secondary" 
+                                            type="button" 
+                                            @click="quantity = Math.min({{ $product->stock }}, quantity + 1)">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Máximo: {{ $product->stock }} unidades</small>
+                            </div>
+
+                            <!-- Botões de Ação -->
+                            <div class="d-grid gap-2">
+                                @livewire('shop.product-card', ['product' => $product], key('product-detail-'.$product->id))
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="d-grid gap-2 mb-4">
+                    <button class="btn btn-lg btn-secondary" disabled>
+                        <i class="bi bi-x-circle me-2"></i>Produto Esgotado
+                    </button>
+                </div>
+            @endif
+
+            <!-- Informações de Entrega -->
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">
+                        <i class="bi bi-truck me-2"></i>Informações de Entrega
+                    </h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Frete grátis para compras acima de R$ 299,00
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Entrega expressa disponível
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Garantia de 90 dias
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="border-top pt-3">
+                <small class="text-muted d-block">
+                    <strong>SKU:</strong> {{ $product->sku ?? 'PROD-'.$product->id }}
+                </small>
+                <small class="text-muted d-block">
+                    <strong>Categorias:</strong> 
+                    @if($product->category)
+                        <a href="{{ route('shop.category', $product->category->slug) }}" class="text-decoration-none">
+                            {{ $product->category->name }}
+                        </a>
+                    @else
+                        Geral
+                    @endif
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de Informações Detalhadas -->
+    <div class="mt-5 pt-4">
+        <ul class="nav nav-tabs nav-fill" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button">
+                    <i class="bi bi-file-text me-2"></i>Descrição
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button">
+                    <i class="bi bi-list-check me-2"></i>Especificações
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button">
+                    <i class="bi bi-star me-2"></i>Avaliações (128)
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content border border-top-0 p-4 bg-white" id="productTabsContent">
+            <!-- Aba Descrição -->
+            <div class="tab-pane fade show active" id="description" role="tabpanel">
+                <h5 class="mb-3">Sobre este produto</h5>
+                @if($product->description)
+                    <p class="lead">{{ $product->description }}</p>
+                @else
+                    <p class="text-muted">Este produto ainda não possui uma descrição detalhada.</p>
+                @endif
+                
+                <h6 class="mt-4 mb-3">Características Principais:</h6>
+                <ul>
+                    <li>Alta qualidade e durabilidade</li>
+                    <li>Design moderno e funcional</li>
+                    <li>Garantia de fábrica</li>
+                    <li>Fácil instalação e uso</li>
+                </ul>
+            </div>
+
+            <!-- Aba Especificações -->
+            <div class="tab-pane fade" id="specifications" role="tabpanel">
+                <h5 class="mb-3">Especificações Técnicas</h5>
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th style="width: 30%;">SKU</th>
+                            <td>{{ $product->sku ?? 'PROD-'.$product->id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Categoria</th>
+                            <td>{{ $product->category->name ?? 'Geral' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Peso</th>
+                            <td>1.5 kg (informação de exemplo)</td>
+                        </tr>
+                        <tr>
+                            <th>Dimensões</th>
+                            <td>20 x 15 x 10 cm (informação de exemplo)</td>
+                        </tr>
+                        <tr>
+                            <th>Garantia</th>
+                            <td>90 dias</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Aba Avaliações -->
+            <div class="tab-pane fade" id="reviews" role="tabpanel">
+                <h5 class="mb-4">Avaliações de Clientes</h5>
+                
+                <!-- Resumo de Avaliações -->
+                <div class="row mb-4">
+                    <div class="col-md-4 text-center">
+                        <div class="display-3 fw-bold">4.5</div>
+                        <div class="text-warning mb-2">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-half"></i>
+                        </div>
+                        <p class="text-muted">128 avaliações</p>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">5 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 75%"></div>
+                                </div>
+                                <span class="ms-2 text-muted">75%</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">4 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 15%"></div>
+                                </div>
+                                <span class="ms-2 text-muted">15%</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">3 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 7%"></div>
+                                </div>
+                                <span class="ms-2 text-muted">7%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exemplo de Avaliação -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <strong>João Silva</strong>
+                                <div class="text-warning small">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                            <small class="text-muted">Há 2 dias</small>
+                        </div>
+                        <p class="mb-0">Produto excelente! Superou minhas expectativas. Entrega rápida e bem embalado.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Sistema de avaliações em desenvolvimento. Em breve você poderá avaliar este produto!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Produtos Relacionados -->
+    @if($relatedProducts->count() > 0)
+        <div class="mt-5 pt-5 border-top">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">
+                    <i class="bi bi-box-seam me-2"></i>Produtos Relacionados
+                </h3>
+                <a href="{{ route('shop.category', $product->category->slug) }}" class="btn btn-outline-primary">
+                    Ver todos <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                @foreach($relatedProducts as $related)
+                    <div class="col">
+                        @livewire('shop.product-card', ['product' => $related], key('related-'.$related->id))
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+</div>
+
+@push('styles')
+<style>
+    .sticky-top {
+        position: sticky;
+    }
+    
+    .thumbnail.active img {
+        border-color: var(--bs-primary);
+        border-width: 2px;
+    }
+    
+    .thumbnail:hover img {
+        opacity: 1 !important;
+    }
+    
+    .card-product {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card-product:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+</style>
+@endpush
+@endsection

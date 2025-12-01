@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Loja - Template E-commerce Completo</title>
+    <!-- Carrega o Bootstrap 5 CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Carrega Ícones Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* Cores Personalizadas (simulando as cores primárias do Bagisto ou e-commerce padrão) */
+        :root {
+            --bs-primary: #005691;
+            /* Azul escuro/marinho */
+            --bs-secondary: #FFC72C;
+            /* Amarelo/Ouro */
+            --bs-danger: #e74c3c;
+            /* Vermelho padrão para destaques/descontos */
+        }
+
+        .bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .text-primary {
+            color: var(--bs-primary) !important;
+        }
+
+        .btn-primary {
+            --bs-btn-bg: var(--bs-primary);
+            --bs-btn-border-color: var(--bs-primary);
+            --bs-btn-hover-bg: #003e6b;
+            /* Um tom mais escuro */
+            --bs-btn-hover-border-color: #003e6b;
+        }
+
+        .bg-secondary {
+            background-color: var(--bs-secondary) !important;
+        }
+
+        .text-secondary {
+            color: var(--bs-secondary) !important;
+        }
+
+        /* Estilo para cards de produto com efeito de sombra */
+        .card-product:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-3px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Estilo do Banner */
+        .hero-banner {
+            min-height: 350px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 0.75rem;
+            /* Bordas arredondadas Bootstrap 5 */
+            display: flex;
+            align-items: center;
+            padding: 3rem;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        /* Classes utilitárias para o template */
+        .rounded-xl {
+            border-radius: 1rem !important;
+        }
+
+        /* Ajuste para a grade de produtos em telas muito grandes */
+        @media (min-width: 1200px) {
+            .col-xl-2dot4 {
+                flex: 0 0 auto;
+                width: 20%;
+                /* 5 colunas em telas xl */
+            }
+        }
+
+        /* Navbar mais alta (20% a mais) */
+        .navbar-taller {
+            min-height: 70px;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        /* NOVO: Custom CSS para truncar texto em 2 linhas com reticências */
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            /* Limita a 2 linhas */
+            -webkit-box-orient: vertical;
+            text-overflow: ellipsis;
+            white-space: normal;
+            line-height: 1.2;
+            /* Para controle exato de altura */
+            max-height: 2.4em;
+            /* 2 linhas * 1.2em */
+        }
+
+        /* Garantir que o conteúdo Offcanvas não crie scroll horizontal */
+        .offcanvas-body {
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- 1. Cabeçalho Fixo (Header) -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top navbar-taller">
+            <div class="container-fluid">
+                <!-- Logo -->
+                <a class="navbar-brand text-primary fw-bold fs-3 me-2" href="#">
+                    <span class="text-secondary">Loja</span>Bagisto
+                </a>
+
+                <!-- Ícones de Ação -->
+                <div class="d-flex order-lg-3 me-2">
+                    <!-- Ícone de Busca (Mobile) -->
+                    <a class="nav-link p-2 text-dark d-lg-none" href="#" id="search-toggle" title="Buscar">
+                        <i class="bi bi-search fs-5"></i>
+                    </a>
+
+                    <!-- Ícone de Conta -->
+                    <a class="nav-link p-2 text-dark" href="#" title="Minha Conta">
+                        <i class="bi bi-person-circle fs-5"></i>
+                    </a>
+
+                    <!-- Ícone de Carrinho (Abre Offcanvas Carrinho) -->
+                    <a class="nav-link p-2 text-dark position-relative" href="#" title="Carrinho"
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
+                        <i class="bi bi-cart4 fs-5" id="cart-icon"></i>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary text-primary d-none"
+                            id="cart-count">
+                            0
+                            <span class="visually-hidden">itens no carrinho</span>
+                        </span>
+                    </a>
+
+                    <!-- Ícone de Lista de Desejos (Abre Offcanvas Wishlist) -->
+                    <a class="nav-link p-2 text-dark position-relative" href="#" title="Lista de Desejos"
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasWishlist"
+                        aria-controls="offcanvasWishlist">
+                        <i class="bi bi-heart fs-5" id="wishlist-icon"></i>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                            id="wishlist-count">
+                            0
+                            <span class="visually-hidden">itens na lista de desejos</span>
+                        </span>
+                    </a>
+
+                    <!-- Botão Toggle do Menu (Hambúrguer) -->
+                    <button class="navbar-toggler p-2 border-0" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasNav" aria-controls="offcanvasNav" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
+                <!-- Menu de Navegação (Desktop) -->
+                <div class="collapse navbar-collapse order-lg-2" id="desktopNav">
+                    <!-- Campo de Busca (Desktop) -->
+                    <form class="d-flex flex-grow-1 me-lg-4 my-2 my-lg-0 d-none d-lg-flex">
+                        <input class="form-control me-2 rounded-pill" type="search"
+                            placeholder="Buscar produtos, categorias..." aria-label="Search">
+                        <button class="btn btn-outline-primary rounded-circle" type="submit" title="Buscar">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+
+                    <!-- Itens de Navegação em Desktop -->
+                    <ul class="navbar-nav d-flex align-items-start mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" href="#">Destaques</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Lançamentos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Ofertas</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- OFF CANVAS (MENU HAMBÚGUER MOBILE) -->
+        <div class="offcanvas offcanvas-start bg-white d-lg-none" tabindex="-1" id="offcanvasNav"
+            aria-labelledby="offcanvasNavLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title text-primary fw-bold" id="offcanvasNavLabel">
+                    <i class="bi bi-grid-3x3-gap-fill me-2"></i> Navegação
+                </h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Fechar"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <li class="nav-item">
+                        <a class="nav-link active fs-5" aria-current="page" href="#">Destaques</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-5" href="#">Lançamentos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-5" href="#">Ofertas</a>
+                    </li>
+                    <li class="nav-item border-top mt-3 pt-3">
+                        <a class="nav-link text-muted" href="#"><i class="bi bi-person-circle me-2"></i> Minha Conta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-muted" href="#" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasWishlist" data-bs-dismiss="offcanvas">
+                            <i class="bi bi-heart-fill me-2"></i> Lista de Desejos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-muted" href="#" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasCart" data-bs-dismiss="offcanvas">
+                            <i class="bi bi-cart-fill me-2"></i> Meu Carrinho
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- OFF CANVAS (LISTA DE DESEJOS) -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasWishlist"
+            aria-labelledby="offcanvasWishlistLabel">
+            <div class="offcanvas-header bg-primary text-white border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="offcanvasWishlistLabel">
+                    <i class="bi bi-heart-fill me-2"></i> Sua Lista de Desejos
+                </h5>
+                <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Fechar"></button>
+            </div>
+            <div class="offcanvas-body p-0" id="wishlist-offcanvas-body">
+                <!-- Conteúdo populado via JavaScript -->
+            </div>
+            <div class="offcanvas-footer border-top p-3 text-center">
+                <a href="#" class="btn btn-primary w-100 fw-semibold">Ver Todos os Itens</a>
+            </div>
+        </div>
+
+        <!-- NOVO: OFF CANVAS (CARRINHO DE COMPRAS) -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCart" aria-labelledby="offcanvasCartLabel">
+            <div class="offcanvas-header bg-primary text-white border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="offcanvasCartLabel">
+                    <i class="bi bi-cart4 me-2"></i> Seu Carrinho (<span id="cart-item-count">0</span>)
+                </h5>
+                <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Fechar"></button>
+            </div>
+            <div class="offcanvas-body d-flex flex-column" id="cart-offcanvas-body">
+                <!-- Conteúdo populado via JavaScript (lista de produtos) -->
+
+                <!-- Subtotal e Frete (Fixado no fim do body) -->
+                <div class="mt-auto pt-3 border-top" id="cart-summary">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span class="fw-bold" id="cart-subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Frete:</span>
+                        <span class="fw-bold text-success">Grátis</span>
+                    </div>
+                    <div class="d-flex justify-content-between fs-5 fw-bold text-primary border-top pt-2">
+                        <span>Total:</span>
+                        <span id="cart-total">R$ 0,00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="offcanvas-footer border-top p-3">
+                <a href="#" class="btn btn-secondary w-100 fw-semibold mb-2">Ver Carrinho Completo</a>
+                <a href="#" class="btn btn-primary w-100 fw-semibold">Finalizar Compra</a>
+            </div>
+        </div>
+
+
+        <!-- Barra de Busca Completa (Aparece ao clicar na lupa em mobile/tablet) -->
+        <div class="collapse bg-white border-bottom shadow-sm d-lg-none" id="search-bar-full">
+            <div class="container-fluid py-3">
+                <form class="d-flex mb-4">
+                    <input class="form-control form-control-lg rounded-pill me-2" type="search"
+                        placeholder="Buscar produtos, categorias..." aria-label="Search" id="mobile-search-input">
+                    <button class="btn btn-primary rounded-pill fw-semibold" type="submit">Buscar</button>
+                </form>
+
+                <!-- NOVO: Últimos Pesquisados e Ofertas -->
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h6 class="text-primary fw-bold border-bottom pb-1">Últimos Pesquisados</h6>
+                        <div id="recent-searches-list" class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-light text-dark border p-2 rounded-pill">Smartwatch</span>
+                            <span class="badge bg-light text-dark border p-2 rounded-pill">Tenis Corrida</span>
+                            <span class="badge bg-light text-dark border p-2 rounded-pill">Mochila</span>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="text-danger fw-bold border-bottom pb-1">Ofertas em Destaque</h6>
+                        <div id="offer-searches-list" class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-danger p-2 rounded-pill"><i class="bi bi-tag me-1"></i> Desconto
+                                50%</span>
+                            <span class="badge bg-danger p-2 rounded-pill"><i class="bi bi-lightning-fill me-1"></i>
+                                Frete Grátis</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- FIM NOVO: Últimos Pesquisados e Ofertas -->
+            </div>
+        </div>
+
+        <!-- Navegação de Categorias (Horizontal - Apenas Desktop/Tablet) -->
+        <div class="bg-primary shadow-sm d-none d-md-block">
+            <div class="container">
+                <ul class="nav justify-content-center">
+                    <li class="nav-item"><a class="nav-link text-white hover-secondary" href="#">Novidades</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Eletrônicos</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Moda Masculina</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Casa & Decoração</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Promoções</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Conteúdo Principal (Main Content) -->
+    <main class="container my-5">
+
+        <!-- Banner de Destaque / Hero Section (Mantido) -->
+        <section class="hero-banner mb-5 bg-primary text-white"
+            style="background-image: url('https://placehold.co/1200x350/005691/ffffff?text=Oferta+Exclusiva');">
+            <div class="p-5 p-md-0">
+                <div class="col-md-7 px-0">
+                    <div class="bg-light p-4 rounded-xl shadow-lg">
+                        <h1 class="display-6 fw-bold text-primary mb-3">Liquidação de Verão</h1>
+                        <p class="fs-5 text-dark mb-4 d-none d-sm-block">Aproveite descontos incríveis de até 50% OFF em
+                            toda a linha de produtos selecionados.</p>
+                        <a href="#" class="btn btn-secondary btn-lg fw-bold shadow-sm">
+                            Comprar Agora <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Produtos em Destaque (Mantido) -->
+        <section class="mb-5">
+            <h2 class="border-bottom border-primary pb-2 mb-4 text-dark fw-bold">Produtos em Destaque</h2>
+
+            <!-- Grade de Produtos (Responsiva) -->
+            <div class="row g-4" id="product-grid">
+
+                <!-- PRODUTO 1: Câmera -->
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2dot4">
+                    <div class="card h-100 card-product shadow-sm rounded-xl overflow-hidden">
+                        <a href="#" class="text-decoration-none">
+                            <div class="position-relative">
+                                <!-- Imagem do Produto -->
+                                <img src="https://placehold.co/400x400/CCCCCC/333333?text=Câmera+Digital"
+                                    class="card-img-top" alt="Câmera Digital Profissional"
+                                    style="height: 200px; object-fit: cover;"
+                                    onerror="this.onerror=null;this.src='https://placehold.co/400x400/CCCCCC/333333?text=Produto';">
+                                <!-- Badge -->
+                                <span
+                                    class="badge bg-secondary text-primary position-absolute top-0 start-0 m-2 fw-bold">NOVO</span>
+                            </div>
+                            <div class="card-body p-3">
+                                <!-- Nome do Produto -->
+                                <h5 class="card-title text-truncate text-dark mb-1"
+                                    title="Câmera Digital Profissional 4K">
+                                    Câmera Digital Profissional 4K
+                                </h5>
+                                <!-- Preço -->
+                                <p class="card-text fs-5 fw-bold text-primary mb-0">R$ 1.899,90</p>
+                            </div>
+                        </a>
+                        <!-- Botão Adicionar ao Carrinho -->
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
+                            <button class="btn btn-primary w-100 fw-semibold btn-sm add-to-cart" data-id="101">
+                                <i class="bi bi-cart-plus me-1"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUTO 2: Tênis -->
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2dot4">
+                    <div class="card h-100 card-product shadow-sm rounded-xl overflow-hidden">
+                        <a href="#" class="text-decoration-none">
+                            <div class="position-relative">
+                                <img src="https://placehold.co/400x400/1abc9c/ffffff?text=Tênis+Esportivo"
+                                    class="card-img-top" alt="Tênis Esportivo Pro"
+                                    style="height: 200px; object-fit: cover;"
+                                    onerror="this.onerror=null;this.src='https://placehold.co/400x400/1abc9c/ffffff?text=Produto';">
+                                <span class="badge bg-danger position-absolute top-0 start-0 m-2 fw-bold">-20%</span>
+                            </div>
+                            <div class="card-body p-3">
+                                <h5 class="card-title text-truncate text-dark mb-1"
+                                    title="Tênis Esportivo Pro Performance">
+                                    Tênis Esportivo Pro Performance
+                                </h5>
+                                <p class="card-text fs-5 fw-bold text-primary mb-0">R$ 319,90</p>
+                                <small class="text-muted text-decoration-line-through">R$ 399,90</small>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
+                            <button class="btn btn-primary w-100 fw-semibold btn-sm add-to-cart" data-id="102">
+                                <i class="bi bi-cart-plus me-1"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUTO 3: Relógio -->
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2dot4">
+                    <div class="card h-100 card-product shadow-sm rounded-xl overflow-hidden">
+                        <a href="#" class="text-decoration-none">
+                            <img src="https://placehold.co/400x400/9b59b6/ffffff?text=Relógio+Smart"
+                                class="card-img-top" alt="Relógio Smartwatch Pro"
+                                style="height: 200px; object-fit: cover;"
+                                onerror="this.onerror=null;this.src='https://placehold.co/400x400/9b59b6/ffffff?text=Produto';">
+                            <div class="card-body p-3">
+                                <h5 class="card-title text-truncate text-dark mb-1"
+                                    title="Relógio Smartwatch Esportivo">
+                                    Relógio Smartwatch Esportivo
+                                </h5>
+                                <p class="card-text fs-5 fw-bold text-primary mb-0">R$ 799,00</p>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
+                            <button class="btn btn-primary w-100 fw-semibold btn-sm add-to-cart" data-id="103">
+                                <i class="bi bi-cart-plus me-1"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUTO 4: Fone de Ouvido -->
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2dot4">
+                    <div class="card h-100 card-product shadow-sm rounded-xl overflow-hidden">
+                        <a href="#" class="text-decoration-none">
+                            <img src="https://placehold.co/400x400/e67e22/ffffff?text=Fone+Bluetooth"
+                                class="card-img-top" alt="Fone de Ouvido Bluetooth"
+                                style="height: 200px; object-fit: cover;"
+                                onerror="this.onerror=null;this.src='https://placehold.co/400x400/e67e22/ffffff?text=Produto';">
+                            <div class="card-body p-3">
+                                <h5 class="card-title text-truncate text-dark mb-1"
+                                    title="Fone de Ouvido Bluetooth Premium">
+                                    Fone de Ouvido Bluetooth Premium
+                                </h5>
+                                <p class="card-text fs-5 fw-bold text-primary mb-0">R$ 149,90</p>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
+                            <button class="btn btn-primary w-100 fw-semibold btn-sm add-to-cart" data-id="104">
+                                <i class="bi bi-cart-plus me-1"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUTO 5: Luminária -->
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2dot4 d-none d-lg-block">
+                    <div class="card h-100 card-product shadow-sm rounded-xl overflow-hidden">
+                        <a href="#" class="text-decoration-none">
+                            <img src="https://placehold.co/400x400/3498db/ffffff?text=Luminária+LED"
+                                class="card-img-top" alt="Luminária de Mesa LED"
+                                style="height: 200px; object-fit: cover;"
+                                onerror="this.onerror=null;this.src='https://placehold.co/400x400/3498db/ffffff?text=Produto';">
+                            <div class="card-body p-3">
+                                <h5 class="card-title text-truncate text-dark mb-1"
+                                    title="Luminária de Mesa LED Flexível">
+                                    Luminária de Mesa LED Flexível
+                                </h5>
+                                <p class="card-text fs-5 fw-bold text-primary mb-0">R$ 89,90</p>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
+                            <button class="btn btn-primary w-100 fw-semibold btn-sm add-to-cart" data-id="105">
+                                <i class="bi bi-cart-plus me-1"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 3. Rodapé (Footer) -->
+    <footer class="bg-dark text-white pt-5 pb-3 mt-5">
+        <div class="container">
+            <div class="row border-bottom border-secondary pb-4 mb-4">
+                <!-- Coluna 1: Sobre a Loja -->
+                <div class="col-6 col-md-3 mb-3">
+                    <h5 class="text-secondary mb-3">A Loja</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Sobre Nós</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Trabalhe Conosco</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Blog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 2: Suporte -->
+                <div class="col-6 col-md-3 mb-3">
+                    <h5 class="text-secondary mb-3">Suporte</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Contato</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Trocas e Devoluções</a>
+                        </li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 3: Conta -->
+                <div class="col-6 col-md-3 mb-3">
+                    <h5 class="text-secondary mb-3">Conta</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Entrar / Registrar</a>
+                        </li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Meus Pedidos</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-light">Lista de Desejos</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 4: Newsletter -->
+                <div class="col-md-3 mb-3">
+                    <h5 class="text-secondary mb-3">Newsletter</h5>
+                    <p class="text-light mb-3">Inscreva-se e ganhe 10% de desconto na primeira compra.</p>
+                    <form class="d-flex">
+                        <input type="email" class="form-control rounded-start" placeholder="Seu e-mail"
+                            aria-label="E-mail para Newsletter">
+                        <button class="btn btn-secondary rounded-end fw-semibold" type="submit">
+                            Enviar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Direitos Autorais -->
+            <div class="text-center text-light small">
+                © 2025 LojaBagisto. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Carrega o Bootstrap 5 JS via CDN (com Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <script>
+        // Dados Fictícios de Produtos (Simulação de Banco de Dados)
+        const allProducts = [
+            { id: 101, name: "Câmera Digital Profissional 4K Ultra HD com Zoom Óptico Avançado e Estabilização de Imagem", price: 1899.90, imageText: "Câmera+Digital", qty: 1, isOffer: false },
+            { id: 102, name: "Tênis Esportivo Pro Performance (Lançamento)", price: 319.90, imageText: "Tênis+Esportivo", qty: 1, isOffer: true },
+            { id: 103, name: "Relógio Smartwatch Esportivo com Monitoramento de Frequência Cardíaca e GPS Integrado", price: 799.00, imageText: "Relógio+Smart", qty: 1, isOffer: false },
+            { id: 104, name: "Fone de Ouvido Bluetooth Premium com Cancelamento Ativo de Ruído (ANC)", price: 149.90, imageText: "Fone+Bluetooth", qty: 1, isOffer: true },
+            { id: 105, name: "Luminária de Mesa LED Flexível com 3 Níveis de Intensidade", price: 89.90, imageText: "Luminária+LED", qty: 1, isOffer: false },
+            { id: 106, name: "Mochila Executiva Impermeável com Carregador USB", price: 220.00, imageText: "Mochila", qty: 1, isOffer: true }
+        ];
+
+        // Estados Simulado (Carrinho e Wishlist)
+        let wishlistProducts = [
+            { id: 101, name: allProducts.find(p => p.id === 101).name, price: allProducts.find(p => p.id === 101).price, imageText: allProducts.find(p => p.id === 101).imageText },
+            { id: 103, name: allProducts.find(p => p.id === 103).name, price: allProducts.find(p => p.id === 103).price, imageText: allProducts.find(p => p.id === 103).imageText }
+        ];
+
+        let cartProducts = [
+            { id: 102, name: allProducts.find(p => p.id === 102).name, price: allProducts.find(p => p.id === 102).price, imageText: allProducts.find(p => p.id === 102).imageText, qty: 1 },
+            { id: 104, name: allProducts.find(p => p.id === 104).name, price: allProducts.find(p => p.id === 104).price, imageText: allProducts.find(p => p.id === 104).imageText, qty: 2 }
+        ];
+
+        // Função utilitária para formatação de moeda
+        const formatCurrency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        // Simulação de Mensagem (Toast-like)
+        function alertMessage(message, type) {
+            const msgContainerId = 'custom-alert-container';
+            let container = document.getElementById(msgContainerId);
+
+            if (!container) {
+                container = document.createElement('div');
+                container.id = msgContainerId;
+                container.className = 'fixed-bottom end-0 p-3';
+                container.style.zIndex = '2000';
+                document.body.appendChild(container);
+            }
+
+            const alertDiv = document.createElement('div');
+            const alertClass = type === 'success' ? 'alert-success' : type === 'danger' ? 'alert-danger' : 'alert-info';
+
+            alertDiv.className = `alert ${alertClass} alert-dismissible fade show mb-2 rounded-pill shadow-lg d-flex align-items-center`;
+            alertDiv.setAttribute('role', 'alert');
+
+            alertDiv.innerHTML = `
+                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-x-octagon-fill'} me-2"></i>
+                <div>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            `;
+
+            container.appendChild(alertDiv);
+
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alertDiv);
+                bsAlert.close();
+            }, 3000);
+        }
+
+        // =========================================================
+        // FUNÇÃO: RENDERIZAR LISTA DE DESEJOS
+        // =========================================================
+        function renderWishlist() {
+            const wishlistBody = document.getElementById('wishlist-offcanvas-body');
+            const wishlistCountElement = document.getElementById('wishlist-count');
+            const wishlistIcon = document.getElementById('wishlist-icon');
+
+            if (!wishlistBody || !wishlistCountElement || !wishlistIcon) return;
+
+            const count = wishlistProducts.length;
+
+            // 1. Atualiza a contagem no badge e o ícone
+            wishlistCountElement.textContent = count;
+
+            if (count > 0) {
+                wishlistCountElement.classList.remove('d-none');
+                wishlistIcon.classList.remove('bi-heart');
+                wishlistIcon.classList.add('bi-heart-fill');
+            } else {
+                wishlistCountElement.classList.add('d-none');
+                wishlistIcon.classList.remove('bi-heart-fill');
+                wishlistIcon.classList.add('bi-heart');
+            }
+
+            // 2. Renderiza a lista de produtos OU o estado vazio com ofertas
+            if (count === 0) {
+                const offers = allProducts.filter(p => p.isOffer).slice(0, 3);
+
+                let emptyHtml = `
+                    <div class="p-5 text-center text-muted">
+                        <i class="bi bi-heart-break fs-1 mb-3"></i>
+                        <p class="mb-0 fw-bold">Sua lista de desejos está vazia.</p>
+                        <small>Adicione produtos para acompanhá-los!</small>
+                    </div>
+                `;
+
+                // Adiciona ofertas abaixo da mensagem de vazio
+                if (offers.length > 0) {
+                    emptyHtml += `
+                        <div class="p-3 border-top">
+                            <h6 class="text-danger fw-bold mb-3">Ofertas que Você Pode Gostar:</h6>
+                            <div class="list-group list-group-flush">
+                    `;
+                    offers.forEach(product => {
+                        emptyHtml += `
+                            <div class="list-group-item d-flex align-items-center p-2 bg-light rounded-3 mb-2">
+                                <img src="https://placehold.co/60x60/3498db/ffffff?text=${product.imageText}" 
+                                     class="rounded me-2 flex-shrink-0" style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="flex-grow-1 me-2 overflow-hidden"> 
+                                    <p class="mb-0 small fw-bold text-dark line-clamp-2" title="${product.name}">${product.name}</p>
+                                    <span class="text-danger fw-semibold small">${formatCurrency(product.price)}</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger add-to-wishlist-from-offer" data-id="${product.id}" title="Adicionar à Lista">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </div>
+                        `;
+                    });
+                    emptyHtml += '</div></div>';
+                }
+
+                wishlistBody.innerHTML = emptyHtml;
+
+                // Adiciona listener para adicionar produto das ofertas
+                document.querySelectorAll('.add-to-wishlist-from-offer').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = parseInt(e.currentTarget.dataset.id);
+                        const productData = allProducts.find(p => p.id === productId);
+                        if (productData && !wishlistProducts.find(p => p.id === productId)) {
+                            wishlistProducts.push({
+                                id: productData.id,
+                                name: productData.name,
+                                price: productData.price,
+                                imageText: productData.imageText
+                            });
+                            renderWishlist();
+                            alertMessage("Produto adicionado à Lista de Desejos!", 'success');
+                        }
+                    });
+                });
+
+                return;
+            }
+
+            let html = '<div class="list-group list-group-flush">';
+            wishlistProducts.forEach(product => {
+                html += `
+                    <div class="list-group-item d-flex align-items-center p-3">
+                        <img src="https://placehold.co/80x80/CCCCCC/333333?text=${product.imageText}" 
+                             class="rounded me-3 flex-shrink-0" style="width: 80px; height: 80px; object-fit: cover;">
+                        
+                        <!-- FIX: Usa line-clamp-2 para 2 linhas e overflow-hidden para layout -->
+                        <div class="flex-grow-1 me-2 overflow-hidden"> 
+                            <p class="mb-1 fw-bold text-dark line-clamp-2" title="${product.name}">${product.name}</p>
+                            <p class="mb-0 text-primary fw-semibold">${formatCurrency(product.price)}</p>
+                        </div>
+                        
+                        <div class="ms-auto d-flex flex-column align-items-end flex-shrink-0">
+                            <button class="btn btn-sm btn-outline-danger remove-from-wishlist mb-1" data-id="${product.id}" title="Remover">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <button class="btn btn-sm btn-primary add-to-cart-from-wishlist" data-id="${product.id}" title="Adicionar ao Carrinho">
+                                <i class="bi bi-bag-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            wishlistBody.innerHTML = html;
+
+            // 3. Anexa Listeners
+            document.querySelectorAll('.remove-from-wishlist').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.id);
+                    const index = wishlistProducts.findIndex(p => p.id === productId);
+
+                    if (index !== -1) {
+                        wishlistProducts.splice(index, 1);
+                        renderWishlist();
+                        alertMessage("Produto removido da Lista de Desejos!", 'danger');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.add-to-cart-from-wishlist').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const productId = parseInt(e.currentTarget.dataset.id);
+                    const product = allProducts.find(p => p.id === productId);
+                    if (product && !cartProducts.find(p => p.id === productId)) {
+                        cartProducts.push({ ...product, qty: 1 });
+                        renderCart(); // Atualiza o carrinho
+                        alertMessage(`"${product.name}" adicionado ao carrinho!`, 'success');
+                    } else if (product) {
+                        alertMessage(`"${product.name}" já está no carrinho!`, 'info');
+                    }
+                });
+            });
+        }
+
+        // =========================================================
+        // FUNÇÃO: RENDERIZAR CARRINHO
+        // =========================================================
+        function renderCart() {
+            const cartBody = document.getElementById('cart-offcanvas-body');
+            const cartItemCount = document.getElementById('cart-item-count');
+            const cartCountBadge = document.getElementById('cart-count');
+            const cartIcon = document.getElementById('cart-icon');
+            const cartSummary = document.getElementById('cart-summary');
+            const cartSubtotal = document.getElementById('cart-subtotal');
+            const cartTotal = document.getElementById('cart-total');
+
+            if (!cartBody || !cartItemCount || !cartCountBadge || !cartIcon || !cartSummary || !cartSubtotal || !cartTotal) return;
+
+            const totalCount = cartProducts.reduce((sum, item) => sum + item.qty, 0);
+            const subtotal = cartProducts.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const total = subtotal; // Simples, pois frete é grátis.
+
+            // 1. Atualiza contagem e visibilidade
+            cartItemCount.textContent = totalCount;
+            cartCountBadge.textContent = totalCount;
+            cartSubtotal.textContent = formatCurrency(subtotal);
+            cartTotal.textContent = formatCurrency(total);
+
+            // Verifica se o summary já existe no HTML (foi injetado pelo DOMContentLoaded)
+            let existingSummary = cartBody.querySelector('#cart-summary');
+
+            if (totalCount > 0) {
+                cartCountBadge.classList.remove('d-none');
+                if (existingSummary) existingSummary.classList.remove('d-none');
+            } else {
+                cartCountBadge.classList.add('d-none');
+                if (existingSummary) existingSummary.classList.add('d-none');
+
+                // Garante que o conteúdo da lista é removido e o estado vazio é exibido
+                cartBody.innerHTML = `
+                    <div class="p-5 text-center text-muted flex-grow-1 d-flex flex-column justify-content-center">
+                        <i class="bi bi-cart-x fs-1 mb-3"></i>
+                        <p class="mb-0 fw-bold">Seu carrinho está vazio.</p>
+                        <small>Que tal adicionar um produto em destaque?</small>
+                    </div>`;
+
+                // Adiciona o summary de volta se ele foi removido, mas o esconde
+                if (existingSummary) {
+                    cartBody.appendChild(existingSummary);
+                    existingSummary.classList.add('d-none');
+                }
+
+                return;
+            }
+
+            // 2. Renderiza a lista de produtos (sem o summary por enquanto)
+            let listHtml = '<div class="list-group list-group-flush flex-grow-1 overflow-y-auto">';
+            cartProducts.forEach(product => {
+                const itemTotal = formatCurrency(product.price * product.qty);
+                listHtml += `
+                    <div class="list-group-item d-flex p-3 align-items-start">
+                        <img src="https://placehold.co/80x80/2c3e50/ffffff?text=${product.imageText}" 
+                             class="rounded me-3 flex-shrink-0" style="width: 80px; height: 80px; object-fit: cover;">
+                        
+                        <div class="flex-grow-1 overflow-hidden me-2">
+                            <!-- FIX: Usa line-clamp-2 para 2 linhas -->
+                            <p class="mb-1 fw-bold text-dark line-clamp-2" title="${product.name}">${product.name}</p>
+                            <small class="text-muted d-block">Preço Unit.: ${formatCurrency(product.price)}</small>
+                            <small class="text-primary fw-semibold d-block">Total Item: ${itemTotal}</small>
+                        </div>
+                        
+                        <div class="ms-auto d-flex flex-column align-items-end flex-shrink-0">
+                            <!-- Controle de Quantidade Simples -->
+                            <input type="number" class="form-control form-control-sm text-center mb-2 cart-qty-input" 
+                                   value="${product.qty}" min="1" style="width: 60px;" data-id="${product.id}">
+                            
+                            <button class="btn btn-sm btn-outline-danger remove-from-cart" data-id="${product.id}" title="Remover">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            listHtml += '</div>';
+
+            // 3. Re-injecta a lista E o summary (se existir)
+            if (existingSummary) {
+                cartBody.innerHTML = listHtml;
+                cartBody.appendChild(existingSummary); // Move o sumário para o final
+                existingSummary.classList.remove('d-none');
+            } else {
+                // Se o summary não foi encontrado (erro de estado), apenas insere a lista
+                cartBody.innerHTML = listHtml;
+            }
+
+
+            // 4. Anexa Listeners
+            document.querySelectorAll('.remove-from-cart').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.id);
+                    const index = cartProducts.findIndex(p => p.id === productId);
+
+                    if (index !== -1) {
+                        cartProducts.splice(index, 1);
+                        renderCart();
+                        alertMessage("Produto removido do Carrinho!", 'danger');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.cart-qty-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.id);
+                    const newQty = parseInt(e.currentTarget.value);
+                    const product = cartProducts.find(p => p.id === productId);
+
+                    if (product && newQty >= 1) {
+                        product.qty = newQty;
+                        renderCart(); // Renderiza para recalcular e atualizar
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicialização dos dois Offcanvas
+            renderWishlist();
+            renderCart();
+
+            // Lógica do Botão "Adicionar ao Carrinho" (Grid Principal)
+            const buttons = document.querySelectorAll('.add-to-cart');
+            buttons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const productId = parseInt(e.currentTarget.dataset.id);
+                    const product = allProducts.find(p => p.id === productId);
+
+                    // Verifica se o produto já está no carrinho
+                    const existingItem = cartProducts.find(p => p.id === productId);
+
+                    if (product) {
+                        if (existingItem) {
+                            // Aumenta a quantidade
+                            existingItem.qty += 1;
+                            alertMessage(`"${product.name}" já está no carrinho! Quantidade atualizada.`, 'info');
+                        } else {
+                            // Adiciona novo item
+                            cartProducts.push({ ...product, qty: 1 });
+                            alertMessage(`"${product.name}" adicionado ao carrinho!`, 'success');
+                        }
+                        renderCart(); // Atualiza o carrinho em ambos os casos
+                    }
+                });
+            });
+
+            // Recarregar a lista quando o Offcanvas for exibido
+            const offcanvasWishlist = document.getElementById('offcanvasWishlist');
+            if (offcanvasWishlist) {
+                offcanvasWishlist.addEventListener('show.bs.offcanvas', renderWishlist);
+            }
+            const offcanvasCart = document.getElementById('offcanvasCart');
+            if (offcanvasCart) {
+                offcanvasCart.addEventListener('show.bs.offcanvas', renderCart);
+            }
+
+            // Lógica de Sincronização de Collapses/Offcanvas
+            const searchToggle = document.getElementById('search-toggle');
+            const searchBarFull = document.getElementById('search-bar-full');
+            const offcanvasNav = document.getElementById('offcanvasNav');
+
+
+            if (searchToggle && searchBarFull && offcanvasNav) {
+
+                // 1. Ação: Quando o ÍCONE de Busca é clicado (no Mobile)
+                searchToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Alterna o estado da barra de busca (Collapse)
+                    const searchCollapse = new bootstrap.Collapse(searchBarFull, { toggle: false });
+
+                    if (searchBarFull.classList.contains('show')) {
+                        searchCollapse.hide();
+                    } else {
+                        // Fecha outros offcanvas antes de abrir a busca
+                        bootstrap.Offcanvas.getInstance(offcanvasNav)?.hide();
+                        bootstrap.Offcanvas.getInstance(offcanvasWishlist)?.hide();
+                        bootstrap.Offcanvas.getInstance(offcanvasCart)?.hide();
+                        searchCollapse.show();
+                    }
+                });
+
+                // 2. Ação: Quando o MENU HAMBÚGUER (Offcanvas) é aberto
+                offcanvasNav.addEventListener('show.bs.offcanvas', () => {
+                    // Garante que a barra de busca (Collapse) está fechada
+                    bootstrap.Collapse.getInstance(searchBarFull)?.hide();
+                });
+
+                // Opcional: focar no campo de busca após abrir
+                searchBarFull.addEventListener('shown.bs.collapse', () => {
+                    const searchInput = document.getElementById('mobile-search-input');
+                    if (searchInput) {
+                        searchInput.focus();
+                    }
+                });
+
+                // 3. Fechar Barra de Busca ao Clicar Fora (Apenas em Mobile/Tablet)
+                document.addEventListener('click', (e) => {
+                    // Verifica se a tela é menor que 'lg' (mobile/tablet)
+                    if (window.innerWidth < 992) {
+                        const isSearchOpen = searchBarFull.classList.contains('show');
+                        const isClickInsideSearch = searchBarFull.contains(e.target);
+                        const isClickOnToggle = searchToggle.contains(e.target);
+
+                        // Se a busca está aberta e o clique não foi no toggle e nem dentro da barra de busca
+                        if (isSearchOpen && !isClickOnToggle && !isClickInsideSearch) {
+                            bootstrap.Collapse.getInstance(searchBarFull)?.hide();
+                        }
+                    }
+                });
+
+            }
+        });
+    </script>
+</body>
+
+</html>

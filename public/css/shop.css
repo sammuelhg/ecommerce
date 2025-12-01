@@ -1,0 +1,129 @@
+/* Copied from shop-styles.css */
+:root {
+    --bs-primary: #005691;
+    --bs-secondary: #FFC72C;
+    --bs-danger: #e74c3c;
+}
+
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+.text-primary {
+    color: var(--bs-primary) !important;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: #003e6b;
+    --bs-btn-hover-border-color: #003e6b;
+}
+
+.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+}
+
+.text-secondary {
+    color: var(--bs-secondary) !important;
+}
+
+.card-product {
+    transition: all 0.3s ease-in-out;
+}
+
+.card-product:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-3px);
+}
+
+.hero-banner {
+    min-height: 350px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    padding: 3rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.rounded-xl {
+    border-radius: 1rem !important;
+}
+
+.navbar-taller {
+    min-height: 70px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+    line-height: 1.25;
+    max-height: 2.5em;
+}
+
+.offcanvas-body {
+    overflow-x: hidden;
+}
+
+.custom-horizontal-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-item-width {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+@media (min-width: 576px) {
+    .scroll-item-width {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+    }
+}
+
+@media (min-width: 992px) {
+    .scroll-item-width {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+}
+
+.wishlist-toggle {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--bs-body-color);
+    padding: 0.5rem;
+    line-height: 1;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.wishlist-toggle:hover {
+    transform: scale(1.1);
+    color: var(--bs-danger);
+    background-color: white;
+}
+
+.wishlist-toggle.is-favorited {
+    color: var(--bs-danger);
+    fill: var(--bs-danger);
+}
+/* Estilos da página de produto */
+.sticky-top { position: sticky; }
+.thumbnail.active img { border-color: var(--bs-primary); border-width: 2px; }
+.thumbnail:hover img { opacity: 1 !important; }
