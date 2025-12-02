@@ -186,12 +186,102 @@
                     <h1 class="h2 mb-0">@yield('title', 'Dashboard')</h1>
                 </div>
                 
+                @if(session('success') || session('message'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') ?? session('message') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 @yield('content')
             </main>
         </div>
     </div>
 
-    @stack('scripts')
+    <!-- Media Library Modal Component -->
+    <livewire:admin.media-library />
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+        <div id="validationToast" class="toast" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong class="me-auto">Erro de Validação</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="validationToastBody"></div>
+        </div>
+    </div>
+
     @livewireScripts
+    @stack('scripts')
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+
+            window.Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
+                fail(({ status, response }) => {
+
+                    if (status === 422 && response?.errors) {
+                        let errorHtml = '<ul class="mb-0 ps-3">';
+
+                        Object.values(response.errors).forEach(errorArray => {
+                            errorArray.forEach(error => {
+                                errorHtml += `<li>${error}</li>`;
+                            });
+                        });
+
+                        errorHtml += '</ul>';
+
+                        document.getElementById('validationToastBody').innerHTML = errorHtml;
+
+                        const toast = new bootstrap.Toast(
+                            document.getElementById('validationToast'),
+                            { delay: 5000 }
+                        );
+
+                        toast.show();
+                    }
+
+                });
+            });
+
+            // EVENTO EMITIDO PELO COMPONENTE LIVEWIRE (V3)
+            window.Livewire.on('show-validation-toast', (event) => {
+
+                const errors = event?.errors ?? event?.[0]?.errors;
+
+                if (errors) {
+                    let errorHtml = '<ul class="mb-0 ps-3">';
+
+                    Object.values(errors).forEach(errorArray => {
+                        errorArray.forEach(error => {
+                            errorHtml += `<li>${error}</li>`;
+                        });
+                    });
+
+                    errorHtml += '</ul>';
+
+                    document.getElementById('validationToastBody').innerHTML = errorHtml;
+
+                    const toast = new bootstrap.Toast(
+                        document.getElementById('validationToast'),
+                        { delay: 5000 }
+                    );
+
+                    toast.show();
+                }
+
+            });
+
+        });
+    </script>
 </body>
 </html>
