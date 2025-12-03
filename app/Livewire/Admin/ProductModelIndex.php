@@ -50,7 +50,8 @@ class ProductModelIndex extends Component
         $models = ProductModel::where('name', 'like', '%' . $this->search . '%')
             ->orWhere('code', 'like', '%' . $this->search . '%')
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10)
+            ->withPath(route('admin.models.index'));
 
         return view('livewire.admin.product-model-index', [
             'models' => $models

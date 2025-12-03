@@ -1,6 +1,6 @@
-<div class="card product-card h-100">
+<div class="card product-card h-100" x-data='{ product: {!! json_encode($product, JSON_HEX_APOS | JSON_HEX_QUOT) !!} }'>
     <!-- Imagem do Produto -->
-    <a href="{{ route('shop.show', $product) }}" class="text-decoration-none">
+    <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="text-decoration-none">
         @if($product->image)
             <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" 
                  class="card-img-top" 
@@ -17,7 +17,7 @@
     
     <div class="card-body d-flex flex-column">
         <!-- Título do Produto -->
-        <a href="{{ route('shop.show', $product) }}" class="text-decoration-none">
+        <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="text-decoration-none">
             <h5 class="card-title fw-bold text-primary mb-0">{{ $product->name }}</h5>
         </a>
         
@@ -26,9 +26,11 @@
             <!-- Preço -->
             <div>
                 @if($product->is_offer && $product->old_price)
-                    <span class="fw-bolder text-success fs-5">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
-                    <br>
-                    <small class="text-muted text-decoration-line-through">R$ {{ number_format($product->old_price, 2, ',', '.') }}</small>
+                    <div>
+                        <span class="fw-bolder text-success fs-5">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
+                        <br>
+                        <small class="text-muted text-decoration-line-through">R$ {{ number_format($product->old_price, 2, ',', '.') }}</small>
+                    </div>
                 @else
                     <span class="fw-bolder text-success fs-5">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
                 @endif
@@ -37,33 +39,28 @@
             <!-- Ícones de Ação -->
             <div>
                 <!-- Ícone Favoritar -->
-                <button wire:click="toggleWishlist" 
-                        class="btn btn-link text-decoration-none p-0 action-icon me-3 {{ $inWishlist ? 'text-danger' : 'text-secondary' }}" 
-                        title="{{ $inWishlist ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos' }}"
-                        wire:loading.attr="disabled">
-                    <i class="bi bi-heart{{ $inWishlist ? '-fill' : '' }}"></i>
+                <button @click="$dispatch('toggle-wishlist', product)" 
+                        class="btn btn-link text-decoration-none p-0 action-icon me-3" 
+                        :class="isInWishlist(product.id) ? 'text-danger' : 'text-secondary'"
+                        title="Adicionar aos Favoritos">
+                    <i class="bi" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
                 </button>
                 
                 <!-- Ícone Compartilhar -->
                 <a href="#" 
                    class="text-secondary action-icon text-decoration-none" 
                    title="Compartilhar este item"
-                   onclick="navigator.share ? navigator.share({title: '{{ $product->name }}', url: '{{ route('shop.show', $product) }}'}) : alert('Compartilhamento não suportado'); return false;">
+                   @click.prevent="navigator.share ? navigator.share({title: '{{ $product->name }}', url: '{{ route('shop.show', $product->slug ?: $product->id) }}'}) : alert('Compartilhamento não suportado')">
                     <i class="bi bi-share-fill"></i>
                 </a>
             </div>
         </div>
         
         <!-- Botão Adicionar ao Carrinho -->
-        <button wire:click="addToCart" 
-                class="btn btn-primary d-flex align-items-center justify-content-center py-2 mt-auto"
-                wire:loading.attr="disabled">
+        <button @click="$dispatch('add-to-cart', { product: product, quantity: 1 })" 
+                class="btn btn-primary d-flex align-items-center justify-content-center py-2 mt-auto">
             <i class="bi bi-cart-plus-fill me-2"></i>
-            <span wire:loading.remove>Adicionar</span>
-            <span wire:loading>
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                Adicionando...
-            </span>
+            <span>Adicionar</span>
         </button>
     </div>
 </div>

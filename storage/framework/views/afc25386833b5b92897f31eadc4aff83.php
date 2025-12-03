@@ -13,8 +13,8 @@
                             <strong>Produto Original:</strong> <?php echo e($originalProduct->name); ?><br>
                             <small class="text-muted">
                                 Atributo: <?php echo e($originalProduct->attribute ?? 'N/A'); ?> | 
-                                Cor: <?php echo e($originalProduct->color ?? 'N/A'); ?> | 
-                                Tamanho: <?php echo e($originalProduct->size ?? 'N/A'); ?>
+                                Cor: <?php echo e($originalProduct->productColor->name ?? $originalProduct->color ?? 'N/A'); ?> | 
+                                Tamanho: <?php echo e($originalProduct->productSize->name ?? $originalProduct->size ?? 'N/A'); ?>
 
                             </small>
                         </div>
@@ -29,18 +29,28 @@
                         <form wire:submit.prevent="duplicate">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Atributo (opcional)</label>
-                                <input type="text" class="form-control" wire:model="newAttribute" placeholder="Ex: Manga Longa, Estampado...">
+                                <input type="text" class="form-control bg-white" wire:model="newAttribute" placeholder="Ex: Manga Longa, Estampado...">
                                 <small class="form-text text-muted">Campo genérico adicionado ao título do produto</small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Cor</label>
-                                <input type="text" class="form-control" wire:model="newColor" placeholder="Ex: Vermelho, Azul...">
+                                <select class="form-select bg-white" wire:model="newColorId">
+                                    <option value="">Selecione uma cor...</option>
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $availableColors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($color->id); ?>"><?php echo e($color->name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                </select>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tamanho</label>
-                                <input type="text" class="form-control" wire:model="newSize" placeholder="Ex: P, M, G, GG...">
+                                <select class="form-select bg-white" wire:model="newSizeId">
+                                    <option value="">Selecione um tamanho...</option>
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $availableSizes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($size->id); ?>"><?php echo e($size->name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                </select>
                             </div>
 
                             <div class="alert alert-warning">

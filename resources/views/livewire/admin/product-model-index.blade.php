@@ -1,7 +1,7 @@
 <div>
     <div class="row mb-4">
         <div class="col-md-6">
-            <input wire:model.live="search" type="text" class="form-control" placeholder="Buscar modelos...">
+            <input wire:model.live="search" type="text" class="form-control bg-white" placeholder="Buscar modelos...">
         </div>
         <div class="col-md-6 text-end">
             <button wire:click="create" class="btn btn-primary">
@@ -71,7 +71,7 @@
             </table>
 
             <div class="mt-4">
-                {{ $models->links() }}
+                {{ $models->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>

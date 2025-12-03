@@ -7,13 +7,13 @@
         <form wire:submit="save">
             <div class="mb-3">
                 <label class="form-label">Nome *</label>
-                <input type="text" wire:model="name" class="form-control @error('name') is-invalid @enderror" placeholder="Ex: Tênis, Camisa">
+                <input type="text" wire:model="name" class="form-control bg-white @error('name') is-invalid @enderror" placeholder="Ex: Tênis, Camisa">
                 @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Código (3 letras) *</label>
-                <input type="text" wire:model="code" class="form-control @error('code') is-invalid @enderror" placeholder="Ex: TEN, CAM" maxlength="3">
+                <input type="text" wire:model="code" class="form-control bg-white @error('code') is-invalid @enderror" placeholder="Ex: TEN, CAM" maxlength="3">
                 @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 <small class="text-muted">Código de 3 letras para uso no SKU</small>
             </div>

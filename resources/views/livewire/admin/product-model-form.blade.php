@@ -7,7 +7,7 @@
         <form wire:submit="save">
             <div class="mb-3">
                 <label class="form-label">Nome *</label>
-                <input type="text" wire:model="name" class="form-control @error('name') is-invalid @enderror" placeholder="Ex: Glide Pro 5, Classic Fit">
+                <input type="text" wire:model="name" class="form-control bg-white @error('name') is-invalid @enderror" placeholder="Ex: Glide Pro 5, Classic Fit">
                 @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 

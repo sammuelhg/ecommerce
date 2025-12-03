@@ -44,8 +44,8 @@ class ShopController extends Controller
      */
     public function show(Product $product)
     {
-        // Load product images
-        $product->load('images');
+        // Load product images, color and size relationships
+        $product->load(['images', 'productColor', 'productSize']);
         
         // Produtos relacionados (mesma categoria)
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -55,41 +55,74 @@ class ShopController extends Controller
             ->get();
 
         // Buscar TODOS os produtos irmãos (mesmo modelo e tipo)
+        // Usando product_model_id como agrupador principal
         $siblings = Product::where('product_model_id', $product->product_model_id)
             ->where('product_type_id', $product->product_type_id)
             ->where('is_active', true)
+            ->with(['productColor', 'productSize'])
             ->get();
 
         // 1. Agrupar Cores (para o seletor de cores)
-        // Cada cor deve ter um link para um produto representativo daquela cor
-        $colorVariants = $siblings->whereNotNull('color')
-            ->groupBy('color')
-            ->map(function ($group) use ($product) {
-                // Tenta encontrar o produto com o mesmo tamanho do atual, senão pega o primeiro
-                $representative = $group->where('size', $product->size)->first() ?? $group->first();
-                
+        $colorVariants = $siblings->groupBy(function($item) {
+            // Agrupa por ID da cor ou string da cor
+            return $item->product_color_id ?? $item->color ?? 'default';
+        })->map(function ($group) use ($product) {
+            $first = $group->first();
+            
+            // Determina nome e hex
+            $name = $first->productColor->name ?? $first->color;
+            $hex = $first->productColor->hex_code ?? ($name ? \App\Helpers\ColorHelper::getHex($name) : '#cccccc');
+            
+            // Tenta encontrar o produto representante desta cor que tenha o mesmo tamanho do produto atual
+            // Se não achar, pega o primeiro da lista
+            $representative = $group->filter(function($item) use ($product) {
+                $itemSize = $item->productSize->name ?? $item->size;
+                $currentSize = $product->productSize->name ?? $product->size;
+                return $itemSize == $currentSize;
+            })->first() ?? $group->first();
+
+            // Verifica se é a cor ativa
+            $isActive = false;
+            if ($product->product_color_id && $first->product_color_id) {
+                $isActive = $product->product_color_id == $first->product_color_id;
+            } else {
+                $isActive = $product->color == $first->color;
+            }
+
+            if ($name) {
                 return [
-                    'name' => $group->first()->color,
-                    'hex' => \App\Helpers\ColorHelper::getHex($group->first()->color),
+                    'name' => $name,
+                    'hex' => $hex,
                     'stock' => $group->sum('stock'),
-                    'slug' => $representative->slug, // Link para trocar de cor
-                    'active' => $group->first()->color === $product->color
+                    'slug' => $representative->slug, 
+                    'active' => $isActive
                 ];
-            })->values();
+            }
+            return null;
+        })->filter()->values();
 
         // 2. Agrupar Tamanhos (para o seletor de tamanhos)
-        // Mostrar apenas tamanhos disponíveis para a COR ATUAL
-        $sizeVariants = $siblings->where('color', $product->color)
-            ->whereNotNull('size')
-            ->sortBy('size') // Pode precisar de ordenação personalizada para P, M, G
-            ->map(function ($variant) use ($product) {
+        // Filtra siblings para mostrar apenas tamanhos da COR ATUAL
+        $currentSiblings = $siblings->filter(function($item) use ($product) {
+            if ($product->product_color_id && $item->product_color_id) {
+                return $product->product_color_id == $item->product_color_id;
+            }
+            return $product->color == $item->color;
+        });
+
+        $sizeVariants = $currentSiblings->map(function ($item) use ($product) {
+            $name = $item->productSize->name ?? $item->size;
+            
+            if ($name) {
                 return [
-                    'name' => $variant->size,
-                    'stock' => $variant->stock,
-                    'slug' => $variant->slug, // Link para trocar de tamanho
-                    'active' => $variant->size === $product->size
+                    'name' => $name,
+                    'stock' => $item->stock,
+                    'slug' => $item->slug,
+                    'active' => $item->id == $product->id
                 ];
-            })->values();
+            }
+            return null;
+        })->filter()->unique('name')->values();
 
         // Fallback se não houver variações (produto único)
         if ($colorVariants->isEmpty() && $product->color) {
@@ -109,6 +142,10 @@ class ShopController extends Controller
                 'slug' => $product->slug,
                 'active' => true
             ]]);
+        }
+
+        if ($product->isKit()) {
+            return view('shop.show-kit', compact('product', 'relatedProducts', 'colorVariants', 'sizeVariants'));
         }
 
         return view('shop.show', compact('product', 'relatedProducts', 'colorVariants', 'sizeVariants'));

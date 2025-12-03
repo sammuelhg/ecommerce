@@ -1,4 +1,28 @@
 <header>
+    <style>
+        /* Fix para telas muito pequenas (344px) - logo absoluta, ícones sobrepõem */
+        @media (max-width: 400px) {
+            .navbar .container {
+                position: relative;
+                min-height: 90px;
+            }
+            .navbar-brand {
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1;
+                margin: 0;
+            }
+            .navbar .d-flex.order-lg-3 {
+                position: relative;
+                z-index: 2;
+                margin-left: auto !important;
+                width: auto;
+            }
+        }
+    </style>
+    
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top navbar-taller" style="background-color: #1a1a1a; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">
         <div class="container" style="max-width: 1200px;">
             <!-- Logo -->
@@ -25,10 +49,24 @@
                 </a>
                 
                 <!-- Carrinho -->
-                @livewire('shop.cart-icon')
+                <button class="nav-link p-2 text-white position-relative bg-transparent border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
+                    <i class="bi bi-cart4 fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary" 
+                          x-show="cartTotalItems > 0" 
+                          x-text="cartTotalItems"
+                          style="display: none;">
+                    </span>
+                </button>
 
                 <!-- Wishlist -->
-                @livewire('shop.wishlist-icon')
+                <button class="nav-link p-2 text-white position-relative bg-transparent border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWishlist">
+                    <i class="bi fs-5" :class="wishlist.length > 0 ? 'bi-heart-fill' : 'bi-heart'" :style="wishlist.length > 0 ? 'color: #ffc107;' : ''"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                          x-show="wishlist.length > 0" 
+                          x-text="wishlist.length"
+                          style="display: none;">
+                    </span>
+                </button>
 
                 <!-- Menu Hambúrguer (Mobile) -->
                 <button class="navbar-toggler border-0 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav">
@@ -40,7 +78,7 @@
             <div class="collapse navbar-collapse order-lg-2">
                 <!-- Busca Desktop -->
                 <form class="d-flex flex-grow-1 me-lg-4 my-2 my-lg-0 d-none d-lg-flex" @submit.prevent="performSearch()">
-                    <input class="form-control me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="background-color: #f0f8ff !important; border: 1px solid #d0e8ff !important; color: #333 !important;">
+                    <input class="form-control bg-white me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="background-color: #f0f8ff !important; border: 1px solid #d0e8ff !important; color: #333 !important;">
                     <button class="btn rounded-circle" type="submit" style="background-color: #ffc107; border: none; color: #1a1a1a; width: 40px; height: 40px;">
                         <i class="bi bi-search"></i>
                     </button>
@@ -64,7 +102,7 @@
          x-transition:enter-end="opacity-100 translate-y-0"
          style="display: none;">
         <form class="d-flex" @submit.prevent="performSearch()">
-            <input class="form-control me-2" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="background-color: #f0f8ff !important; border: 1px solid #d0e8ff !important; color: #333 !important;">
+            <input class="form-control bg-white me-2" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="background-color: #f0f8ff !important; border: 1px solid #d0e8ff !important; color: #333 !important;">
             <button class="btn" type="button" @click="performSearch()" style="background-color: #ffc107; color: #1a1a1a;">
                 <i class="bi bi-search"></i>
             </button>

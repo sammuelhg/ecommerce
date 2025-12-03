@@ -16,6 +16,11 @@ Route::get('/loja/categoria/{category}', [App\Http\Controllers\ShopController::c
 Route::get('/loja/categoria/{parent}/{category}', [App\Http\Controllers\ShopController::class, 'subcategory'])->name('shop.subcategory');
 Route::get('/loja/produto/{product}', [App\Http\Controllers\ShopController::class, 'show'])->name('shop.show');
 
+// Cart Routes
+Route::post('/loja/carrinho/sync', [App\Http\Controllers\CartController::class, 'sync'])->name('cart.sync');
+Route::get('/loja/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('checkout.index');
+
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/perfil', App\Livewire\UserProfile::class)->name('profile');
     Route::view('/meus-pedidos', 'user.orders')->name('user.orders');
@@ -35,6 +40,15 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
     Route::view('/products', 'admin.products.index')->name('products.index');
+    Route::view('/products/create', 'admin.products.create')->name('products.create');
+    Route::get('/products/{product}', function ($product) {
+        // Try to find by ID first, then by slug
+        $productModel = is_numeric($product) 
+            ? \App\Models\Product::findOrFail($product)
+            : \App\Models\Product::where('slug', $product)->firstOrFail();
+        
+        return view('admin.products.edit', ['product' => $productModel]);
+    })->name('products.edit');
     Route::view('/categories', 'admin.categories.index')->name('categories.index');
     Route::view('/orders', 'admin.orders.index')->name('orders.index');
     
@@ -42,6 +56,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::view('/types', 'admin.types.index')->name('types.index');
     Route::view('/materials', 'admin.materials.index')->name('materials.index');
     Route::view('/models', 'admin.models.index')->name('models.index');
+    Route::view('/colors', 'admin.colors.index')->name('colors.index');
+    Route::view('/sizes', 'admin.sizes.index')->name('sizes.index');
+
+    // Users
+    Route::view('/users', 'admin.users.index')->name('users.index');
 
     // Store Settings
     Route::get('/settings', [App\Http\Controllers\Admin\StoreSettingController::class, 'index'])->name('settings.index');
@@ -66,3 +85,7 @@ Route::get('/teste-main', function () {
     
     return view('shop', compact('productsJson'));
 })->name('shop.test');
+
+Route::get('/test-livewire', function () {
+    return view('test_livewire');
+});

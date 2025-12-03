@@ -109,12 +109,12 @@
                             @csrf
                             <div class="mb-3">
                                 <label for="email" class="form-label">E-mail</label>
-                                <input type="email" class="form-control" id="email" name="email"
+                                <input type="email" class="form-control bg-white" id="email" name="email"
                                        placeholder="seu@email.com" required autofocus>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="password" name="password"
+                                <input type="password" class="form-control bg-white" id="password" name="password"
                                        placeholder="••••••••" required>
                             </div>
                             <div class="form-check mb-3">
@@ -138,22 +138,22 @@
                             @csrf
                             <div class="mb-3">
                                 <label for="reg_name" class="form-label">Nome Completo</label>
-                                <input type="text" class="form-control" id="reg_name" name="name"
+                                <input type="text" class="form-control bg-white" id="reg_name" name="name"
                                        placeholder="Seu nome" required>
                             </div>
                             <div class="mb-3">
                                 <label for="reg_email" class="form-label">E-mail</label>
-                                <input type="email" class="form-control" id="reg_email" name="email"
+                                <input type="email" class="form-control bg-white" id="reg_email" name="email"
                                        placeholder="seu@email.com" required>
                             </div>
                             <div class="mb-3">
                                 <label for="reg_password" class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="reg_password" name="password"
+                                <input type="password" class="form-control bg-white" id="reg_password" name="password"
                                        placeholder="••••••••" required>
                             </div>
                             <div class="mb-3">
                                 <label for="reg_password_confirmation" class="form-label">Confirmar Senha</label>
-                                <input type="password" class="form-control" id="reg_password_confirmation"
+                                <input type="password" class="form-control bg-white" id="reg_password_confirmation"
                                        name="password_confirmation" placeholder="••••••••" required>
                             </div>
                             <div class="form-check mb-3">

@@ -15,14 +15,14 @@
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input wire:model.live.debounce.300ms="search" 
                        type="text" 
-                       class="form-control" 
+                       class="form-control bg-white" 
                        placeholder="Buscar produtos...">
             </div>
         </div>
 
         <!-- Filtro de Categoria -->
         <div class="col-md-4 mb-3">
-            <select wire:model.live="categoryFilter" class="form-select">
+            <select wire:model.live="categoryFilter" class="form-select bg-white">
                 <option value="">Todas as Categorias</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">
@@ -34,7 +34,7 @@
 
         <!-- Ordenação -->
         <div class="col-md-4 mb-3">
-            <select wire:model.live="sortBy" class="form-select">
+            <select wire:model.live="sortBy" class="form-select bg-white">
                 <option value="newest">Mais Recentes</option>
                 <option value="name">Nome (A-Z)</option>
                 <option value="price_asc">Menor Preço</option>
@@ -135,7 +135,7 @@
     @if($products->hasPages())
         <div class="row mt-5">
             <div class="col-12">
-                {{ $products->links() }}
+                {{ $products->links('pagination::bootstrap-5') }}
             </div>
         </div>
     @endif

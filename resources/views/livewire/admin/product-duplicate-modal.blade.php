@@ -13,8 +13,8 @@
                             <strong>Produto Original:</strong> {{ $originalProduct->name }}<br>
                             <small class="text-muted">
                                 Atributo: {{ $originalProduct->attribute ?? 'N/A' }} | 
-                                Cor: {{ $originalProduct->color ?? 'N/A' }} | 
-                                Tamanho: {{ $originalProduct->size ?? 'N/A' }}
+                                Cor: {{ $originalProduct->productColor->name ?? $originalProduct->color ?? 'N/A' }} | 
+                                Tamanho: {{ $originalProduct->productSize->name ?? $originalProduct->size ?? 'N/A' }}
                             </small>
                         </div>
 
@@ -27,18 +27,28 @@
                         <form wire:submit.prevent="duplicate">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Atributo (opcional)</label>
-                                <input type="text" class="form-control" wire:model="newAttribute" placeholder="Ex: Manga Longa, Estampado...">
+                                <input type="text" class="form-control bg-white" wire:model="newAttribute" placeholder="Ex: Manga Longa, Estampado...">
                                 <small class="form-text text-muted">Campo genérico adicionado ao título do produto</small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Cor</label>
-                                <input type="text" class="form-control" wire:model="newColor" placeholder="Ex: Vermelho, Azul...">
+                                <select class="form-select bg-white" wire:model="newColorId">
+                                    <option value="">Selecione uma cor...</option>
+                                    @foreach($availableColors as $color)
+                                        <option value="{{ $color->id }}">{{ $color->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tamanho</label>
-                                <input type="text" class="form-control" wire:model="newSize" placeholder="Ex: P, M, G, GG...">
+                                <select class="form-select bg-white" wire:model="newSizeId">
+                                    <option value="">Selecione um tamanho...</option>
+                                    @foreach($availableSizes as $size)
+                                        <option value="{{ $size->id }}">{{ $size->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="alert alert-warning">

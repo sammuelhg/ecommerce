@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Configure pagination to use Bootstrap 5
+        \Illuminate\Pagination\Paginator::useBootstrapFive();
+        
         // Share settings with all views
         view()->composer('*', function ($view) {
             // Cache settings for performance if needed, but for now direct query

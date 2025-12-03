@@ -49,7 +49,8 @@ class ProductMaterialIndex extends Component
     {
         $materials = ProductMaterial::where('name', 'like', '%' . $this->search . '%')
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10)
+            ->withPath(route('admin.materials.index'));
 
         return view('livewire.admin.product-material-index', [
             'materials' => $materials

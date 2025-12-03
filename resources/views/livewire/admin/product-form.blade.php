@@ -25,7 +25,55 @@
     <div class="container-fluid px-4 pb-5">
         
         <!-- Product Identity Section (Always Visible) -->
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4" 
+             x-data="{
+                 types: @js($types->pluck('name', 'id')->toArray()),
+                 models: @js($models->pluck('name', 'id')->toArray()),
+                 materials: @js($materials->pluck('name', 'id')->toArray()),
+                 colors: @js($colors->pluck('name', 'id')->toArray()),
+                 sizes: @js($sizes->pluck('name', 'id')->toArray()),
+                 
+                 generateTitle() {
+                     let parts = [];
+                     
+                     if ($wire.product_type_id && this.types[$wire.product_type_id]) {
+                         parts.push(this.types[$wire.product_type_id]);
+                     }
+                     
+                     if ($wire.product_model_id && this.models[$wire.product_model_id]) {
+                         parts.push(this.models[$wire.product_model_id]);
+                     }
+                     
+                     if ($wire.product_material_id && this.materials[$wire.product_material_id]) {
+                         parts.push('em ' + this.materials[$wire.product_material_id]);
+                     }
+                     
+                     if ($wire.attribute) {
+                         parts.push($wire.attribute);
+                     }
+                     
+                     if ($wire.product_color_id && this.colors[$wire.product_color_id]) {
+                         parts.push('– ' + this.colors[$wire.product_color_id]);
+                     }
+                     
+                     if ($wire.product_size_id && this.sizes[$wire.product_size_id]) {
+                         parts.push('Tamanho ' + this.sizes[$wire.product_size_id]);
+                     }
+                     
+                     if (parts.length > 0) {
+                         let title = parts.join(' ');
+                         // Capitalize first letter of each word
+                         title = title.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+                         $wire.name = title;
+                     }
+                 }
+             }"
+             x-init="$watch('$wire.product_type_id', () => generateTitle());
+                     $watch('$wire.product_model_id', () => generateTitle());
+                     $watch('$wire.product_material_id', () => generateTitle());
+                     $watch('$wire.product_color_id', () => generateTitle());
+                     $watch('$wire.product_size_id', () => generateTitle());
+                     $watch('$wire.attribute', () => generateTitle());">
             <div class="card-body bg-light rounded-3 p-4">
                 <div class="row align-items-center">
                     <div class="col-md-9">

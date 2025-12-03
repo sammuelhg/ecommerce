@@ -1,0 +1,35 @@
+Products found: 2
+--------------------------------
+ID: 65
+Name: Whey Protein Concentrado Em Cafeína – Rosa Tamanho M
+Slug: whey-protein-concentrado-em-cafeina-rosa-tamanho-m
+Model ID: 56
+Type ID: 45
+Color ID: 3
+Color String: 
+Size ID: 2
+Size String: 
+Relation Size Name: M
+--------------------------------
+ID: 66
+Name: Whey Protein Concentrado Em Cafeína – Verde Tamanho M
+Slug: whey-protein-concentrado-em-cafeina-verde-tamanho-m
+Model ID: 56
+Type ID: 45
+Color ID: 4
+Color String: 
+Size ID: 2
+Size String: G
+Relation Size Name: M
+
+All Sizes:
+ID: 1 - Name: P
+ID: 2 - Name: M
+ID: 3 - Name: G
+ID: 4 - Name: GG
+ID: 5 - Name: Único
+ID: 6 - Name: 1kg
+ID: 7 - Name: 300g
+ID: 8 - Name: 250g
+ID: 9 - Name: 120 cápsulas
+ID: 10 - Name: 60 cápsulas

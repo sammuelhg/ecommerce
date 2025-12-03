@@ -10,7 +10,22 @@
         @if(count($cartItems) > 0)
             <div class="list-group list-group-flush">
                 @foreach($cartItems as $item)
-                    <div class="list-group-item px-0 py-3 border-bottom" wire:key="cart-item-{{ $item['id'] }}">
+                    <div class="list-group-item px-0 py-3 border-bottom" 
+                         wire:key="cart-item-{{ $item['id'] }}"
+                         x-data="{ 
+                            qty: {{ $item['qty'] }}, 
+                            timeout: null,
+                            updateQty(delta) {
+                                const newQty = Math.max(1, this.qty + delta);
+                                this.qty = newQty;
+                                
+                                // Debounce server update
+                                clearTimeout(this.timeout);
+                                this.timeout = setTimeout(() => {
+                                    $wire.updateQty({{ $item['id'] }}, this.qty);
+                                }, 500);
+                            }
+                         }">
                         <div class="d-flex gap-3">
                             <div class="flex-shrink-0">
                                 <img src="https://placehold.co/80x80/2c3e50/ffffff?text={{ $item['image'] ?? 'Prod' }}" 
@@ -19,16 +34,24 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <h6 class="mb-1 line-clamp-2">{{ $item['name'] }}</h6>
-                                    <button wire:click="removeItem({{ $item['id'] }})" class="btn btn-link text-danger p-0 ms-2" wire:loading.attr="disabled">
+                                    <button wire:click="removeItem({{ $item['id'] }})" 
+                                            class="btn btn-link text-danger p-0 ms-2" 
+                                            wire:loading.attr="disabled">
                                         <i class="bi bi-trash" wire:loading.remove wire:target="removeItem({{ $item['id'] }})"></i>
                                         <span class="spinner-border spinner-border-sm" wire:loading wire:target="removeItem({{ $item['id'] }})"></span>
                                     </button>
                                 </div>
                                 <p class="text-primary fw-bold mb-2">R$ {{ number_format($item['price'], 2, ',', '.') }}</p>
                                 <div class="d-flex align-items-center" style="width: 120px;">
-                                    <button wire:click="updateQty({{ $item['id'] }}, {{ $item['qty'] - 1 }})" class="btn btn-sm btn-outline-secondary" {{ $item['qty'] <= 1 ? 'disabled' : '' }} wire:loading.attr="disabled">-</button>
-                                    <input type="text" class="form-control form-control-sm text-center mx-1" value="{{ $item['qty'] }}" readonly>
-                                    <button wire:click="updateQty({{ $item['id'] }}, {{ $item['qty'] + 1 }})" class="btn btn-sm btn-outline-secondary" wire:loading.attr="disabled">+</button>
+                                    <button @click="updateQty(-1)" 
+                                            class="btn btn-sm btn-outline-secondary" 
+                                            :disabled="qty <= 1">-</button>
+                                    <input type="text" 
+                                           class="form-control bg-white form-control-sm text-center mx-1" 
+                                           x-model="qty" 
+                                           readonly>
+                                    <button @click="updateQty(1)" 
+                                            class="btn btn-sm btn-outline-secondary">+</button>
                                 </div>
                             </div>
                         </div>

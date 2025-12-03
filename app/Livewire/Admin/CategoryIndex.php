@@ -57,7 +57,8 @@ class CategoryIndex extends Component
         return view('livewire.admin.category-index', [
             'categories' => Category::where('name', 'like', '%' . $this->search . '%')
                 ->withCount('products')
-                ->paginate(10),
+                ->paginate(10)
+                ->withPath(route('admin.categories.index')),
         ]);
     }
 }

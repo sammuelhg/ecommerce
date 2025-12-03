@@ -14,6 +14,7 @@ use Livewire\WithFileUploads;
 class ProductForm extends Component
 {
     use WithFileUploads;
+    use \Livewire\WithPagination;
     use ProductKitTrait; // módulo de kits separado
 
     public $productId;
@@ -38,9 +39,11 @@ class ProductForm extends Component
     public $product_type_id = '';
     public $product_model_id = '';
     public $product_material_id = '';
-    public $color = '';
+    public $product_color_id = '';
+    public $product_size_id = '';
+    public $color = ''; // Deprecated, mantido para compatibilidade temporária
     public $attribute = '';
-    public $size = '';
+    public $size = ''; // Deprecated, mantido para compatibilidade temporária
 
 
 
@@ -71,8 +74,8 @@ class ProductForm extends Component
             'product_type_id' => 'nullable|exists:product_types,id',
             'product_model_id' => 'nullable|exists:product_models,id',
             'product_material_id' => 'nullable|exists:product_materials,id',
-            'color' => 'nullable|string|max:50',
-            'size' => 'nullable|string|max:20',
+            'product_color_id' => 'nullable|exists:product_colors,id',
+            'product_size_id' => 'nullable|exists:product_sizes,id',
         ];
     }
 
@@ -120,8 +123,10 @@ class ProductForm extends Component
         $this->product_type_id = $product->product_type_id;
         $this->product_model_id = $product->product_model_id;
         $this->product_material_id = $product->product_material_id;
-        $this->color = $product->color;
-        $this->size = $product->size;
+        $this->product_color_id = $product->product_color_id;
+        $this->product_size_id = $product->product_size_id;
+        $this->color = $product->color; // Legacy field
+        $this->size = $product->size; // Legacy field
         $this->attribute = $product->attribute;
 
         // Load existing images
@@ -154,6 +159,8 @@ class ProductForm extends Component
             'product_type_id',
             'product_model_id',
             'product_material_id',
+            'product_color_id',
+            'product_size_id',
             'color',
             'size',
             'attribute'
@@ -180,13 +187,33 @@ class ProductForm extends Component
 
     public function generateTitle()
     {
+        // Get color and size names from IDs
+        $colorName = '';
+        $sizeName = '';
+        
+        if ($this->product_color_id) {
+            $color = \App\Models\ProductColor::find($this->product_color_id);
+            $colorName = $color ? $color->name : '';
+        } elseif ($this->color) {
+            // Fallback to legacy text field
+            $colorName = $this->color;
+        }
+        
+        if ($this->product_size_id) {
+            $size = \App\Models\ProductSize::find($this->product_size_id);
+            $sizeName = $size ? $size->name : '';
+        } elseif ($this->size) {
+            // Fallback to legacy text field
+            $sizeName = $this->size;
+        }
+        
         $this->name = app(\App\Services\ProductTitleService::class)->generateTitle(
             $this->product_type_id,
             $this->product_model_id,
             $this->product_material_id,
             $this->attribute,
-            $this->color,
-            $this->size
+            $colorName,
+            $sizeName
         );
 
         $this->generateSlug();
@@ -205,8 +232,8 @@ class ProductForm extends Component
         \Log::info('generateSku called', [
             'category_id' => $this->category_id,
             'product_type_id' => $this->product_type_id,
-            'color' => $this->color,
-            'size' => $this->size,
+            'product_color_id' => $this->product_color_id,
+            'product_size_id' => $this->product_size_id,
         ]);
         
         // Only generate if we have the minimum required fields
@@ -224,12 +251,30 @@ class ProductForm extends Component
             \Log::warning('SKU not generated - category or type not found in DB');
             return;
         }
+        
+        // Get color code
+        $colorCode = 'STD';
+        if ($this->product_color_id) {
+            $color = \App\Models\ProductColor::find($this->product_color_id);
+            $colorCode = $color && $color->code ? $color->code : 'STD';
+        } elseif ($this->color) {
+            $colorCode = $this->color;
+        }
+        
+        // Get size code
+        $sizeCode = 'U';
+        if ($this->product_size_id) {
+            $size = \App\Models\ProductSize::find($this->product_size_id);
+            $sizeCode = $size && $size->code ? $size->code : 'U';
+        } elseif ($this->size) {
+            $sizeCode = $this->size;
+        }
 
         $this->sku = app(\App\Services\SkuGeneratorService::class)->generate(
             $category->name,
             $type->name,
-            $this->color ?: 'STD', // Standard if no color
-            $this->size ?: 'U',  // Universal if no size
+            $colorCode,
+            $sizeCode,
             $this->productId  // Exclude current product ID when editing
         );
         
@@ -296,6 +341,8 @@ class ProductForm extends Component
                 'product_type_id' => $this->product_type_id,
                 'product_model_id' => $this->product_model_id,
                 'product_material_id' => $this->product_material_id,
+                'product_color_id' => $this->product_color_id,
+                'product_size_id' => $this->product_size_id,
                 'color' => $this->color,
                 'size' => $this->size,
                 'attribute' => $this->attribute,
@@ -563,6 +610,8 @@ class ProductForm extends Component
         $types = ProductType::where('is_active', true)->get();
         $models = ProductModel::where('is_active', true)->get();
         $materials = ProductMaterial::where('is_active', true)->get();
+        $colors = \App\Models\ProductColor::where('is_active', true)->get();
+        $sizes = \App\Models\ProductSize::where('is_active', true)->get();
 
         // Carregar categorias para o select (hierarquia simples para visualização)
         $categories = Category::with('parent')->get()->map(function($category) {
@@ -576,11 +625,24 @@ class ProductForm extends Component
             ];
         })->sortBy('name');
 
+        // Kit Products Pagination
+        $kitProducts = null;
+        if ($this->isKit) {
+            $kitProducts = Product::where('name', 'like', '%' . $this->productSearch . '%')
+                ->where('id', '!=', $this->productId)
+                ->where('is_active', true)
+                ->paginate(5, ['*'], 'kit_page')
+                ->withPath(route('admin.products.edit', $this->productId));
+        }
+
         return view('livewire.admin.product-form', [
             'categories' => $categories,
             'types' => $types,
             'models' => $models,
             'materials' => $materials,
+            'colors' => $colors,
+            'sizes' => $sizes,
+            'kitProducts' => $kitProducts,
         ])->layout('layouts.admin');
     }
 }

@@ -8,12 +8,7 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+
 
                     <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -29,7 +24,7 @@
                                             <img src="{{ $settings['store_logo'] }}" alt="Logo Atual" style="height: 60px;">
                                         </div>
                                     @endif
-                                    <input type="file" class="form-control" name="store_logo" accept="image/*">
+                                    <input type="file" class="form-control bg-white" name="store_logo" accept="image/*">
                                 </div>
                                 <div class="form-text">Recomendado: PNG transparente, altura min. 90px.</div>
                             </div>
@@ -41,29 +36,29 @@
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Cor Primária (Primary)</label>
                                 <div class="input-group">
-                                    <input type="color" class="form-control form-control-color" name="color_primary" value="{{ $settings['color_primary'] ?? '#0d6efd' }}" title="Escolher cor">
-                                    <input type="text" class="form-control" value="{{ $settings['color_primary'] ?? '#0d6efd' }}" readonly>
+                                    <input type="color" class="form-control form-control-color bg-white" name="color_primary" value="{{ $settings['color_primary'] ?? '#0d6efd' }}" title="Escolher cor">
+                                    <input type="text" class="form-control bg-white" value="{{ $settings['color_primary'] ?? '#0d6efd' }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Cor Secundária (Secondary)</label>
                                 <div class="input-group">
-                                    <input type="color" class="form-control form-control-color" name="color_secondary" value="{{ $settings['color_secondary'] ?? '#6c757d' }}" title="Escolher cor">
-                                    <input type="text" class="form-control" value="{{ $settings['color_secondary'] ?? '#6c757d' }}" readonly>
+                                    <input type="color" class="form-control form-control-color bg-white" name="color_secondary" value="{{ $settings['color_secondary'] ?? '#6c757d' }}" title="Escolher cor">
+                                    <input type="text" class="form-control bg-white" value="{{ $settings['color_secondary'] ?? '#6c757d' }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Cor de Destaque (Accent)</label>
                                 <div class="input-group">
-                                    <input type="color" class="form-control form-control-color" name="color_accent" value="{{ $settings['color_accent'] ?? '#ffc107' }}" title="Escolher cor">
-                                    <input type="text" class="form-control" value="{{ $settings['color_accent'] ?? '#ffc107' }}" readonly>
+                                    <input type="color" class="form-control form-control-color bg-white" name="color_accent" value="{{ $settings['color_accent'] ?? '#ffc107' }}" title="Escolher cor">
+                                    <input type="text" class="form-control bg-white" value="{{ $settings['color_accent'] ?? '#ffc107' }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Cor de Fundo (Background)</label>
                                 <div class="input-group">
-                                    <input type="color" class="form-control form-control-color" name="color_background" value="{{ $settings['color_background'] ?? '#f8f9fa' }}" title="Escolher cor">
-                                    <input type="text" class="form-control" value="{{ $settings['color_background'] ?? '#f8f9fa' }}" readonly>
+                                    <input type="color" class="form-control form-control-color bg-white" name="color_background" value="{{ $settings['color_background'] ?? '#f8f9fa' }}" title="Escolher cor">
+                                    <input type="text" class="form-control bg-white" value="{{ $settings['color_background'] ?? '#f8f9fa' }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -73,11 +68,11 @@
                         <div class="row mb-4">
                             <div class="col-md-8 mb-3">
                                 <label class="form-label">Endereço Completo</label>
-                                <textarea class="form-control" name="store_address" rows="3">{{ $settings['store_address'] ?? '' }}</textarea>
+                                <textarea class="form-control bg-white" name="store_address" rows="3">{{ $settings['store_address'] ?? '' }}</textarea>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">CNPJ</label>
-                                <input type="text" class="form-control" name="store_cnpj" value="{{ $settings['store_cnpj'] ?? '' }}" placeholder="00.000.000/0000-00">
+                                <input type="text" class="form-control bg-white" name="store_cnpj" value="{{ $settings['store_cnpj'] ?? '' }}" placeholder="00.000.000/0000-00">
                             </div>
                         </div>
 
@@ -86,7 +81,7 @@
                         <div class="row mb-4">
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Adicionar Certificados (Imagens)</label>
-                                <input type="file" class="form-control" name="security_certificates[]" multiple accept="image/*">
+                                <input type="file" class="form-control bg-white" name="security_certificates[]" multiple accept="image/*">
                             </div>
                             
                             @if(count($certificates) > 0)

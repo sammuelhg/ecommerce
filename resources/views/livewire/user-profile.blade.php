@@ -28,7 +28,7 @@
                                     <label for="name" class="form-label">Nome Completo *</label>
                                     <input type="text" 
                                            wire:model="name" 
-                                           class="form-control @error('name') is-invalid @enderror" 
+                                           class="form-control bg-white @error('name') is-invalid @enderror" 
                                            id="name">
                                     @error('name') 
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -40,7 +40,7 @@
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" 
                                            value="{{ $email }}" 
-                                           class="form-control" 
+                                           class="form-control bg-white" 
                                            id="email" 
                                            readonly>
                                     <small class="text-muted">O email não pode ser alterado</small>
@@ -51,7 +51,7 @@
                                     <label for="phone" class="form-label">Telefone</label>
                                     <input type="text" 
                                            wire:model="phone" 
-                                           class="form-control @error('phone') is-invalid @enderror" 
+                                           class="form-control bg-white @error('phone') is-invalid @enderror" 
                                            id="phone"
                                            placeholder="(00) 00000-0000">
                                     @error('phone') 
@@ -64,7 +64,7 @@
                                     <label for="birth_date" class="form-label">Data de Nascimento</label>
                                     <input type="date" 
                                            wire:model="birth_date" 
-                                           class="form-control @error('birth_date') is-invalid @enderror" 
+                                           class="form-control bg-white @error('birth_date') is-invalid @enderror" 
                                            id="birth_date">
                                     @error('birth_date') 
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -75,7 +75,7 @@
                                 <div class="col-12">
                                     <label for="address" class="form-label">Endereço Completo</label>
                                     <textarea wire:model="address" 
-                                              class="form-control @error('address') is-invalid @enderror" 
+                                              class="form-control bg-white @error('address') is-invalid @enderror" 
                                               id="address" 
                                               rows="3"
                                               placeholder="Rua, Número, Complemento, Bairro, Cidade - UF, CEP"></textarea>

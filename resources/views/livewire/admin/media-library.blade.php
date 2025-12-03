@@ -13,7 +13,7 @@
                         <div class="col-12 mb-3">
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                <input type="text" wire:model.live.debounce.300ms="librarySearch" class="form-control" placeholder="Buscar imagens...">
+                                <input type="text" wire:model.live.debounce.300ms="librarySearch" class="form-control bg-white" placeholder="Buscar imagens...">
                             </div>
                         </div>
 

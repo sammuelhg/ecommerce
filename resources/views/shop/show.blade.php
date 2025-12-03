@@ -202,7 +202,50 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold mb-2">Quantidade:</label>
                         
-                        @livewire('shop.add-to-cart-button', ['product' => $product], key('add-to-cart-'.$product->id))
+                        <!-- Client-Side Add to Cart (Pure Alpine.js) -->
+                        <div class="d-flex gap-3 align-items-stretch" 
+                             x-data="{ 
+                                 quantity: 1, 
+                                 maxStock: {{ $product->stock }},
+                                 product: {
+                                     id: {{ $product->id }},
+                                     name: '{{ addslashes($product->name) }}',
+                                     price: {{ $product->price }},
+                                     image: '{{ $product->image }}',
+                                     slug: '{{ $product->slug }}'
+                                 }
+                             }">
+                            <!-- Seletor de Quantidade -->
+                            <div class="input-group" style="width: 140px;">
+                                <button class="btn btn-outline-secondary" type="button" @click="quantity = Math.max(1, quantity - 1)">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <input type="number" class="form-control text-center border-secondary" 
+                                       x-model.number="quantity" min="1" :max="maxStock" 
+                                       style="-moz-appearance: textfield;"
+                                       @input="quantity = Math.max(1, Math.min(maxStock, parseInt(quantity) || 1))">
+                                <button class="btn btn-outline-secondary" type="button" @click="quantity = Math.min(maxStock, quantity + 1)">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+
+                            <!-- Botões de Ação -->
+                            <div class="flex-grow-1 d-flex gap-2">
+                                <button @click="addToCart(product, quantity); 
+                                                showAlert('{{ addslashes($product->name) }} adicionado ao carrinho!', 'success')" 
+                                        class="btn btn-primary flex-grow-1 d-flex align-items-center justify-content-center py-2">
+                                    <i class="bi bi-cart-plus-fill me-2"></i>
+                                    <span>Adicionar ao Carrinho</span>
+                                </button>
+                                
+                                <button @click="toggleWishlist(product)" 
+                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-center px-3"
+                                        :class="{ 'text-danger': isInWishlist(product.id) }"
+                                        title="Adicionar aos Favoritos">
+                                    <i class="bi fs-5" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
+                                </button>
+                            </div>
+                        </div>
 
                         <small class="text-muted mt-2 d-block">
                             <i class="bi bi-box-seam me-1"></i>{{ $product->stock }} unidades disponíveis
@@ -330,7 +373,79 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 @foreach($relatedProducts as $related)
                     <div class="col">
-                        @livewire('shop.product-card', ['product' => $related], key('related-'.$related->id))
+                        <!-- Client-Side Product Card (Pure Alpine.js) -->
+                        <div class="card product-card h-100" 
+                             x-data="{ 
+                                 product: {
+                                     id: {{ $related->id }},
+                                     name: '{{ addslashes($related->name) }}',
+                                     price: {{ $related->price }},
+                                     image: '{{ $related->image }}',
+                                     slug: '{{ $related->slug }}'
+                                 }
+                             }">
+                            <!-- Imagem do Produto -->
+                            <a href="{{ route('shop.show', $related->slug ?: $related->id) }}" class="text-decoration-none">
+                                @if($related->image)
+                                    <img src="{{ Str::startsWith($related->image, 'http') ? $related->image : asset('storage/' . $related->image) }}" 
+                                         class="card-img-top" 
+                                         alt="{{ $related->name }}"
+                                         style="height: 200px; object-fit: cover;"
+                                         onerror="this.onerror=null;this.src='https://placehold.co/350x200/f0f8ff/1a1a1a?text=Imagem+Indispon%C3%ADvel';">
+                                @else
+                                    <img src="https://placehold.co/350x200/f0f8ff/1a1a1a?text={{ urlencode($related->name) }}" 
+                                         class="card-img-top" 
+                                         alt="{{ $related->name }}"
+                                         style="height: 200px; object-fit: cover;">
+                                @endif
+                            </a>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <!-- Título do Produto -->
+                                <a href="{{ route('shop.show', $related->slug ?: $related->id) }}" class="text-decoration-none">
+                                    <h5 class="card-title fw-bold text-primary mb-0">{{ $related->name }}</h5>
+                                </a>
+                                
+                                <!-- Preço e Ícones -->
+                                <div class="d-flex justify-content-between align-items-center mt-1 mb-3">
+                                    <div>
+                                        @if($related->is_offer && $related->old_price)
+                                            <div>
+                                                <span class="fw-bolder text-success fs-5">R$ {{ number_format($related->price, 2, ',', '.') }}</span>
+                                                <br>
+                                                <small class="text-muted text-decoration-line-through">R$ {{ number_format($related->old_price, 2, ',', '.') }}</small>
+                                            </div>
+                                        @else
+                                            <span class="fw-bolder text-success fs-5">R$ {{ number_format($related->price, 2, ',', '.') }}</span>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Ícones de Ação -->
+                                    <div>
+                                        <button @click="toggleWishlist(product)" 
+                                                class="btn btn-link text-decoration-none p-0 action-icon me-3" 
+                                                :class="isInWishlist(product.id) ? 'text-danger' : 'text-secondary'"
+                                                title="Adicionar aos Favoritos">
+                                            <i class="bi" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
+                                        </button>
+                                        
+                                        <a href="#" 
+                                           class="text-secondary action-icon text-decoration-none" 
+                                           title="Compartilhar"
+                                           @click.prevent="navigator.share ? navigator.share({title: '{{ addslashes($related->name) }}', url: '{{ route('shop.show', $related->slug) }}'}) : alert('Compartilhamento não suportado')">
+                                            <i class="bi bi-share-fill"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botão Adicionar ao Carrinho -->
+                                <button @click="addToCart(product, 1); showAlert('{{ addslashes($related->name) }} adicionado!', 'success')" 
+                                        class="btn btn-primary d-flex align-items-center justify-content-center py-2 mt-auto">
+                                    <i class="bi bi-cart-plus-fill me-2"></i>
+                                    <span>Adicionar</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 @endforeach
             </div>

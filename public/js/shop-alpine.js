@@ -18,21 +18,34 @@ function shopApp() {
             this.loadSearchHistory();
         },
         loadFromStorage() {
-            const storedCart = localStorage.getItem('myShopCart');
-            const storedWishlist = localStorage.getItem('myShopWishlist');
-            if (storedCart) {
-                const parsedCart = JSON.parse(storedCart);
-                this.cart = parsedCart.map(item => {
-                    const fresh = this.products.find(p => p.id === item.id);
-                    return fresh ? { ...fresh, qty: item.qty } : null;
-                }).filter(i => i);
+            // Prioritize Server Cart if available and not empty (Source of Truth)
+            if (window.SERVER_CART && window.SERVER_CART.length > 0) {
+                this.cart = window.SERVER_CART.map(item => {
+                    // Ensure imageText is set if missing (compatibility)
+                    if (!item.imageText && item.image) item.imageText = item.image;
+                    return item;
+                });
+                // Sync localStorage with Server Cart
+                localStorage.setItem('myShopCart', JSON.stringify(this.cart));
+            } else {
+                // Fallback to localStorage (e.g. session expired but local data exists)
+                const storedCart = localStorage.getItem('myShopCart');
+                if (storedCart) {
+                    const parsedCart = JSON.parse(storedCart);
+                    this.cart = parsedCart.map(item => {
+                        const fresh = this.products.find(p => p.id === item.id);
+                        return fresh ? { ...fresh, qty: item.qty } : item;
+                    });
+                }
             }
+
+            const storedWishlist = localStorage.getItem('myShopWishlist');
             if (storedWishlist) {
                 const parsed = JSON.parse(storedWishlist);
                 this.wishlist = parsed.map(item => {
                     const fresh = this.products.find(p => p.id === item.id);
-                    return fresh ? fresh : null;
-                }).filter(i => i);
+                    return fresh ? fresh : item;
+                });
             }
         },
         setupWatchers() {
@@ -43,14 +56,14 @@ function shopApp() {
         get cartSubtotal() { return this.cart.reduce((s, i) => s + (i.price * i.qty), 0); },
         get offerProducts() { return this.products.filter(p => p.isOffer); },
         formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); },
-        addToCart(product) {
-            console.log('Adding to cart:', product);
+        addToCart(product, quantity = 1) {
+            console.log('Adding to cart:', product, quantity);
             const ex = this.cart.find(i => i.id === product.id);
             if (ex) {
-                ex.qty++;
-                this.showAlert(`Mais um item de "${this.truncate(product.name, 20)}" adicionado!`, 'success');
+                ex.qty += quantity;
+                this.showAlert(`Mais ${quantity} item(s) de "${this.truncate(product.name, 20)}" adicionado!`, 'success');
             } else {
-                const item = { ...product, qty: 1 };
+                const item = { ...product, qty: quantity };
                 if (!item.imageText && item.image) item.imageText = item.image;
                 this.cart.push(item);
                 this.showAlert(`"${this.truncate(product.name, 20)}" adicionado ao carrinho!`, 'success');
@@ -72,8 +85,11 @@ function shopApp() {
                 this.showAlert(`"${this.truncate(product.name, 20)}" salvo na lista de desejos!`, 'success');
             }
         },
-        showAlert(msg, type = 'info') { const id = this.alertId++; this.alerts.push({ id, msg, type }); setTimeout(() => this.removeAlert(id), 3000); },
-        removeAlert(id) { this.alerts = this.alerts.filter(a => a.id !== id); },
+        showAlert(msg, type = 'info') {
+            // Map 'danger' to 'error' for compatibility with toasts.blade.php
+            if (type === 'danger') type = 'error';
+            window.dispatchEvent(new CustomEvent('toast-' + type, { detail: msg }));
+        },
         truncate(text, len) { return text.length > len ? text.substring(0, len) + '...' : text; },
         performSearch() {
             if (!this.searchQuery.trim()) return;
@@ -85,6 +101,39 @@ function shopApp() {
             }
             // Redireciona para a página de busca
             window.location.href = `/loja/busca?q=${encodeURIComponent(this.searchQuery)}`;
+        },
+        async finalizePurchase() {
+            if (this.cart.length === 0) return;
+
+            // Show loading state if needed, or just redirect
+            this.showAlert('Processando...', 'info');
+
+            try {
+                const response = await fetch('/loja/carrinho/sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ cart: this.cart })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.redirect_url) {
+                        // Clear cart after successful sync if you want, or keep it until order is confirmed
+                        // localStorage.removeItem('myShopCart'); 
+                        // this.cart = [];
+                        window.location.href = data.redirect_url;
+                    }
+                } else {
+                    console.error('Failed to sync cart');
+                    this.showAlert('Erro ao finalizar compra. Tente novamente.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.showAlert('Erro ao conectar com o servidor.', 'danger');
+            }
         },
         loadSearchHistory() { const s = localStorage.getItem('recentSearches'); if (s) this.recentSearches = JSON.parse(s); }
     };

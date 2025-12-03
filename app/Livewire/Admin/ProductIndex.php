@@ -13,13 +13,11 @@ class ProductIndex extends Component
     use WithPagination;
 
     public $search = '';
-    public $showCreateForm = false;
-    public $editingProductId = null;
+    // public $showCreateForm = false; // Removed
+    // public $editingProductId = null; // Removed
 
     protected $paginationTheme = 'bootstrap';
     
-    // protected $listeners = ['productSaved' => 'refreshList', 'closeForm' => 'closeForm'];
-
     public function updatingSearch()
     {
         $this->resetPage();
@@ -31,26 +29,9 @@ class ProductIndex extends Component
         session()->flash('message', 'Produto excluído com sucesso.');
     }
     
-    public function edit($id)
-    {
-        $this->editingProductId = $id;
-        $this->showCreateForm = true;
-    }
+    // Edit method removed (using routes)
     
-    #[On('productSaved')]
-    public function refreshList()
-    {
-        $this->showCreateForm = false;
-        $this->editingProductId = null;
-        $this->resetPage();
-    }
-    
-    #[On('closeForm')]
-    public function closeForm()
-    {
-        $this->showCreateForm = false;
-        $this->editingProductId = null;
-    }
+    // Listeners for inline form removed
 
     public $duplicatingProductId = null;
 
@@ -74,7 +55,8 @@ class ProductIndex extends Component
             'products' => Product::with('category')
                 ->where('name', 'like', '%' . $this->search . '%')
                 ->orderBy('created_at', 'desc')
-                ->paginate(10),
+                ->paginate(10)
+                ->withPath(route('admin.products.index')),
         ]);
     }
 }

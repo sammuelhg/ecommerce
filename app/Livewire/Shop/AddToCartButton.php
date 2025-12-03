@@ -10,7 +10,6 @@ use App\Services\CartService;
 class AddToCartButton extends Component
 {
     public Product $product;
-    public int $quantity = 1;
     public bool $inWishlist = false;
 
     public function mount(WishlistService $wishlist)
@@ -18,11 +17,27 @@ class AddToCartButton extends Component
         $this->inWishlist = $wishlist->has($this->product->id);
     }
 
-    public function addToCart(CartService $cart)
+    public function addToCart(int $quantity, CartService $cart)
     {
-        $cart->add($this->product, $this->quantity);
+        // Validate quantity
+        $quantity = max(1, min($quantity, (int) $this->product->stock));
+        
+        $cart->add($this->product, $quantity);
         $this->dispatch('cartUpdated');
-        $this->dispatch('toast-success', message: 'Produto adicionado ao carrinho!');
+        
+        // Dispatch event for Client-Side Alpine Cart
+        $this->dispatch('add-to-cart', [
+            'product' => [
+                'id' => $this->product->id,
+                'name' => $this->product->name,
+                'price' => $this->product->price,
+                'image' => $this->product->image,
+                'slug' => $this->product->slug,
+            ],
+            'quantity' => $quantity
+        ]);
+        
+        // Toast is now shown optimistically on client-side for instant feedback
     }
 
     public function toggleWishlist(WishlistService $wishlist)
@@ -34,20 +49,6 @@ class AddToCartButton extends Component
             $this->dispatch('toast-success', message: 'Produto adicionado à lista de desejos!');
         } else {
             $this->dispatch('toast-info', message: 'Produto removido da lista de desejos.');
-        }
-    }
-
-    public function increment()
-    {
-        if ($this->quantity < (int) $this->product->stock) {
-            $this->quantity++;
-        }
-    }
-
-    public function decrement()
-    {
-        if ($this->quantity > 1) {
-            $this->quantity--;
         }
     }
 

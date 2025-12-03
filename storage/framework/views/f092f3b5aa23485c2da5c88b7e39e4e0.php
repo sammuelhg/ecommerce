@@ -58,6 +58,30 @@
             width: 20px;
         }
         
+        /* Submenu styles */
+        .admin-nav .nav-link[data-bs-toggle="collapse"] {
+            cursor: pointer;
+        }
+        
+        .admin-nav .nav-link .bi-chevron-down {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .admin-nav .nav-link[aria-expanded="true"] .bi-chevron-down {
+            transform: rotate(180deg);
+        }
+        
+        .admin-nav .collapse .nav-link {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .admin-nav .collapse .nav-link i {
+            width: 16px;
+            font-size: 0.9rem;
+        }
+        
         .home-link {
             padding: 1rem 1.5rem;
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -100,7 +124,9 @@
                 <div class="d-flex flex-column h-100">
                     <!-- Logo -->
                     <div class="admin-logo">
-                        <img src="<?php echo e(asset('logo.svg')); ?>" alt="LosFit" style="height: 90px; width: auto;" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 60%22%3E%3Ctext x=%2210%22 y=%2240%22 font-family=%22Arial,sans-serif%22 font-size=%2230%22 font-weight=%22bold%22 fill=%22%23ffd700%22%3ELosFit%3C/text%3E%3C/svg%3E';">
+                        <a href="<?php echo e(route('shop.index')); ?>" target="_blank" title="Ir para a Loja">
+                            <img src="<?php echo e(asset('logo.svg')); ?>" alt="LosFit" style="height: 90px; width: auto;" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 60%22%3E%3Ctext x=%2210%22 y=%2240%22 font-family=%22Arial,sans-serif%22 font-size=%2230%22 font-weight=%22bold%22 fill=%22%23ffd700%22%3ELosFit%3C/text%3E%3C/svg%3E';">
+                        </a>
                     </div>
 
                     <!-- Logout Button -->
@@ -115,58 +141,121 @@
 
                     <!-- Navigation -->
                     <ul class="nav flex-column admin-nav pt-3">
+                        <!-- Dashboard -->
                         <li class="nav-item">
                             <a class="nav-link <?php echo e(request()->routeIs('admin.dashboard') ? 'active' : ''); ?>" 
                                href="<?php echo e(route('admin.dashboard')); ?>">
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
+
+                        <!-- Dados de Itens (Data Items) -->
                         <li class="nav-item">
-                            <a class="nav-link <?php echo e(request()->routeIs('admin.products.*') ? 'active' : ''); ?>" 
-                               href="<?php echo e(route('admin.products.index')); ?>">
-                                <i class="bi bi-box"></i> Produtos
+                            <a class="nav-link d-flex justify-content-between align-items-center" 
+                               data-bs-toggle="collapse" 
+                               href="#dataItemsMenu" 
+                               role="button" 
+                               aria-expanded="<?php echo e(request()->routeIs('admin.categories.*', 'admin.products.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'true' : 'false'); ?>">
+                                <span><i class="bi bi-database"></i> Dados de Itens</span>
+                                <i class="bi bi-chevron-down"></i>
                             </a>
+                            <div class="collapse <?php echo e(request()->routeIs('admin.categories.*', 'admin.products.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'show' : ''); ?>" 
+                                 id="dataItemsMenu">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.categories.*') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.categories.index')); ?>">
+                                            <i class="bi bi-folder"></i> Categorias
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.products.*') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.products.index')); ?>">
+                                            <i class="bi bi-box"></i> Produtos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.types.*') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.types.index')); ?>">
+                                            <i class="bi bi-tags"></i> Tipos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.models.*') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.models.index')); ?>">
+                                            <i class="bi bi-diagram-3"></i> Modelos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.materials.*') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.materials.index')); ?>">
+                                            <i class="bi bi-palette"></i> Materiais
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.colors.*') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.colors.index')); ?>">
+                                            <i class="bi bi-paint-bucket"></i> Cores
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.sizes.*') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.sizes.index')); ?>">
+                                            <i class="bi bi-rulers"></i> Tamanhos
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
+
+                        <!-- Pedidos (Orders) -->
                         <li class="nav-item">
-                            <a class="nav-link <?php echo e(request()->routeIs('admin.categories.*') ? 'active' : ''); ?>" 
-                               href="<?php echo e(route('admin.categories.index')); ?>">
-                                <i class="bi bi-folder"></i> Categorias
+                            <a class="nav-link d-flex justify-content-between align-items-center" 
+                               data-bs-toggle="collapse" 
+                               href="#ordersMenu" 
+                               role="button" 
+                               aria-expanded="<?php echo e(request()->routeIs('admin.orders.*') ? 'true' : 'false'); ?>">
+                                <span><i class="bi bi-cart-check"></i> Pedidos</span>
+                                <i class="bi bi-chevron-down"></i>
                             </a>
+                            <div class="collapse <?php echo e(request()->routeIs('admin.orders.*') ? 'show' : ''); ?>" 
+                                 id="ordersMenu">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.orders.incoming') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.orders.index', ['type' => 'incoming'])); ?>">
+                                            <i class="bi bi-box-arrow-in-down"></i> Entrada
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.orders.outgoing') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.orders.index', ['type' => 'outgoing'])); ?>">
+                                            <i class="bi bi-box-arrow-up"></i> Saída
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link <?php echo e(request()->routeIs('admin.orders.returns') ? 'active' : ''); ?>" 
+                                           href="<?php echo e(route('admin.orders.index', ['type' => 'returns'])); ?>">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Devoluções
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo e(request()->routeIs('admin.types.*') ? 'active' : ''); ?>" 
-                               href="<?php echo e(route('admin.types.index')); ?>">
-                                <i class="bi bi-tags"></i> Tipos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo e(request()->routeIs('admin.materials.*') ? 'active' : ''); ?>" 
-                               href="<?php echo e(route('admin.materials.index')); ?>">
-                                <i class="bi bi-palette"></i> Materiais
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo e(request()->routeIs('admin.models.*') ? 'active' : ''); ?>" 
-                               href="<?php echo e(route('admin.models.index')); ?>">
-                                <i class="bi bi-diagram-3"></i> Modelos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo e(request()->routeIs('admin.orders.*') ? 'active' : ''); ?>" 
-                               href="<?php echo e(route('admin.orders.index')); ?>">
-                                <i class="bi bi-cart-check"></i> Pedidos
-                            </a>
-                        </li>
+
+                        <!-- Configurações -->
                         <li class="nav-item">
                             <a class="nav-link <?php echo e(request()->routeIs('admin.settings.*') ? 'active' : ''); ?>" 
                                href="<?php echo e(route('admin.settings.index')); ?>">
                                 <i class="bi bi-gear"></i> Configurações
                             </a>
                         </li>
+
+                        <!-- Usuários Clientes -->
                         <li class="nav-item">
-                            <a class="nav-link <?php echo e(request()->routeIs('profile') ? 'active' : ''); ?>" 
-                               href="<?php echo e(route('profile')); ?>">
-                                <i class="bi bi-person-circle"></i> Meu Perfil
+                            <a class="nav-link <?php echo e(request()->routeIs('admin.users.*') ? 'active' : ''); ?>" 
+                               href="<?php echo e(route('admin.users.index')); ?>">
+                                <i class="bi bi-people"></i> Usuários Clientes
                             </a>
                         </li>
                     </ul>
@@ -187,14 +276,125 @@
                     <h1 class="h2 mb-0"><?php echo $__env->yieldContent('title', 'Dashboard'); ?></h1>
                 </div>
                 
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success') || session('message')): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i> <?php echo e(session('success') ?? session('message')); ?>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('error')): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> <?php echo e(session('error')); ?>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
                 <?php echo $__env->yieldContent('content'); ?>
             </main>
         </div>
     </div>
 
-    <?php echo $__env->yieldPushContent('scripts'); ?>
+    <!-- Media Library Modal Component -->
+    <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('admin.media-library', []);
+
+$key = null;
+
+$key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-3880656569-0', null);
+
+$__html = app('livewire')->mount($__name, $__params, $key);
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+        <div id="validationToast" class="toast" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong class="me-auto">Erro de Validação</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="validationToastBody"></div>
+        </div>
+    </div>
+
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
 
+    <?php echo $__env->yieldPushContent('scripts'); ?>
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+
+            window.Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
+                fail(({ status, response }) => {
+
+                    if (status === 422 && response?.errors) {
+                        let errorHtml = '<ul class="mb-0 ps-3">';
+
+                        Object.values(response.errors).forEach(errorArray => {
+                            errorArray.forEach(error => {
+                                errorHtml += `<li>${error}</li>`;
+                            });
+                        });
+
+                        errorHtml += '</ul>';
+
+                        document.getElementById('validationToastBody').innerHTML = errorHtml;
+
+                        const toast = new bootstrap.Toast(
+                            document.getElementById('validationToast'),
+                            { delay: 5000 }
+                        );
+
+                        toast.show();
+                    }
+
+                });
+            });
+
+            // EVENTO EMITIDO PELO COMPONENTE LIVEWIRE (V3)
+            window.Livewire.on('show-validation-toast', (event) => {
+
+                const errors = event?.errors ?? event?.[0]?.errors;
+
+                if (errors) {
+                    let errorHtml = '<ul class="mb-0 ps-3">';
+
+                    Object.values(errors).forEach(errorArray => {
+                        errorArray.forEach(error => {
+                            errorHtml += `<li>${error}</li>`;
+                        });
+                    });
+
+                    errorHtml += '</ul>';
+
+                    document.getElementById('validationToastBody').innerHTML = errorHtml;
+
+                    const toast = new bootstrap.Toast(
+                        document.getElementById('validationToast'),
+                        { delay: 5000 }
+                    );
+
+                    toast.show();
+                }
+
+            });
+
+        });
+    </script>
 </body>
 </html>
 <?php /**PATH C:\xampp\htdocs\ecommerce\ecommerce-hp\resources\views/layouts/admin.blade.php ENDPATH**/ ?>

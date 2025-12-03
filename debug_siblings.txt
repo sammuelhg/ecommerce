@@ -1,0 +1,13 @@
+Siblings found: 2
+--------------------------------
+ID: 65
+Name: Whey Protein Concentrado Em Cafeína – Rosa Tamanho M
+Size ID: 2
+Size String: 
+Relation Size Name: M
+--------------------------------
+ID: 66
+Name: Whey Protein Concentrado Em Cafeína – Verde Tamanho M
+Size ID: 2
+Size String: G
+Relation Size Name: M

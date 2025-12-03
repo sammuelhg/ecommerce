@@ -52,7 +52,7 @@
                         <button wire:click="decrementQuantity" class="btn btn-outline-secondary" type="button">
                             <i class="bi bi-dash"></i>
                         </button>
-                        <input type="text" class="form-control text-center" value="{{ $quantity }}" readonly>
+                        <input type="text" class="form-control bg-white text-center" value="{{ $quantity }}" readonly>
                         <button wire:click="incrementQuantity" class="btn btn-outline-secondary" type="button">
                             <i class="bi bi-plus"></i>
                         </button>

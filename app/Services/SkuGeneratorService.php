@@ -6,106 +6,105 @@ use App\Models\Product;
 
 class SkuGeneratorService
 {
-    /**
-     * Lookup tables for standardized codes.
-     */
     private const CATEGORY_CODES = [
-        'calçado' => 'CAL',
-        'roupa' => 'ROU',
-        'acessório' => 'ACE',
-        'modafit' => 'FIT',
-        'modapraia' => 'PRA',
-        'modacrochê' => 'CRO',
-        'modacroche' => 'CRO',
-        'losfitnutri' => 'SUP',
+        'calcado'       => 'CAL',
+        'roupa'         => 'ROU',
+        'acessorio'     => 'ACE',
+        'modafit'       => 'FIT',
+        'modapraia'     => 'PRA',
+        'modacroche'    => 'CRO',
+        'modacroche^e'  => 'CRO', // Variação com acento normalizado
+        'losfitnutri'   => 'SUP',
+        'suplementos'   => 'SUP',
     ];
 
     private const TYPE_CODES = [
-        'tênis' => 'TEN',
-        'camisa' => 'CAM',
+        'tenis'   => 'TEN',
+        'camisa'  => 'CAM',
         'bermuda' => 'BER',
         'jaqueta' => 'JAQ',
     ];
 
     private const COLOR_CODES = [
-        'preto' => 'PRT',
-        'branco' => 'BRA',
+        'preto'        => 'PRT',
+        'branco'       => 'BRA',
         'azul marinho' => 'AZM',
-        'vermelho' => 'VER',
-        'verde' => 'VRD',
-        'cinza' => 'CIN',
+        'vermelho'     => 'VER',
+        'verde'        => 'VRD',
+        'cinza'         => 'CIN',
     ];
 
-    /**
-     * Generate a SKU with sequential number.
-     *
-     * @param string $category
-     * @param string $type
-     * @param string $color
-     * @param string $size
-     * @param int|null $excludeId Product ID to exclude when checking for last number (for edits)
-     * @return string
-     */
     public function generate(string $category, string $type, string $color, string $size, ?int $excludeId = null): string
     {
-        $categoryCode = $this->getCategoryCode($category);
-        $typeCode = $this->getTypeCode($type);
-        $colorCode = $this->getColorCode($color);
-        $sizeCode = strtoupper($size);
+        if (!$category || !$type || !$color || !$size) {
+            return '';
+        }
 
-        // Get next sequential number
+        $categoryCode = $this->getCategoryCode($category);
+        $typeCode     = $this->getTypeCode($type);
+        $colorCode    = $this->getColorCode($color);
+        $sizeCode     = strtoupper(trim($size));
+
         $sequenceNumber = $this->getNextSequenceNumber($excludeId);
 
-        return implode('-', [$categoryCode, $typeCode, $sequenceNumber, $colorCode, $sizeCode]);
+        return implode('-', [
+            $categoryCode,
+            $typeCode,
+            $sequenceNumber,
+            $colorCode,
+            $sizeCode
+        ]);
     }
 
-    /**
-     * Get the next available sequence number (4 digits).
-     */
     private function getNextSequenceNumber(?int $excludeId = null): string
     {
-        // Get the last product SKU (excluding current product if editing)
         $query = Product::whereNotNull('sku')->where('sku', '!=', '');
-        
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
-        
-        $lastProduct = $query->orderBy('id', 'desc')->first();
 
-        if (!$lastProduct || !$lastProduct->sku) {
+        $last = $query
+            ->orderByRaw("CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(sku,'-',3),'-',-1) AS UNSIGNED) DESC")
+            ->first();
+
+        if (!$last || !$last->sku) {
             return '0001';
         }
 
-        // Extract the sequence number from SKU (format: XXX-XXX-0000-XXX-XX)
-        $parts = explode('-', $lastProduct->sku);
-        
-        if (count($parts) >= 3 && is_numeric($parts[2])) {
-            $lastNumber = (int) $parts[2];
-            $nextNumber = $lastNumber + 1;
-            
-            // Format with 4 digits
-            return str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $parts = explode('-', $last->sku);
+
+        if (isset($parts[2]) && is_numeric($parts[2])) {
+            return str_pad(((int) $parts[2]) + 1, 4, '0', STR_PAD_LEFT);
         }
 
         return '0001';
     }
 
+    private function normalize(string $value): string
+    {
+        $value = trim($value);
+        $value = iconv('UTF-8', 'ASCII//TRANSLIT', $value);
+        // Remove caracteres especiais gerados pela transliteração (como ^)
+        $value = preg_replace('/[^a-zA-Z0-9]/', '', $value);
+        return strtolower($value);
+    }
+
     private function getCategoryCode(string $category): string
     {
-        $normalized = strtolower($category);
-        return self::CATEGORY_CODES[$normalized] ?? strtoupper(substr($category, 0, 3));
+        $key = $this->normalize($category);
+        return self::CATEGORY_CODES[$key] ?? strtoupper(substr($key, 0, 3));
     }
 
     private function getTypeCode(string $type): string
     {
-        $normalized = strtolower($type);
-        return self::TYPE_CODES[$normalized] ?? strtoupper(substr($type, 0, 3));
+        $key = $this->normalize($type);
+        return self::TYPE_CODES[$key] ?? strtoupper(substr($key, 0, 3));
     }
 
     private function getColorCode(string $color): string
     {
-        $normalized = strtolower($color);
-        return self::COLOR_CODES[$normalized] ?? strtoupper(substr($color, 0, 3));
+        $key = $this->normalize($color);
+        return self::COLOR_CODES[$key] ?? strtoupper(substr($key, 0, 3));
     }
 }

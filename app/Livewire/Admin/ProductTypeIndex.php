@@ -50,7 +50,8 @@ class ProductTypeIndex extends Component
         $types = ProductType::where('name', 'like', '%' . $this->search . '%')
             ->orWhere('code', 'like', '%' . $this->search . '%')
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10)
+            ->withPath(route('admin.types.index'));
 
         return view('livewire.admin.product-type-index', [
             'types' => $types

@@ -32,7 +32,7 @@
                         <small class="text-primary fw-semibold d-block">Total: <span x-text="formatCurrency(item.price * item.qty)"></span></small>
                     </div>
                     <div class="ms-auto d-flex flex-column align-items-end">
-                        <input type="number" class="form-control form-control-sm text-center mb-2"
+                        <input type="number" class="form-control bg-white form-control-sm text-center mb-2"
                                x-model.number="item.qty" @change="updateQty(item)" min="1" style="width: 60px;">
                         <button class="btn btn-sm btn-outline-danger" @click="removeFromCart(item.id)">
                             <i class="bi bi-trash"></i>
@@ -55,6 +55,6 @@
         </div>
     </div>
     <div class="offcanvas-footer border-top p-3" x-show="cart.length > 0">
-        <a href="#" class="btn btn-primary w-100 fw-semibold">Finalizar Compra</a>
+        <button @click="finalizePurchase()" class="btn btn-primary w-100 fw-semibold">Finalizar Compra</button>
     </div>
 </div>

@@ -20,6 +20,8 @@ class Product extends Model
         'product_type_id',
         'product_model_id',
         'product_material_id',
+        'product_color_id',
+        'product_size_id',
         'color',
         'attribute',
         'size',
@@ -43,6 +45,16 @@ class Product extends Model
     public function productMaterial()
     {
         return $this->belongsTo(ProductMaterial::class);
+    }
+
+    public function productColor()
+    {
+        return $this->belongsTo(ProductColor::class);
+    }
+
+    public function productSize()
+    {
+        return $this->belongsTo(ProductSize::class);
     }
 
     /**
