@@ -1,22 +1,25 @@
-@extends('layouts.app')
+@extends('layouts.shop')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Formas de Pagamento</h5>
+<div class="container py-4">
+    <div class="row">
+        <x-account-sidebar />
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Formas de Pagamento</h5>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Adicionar Cartão
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Esta funcionalidade será implementada na Fase IV (Integração de Pagamentos).
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item p-5 text-center text-muted">
+                            <i class="bi bi-credit-card fs-1 mb-3"></i>
+                            <h5 class="mb-2">Nenhum cartão cadastrado</h5>
+                            <p class="small">Cadastre cartões para pagamento mais rápido e seguro.</p>
+                        </div>
                     </div>
-                    <p class="text-muted">Aqui você poderá gerenciar seus cartões e métodos de pagamento salvos.</p>
-                    <a href="{{ route('profile') }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left me-2"></i>Voltar ao Perfil
-                    </a>
                 </div>
             </div>
         </div>

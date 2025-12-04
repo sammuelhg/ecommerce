@@ -106,4 +106,22 @@ class Product extends Model
     {
         return 'slug';
     }
+
+    /**
+     * Get the product image.
+     * Fallback to the first image in product_images table if the main image column is empty.
+     */
+    public function getImageAttribute($value)
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+
+        // Try to get from relationship if loaded, otherwise query
+        $image = $this->relationLoaded('images') 
+            ? $this->images->first() 
+            : $this->images()->orderBy('order')->first();
+
+        return $image ? $image->path : null;
+    }
 }

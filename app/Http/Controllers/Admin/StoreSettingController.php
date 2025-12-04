@@ -25,10 +25,19 @@ class StoreSettingController extends Controller
             'store_logo' => 'nullable|image|max:2048',
             'store_address' => 'nullable|string',
             'store_cnpj' => 'nullable|string',
+            'store_phone' => 'nullable|string',
+            'google_maps_embed_url' => 'nullable|string',
+            'ai_image_prompt_template' => 'nullable|string',
+            'modal_about' => 'nullable|string',
+            'modal_careers' => 'nullable|string',
+            'modal_contact' => 'nullable|string',
+            'modal_returns' => 'nullable|string',
+            'modal_faq' => 'nullable|string',
             'color_primary' => 'nullable|string',
             'color_secondary' => 'nullable|string',
             'color_accent' => 'nullable|string',
             'color_background' => 'nullable|string',
+            'color_category_bar' => 'nullable|string',
             'security_certificates.*' => 'image|max:2048'
         ]);
 
@@ -36,10 +45,19 @@ class StoreSettingController extends Controller
         $textFields = [
             'store_address', 
             'store_cnpj', 
+            'store_phone',
+            'google_maps_embed_url',
+            'ai_image_prompt_template',
+            'modal_about',
+            'modal_careers',
+            'modal_contact',
+            'modal_returns',
+            'modal_faq',
             'color_primary', 
             'color_secondary', 
             'color_accent', 
-            'color_background'
+            'color_background',
+            'color_category_bar'
         ];
 
         foreach ($textFields as $field) {

@@ -78,7 +78,7 @@
             <div class="collapse navbar-collapse order-lg-2">
                 <!-- Busca Desktop -->
                 <form class="d-flex flex-grow-1 me-lg-4 my-2 my-lg-0 d-none d-lg-flex" @submit.prevent="performSearch()">
-                    <input class="form-control bg-white me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="background-color: #f0f8ff !important; border: 1px solid #d0e8ff !important; color: #333 !important;">
+                    <input class="form-control bg-white me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
                     <button class="btn rounded-circle" type="submit" style="background-color: #ffc107; border: none; color: #1a1a1a; width: 40px; height: 40px;">
                         <i class="bi bi-search"></i>
                     </button>
@@ -102,7 +102,7 @@
          x-transition:enter-end="opacity-100 translate-y-0"
          style="display: none;">
         <form class="d-flex" @submit.prevent="performSearch()">
-            <input class="form-control bg-white me-2" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="background-color: #f0f8ff !important; border: 1px solid #d0e8ff !important; color: #333 !important;">
+            <input class="form-control bg-white me-2" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
             <button class="btn" type="button" @click="performSearch()" style="background-color: #ffc107; color: #1a1a1a;">
                 <i class="bi bi-search"></i>
             </button>
@@ -182,7 +182,7 @@
     </div>
 
     <!-- Barra de Categorias -->
-    <div class="shadow-sm d-none d-md-block" style="background-color: #f0f8ff !important; border-top: 1px solid #d0e8ff !important;">
+    <div class="shadow-sm d-none d-md-block" style="background-color: <?php echo e($storeSettings['color_category_bar'] ?? '#f0f8ff'); ?> !important; border-top: 1px solid rgba(0,0,0,0.05) !important;">
         <div class="container" style="max-width: 1200px;">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-dark fw-bold" href="<?php echo e(route('shop.index', ['sort' => 'latest'])); ?>" style="transition: color 0.3s;" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#212529'">Novidades</a></li>

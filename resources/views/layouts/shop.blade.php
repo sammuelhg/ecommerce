@@ -23,6 +23,7 @@
       @toggle-wishlist.window="toggleWishlist($event.detail)">
     @include('shop.partials.header')
     <main class="container my-5">
+        {{ $slot ?? '' }}
         @yield('content')
     </main>
     @include('shop.partials.footer')

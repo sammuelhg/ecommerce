@@ -33,8 +33,15 @@
                         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <tr wire:key="product-<?php echo e($product->id); ?>">
                                 <td>
-                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($product->image): ?>
-                                        <img src="<?php echo e(asset('storage/' . $product->image)); ?>" 
+                                    <?php
+                                        $mainImage = $product->images->where('is_main', true)->first() 
+                                                    ?? $product->images->first();
+                                        $imageUrl = $mainImage ? asset('storage/' . $mainImage->path) 
+                                                    : ($product->image ? asset('storage/' . $product->image) : null);
+                                    ?>
+
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($imageUrl): ?>
+                                        <img src="<?php echo e($imageUrl); ?>" 
                                                 alt="<?php echo e($product->name); ?>" 
                                                 class="img-thumbnail"
                                                 style="width: 60px; height: 60px; object-fit: cover;">
@@ -86,13 +93,17 @@
                                         <a href="<?php echo e(route('admin.products.edit', $product)); ?>" class="btn btn-sm btn-info" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        <button wire:click="openImageGenerator(<?php echo e($product->id); ?>)" 
+                                                class="btn btn-sm btn-success" 
+                                                title="Gerar Imagem com IA">
+                                            <i class="bi bi-image"></i>
+                                        </button>
                                         <button wire:click="$set('duplicatingProductId', <?php echo e($product->id); ?>)" class="btn btn-sm btn-secondary" title="Duplicar">
                                             <i class="bi bi-files"></i>
                                         </button>
                                         <button 
                                             class="btn btn-sm btn-danger"
                                             wire:click="delete(<?php echo e($product->id); ?>)"
-                                            wire:confirm="Tem certeza que deseja excluir este produto?"
                                             title="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -145,6 +156,60 @@ unset($__params);
 unset($__split);
 if (isset($__slots)) unset($__slots);
 ?>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+    <!-- Modal de Geração de Imagem com IA -->
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($generatingImageForProductId): ?>
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-image me-2"></i>
+                            Gerar Imagem com IA
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" wire:click="cancelImageGeneration"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Preview do Prompt:</strong> Este é o texto que será enviado para a IA gerar a imagem do produto.
+                        </div>
+                        
+                        <div class="card bg-light">
+                            <div class="card-body p-0">
+                                <textarea 
+                                    wire:model="editablePrompt" 
+                                    class="form-control border-0 bg-light" 
+                                    rows="6" 
+                                    style="font-family: 'Courier New', monospace; font-size: 0.9rem; resize: vertical;"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <i class="bi bi-clock me-2"></i>
+                            <small>A geração pode levar de 30 a 60 segundos. Você será redirecionado para a galeria do produto após a conclusão.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" wire:click="cancelImageGeneration">
+                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                        </button>
+                        <button type="button" 
+                                class="btn btn-success" 
+                                wire:click="generateImage(<?php echo e($generatingImageForProductId); ?>)"
+                                wire:loading.attr="disabled"
+                                wire:target="generateImage">
+                            <i class="bi bi-stars me-2" wire:loading.remove wire:target="generateImage"></i>
+                            <span wire:loading wire:target="generateImage" class="spinner-border spinner-border-sm me-2"></span>
+                            <span wire:loading.remove wire:target="generateImage">Gerar Imagem</span>
+                            <span wire:loading wire:target="generateImage">Gerando...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </div>
 <?php /**PATH C:\xampp\htdocs\ecommerce\ecommerce-hp\resources\views/livewire/admin/product-index.blade.php ENDPATH**/ ?>

@@ -55,7 +55,13 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Cor</label>
+                        <label class="form-label">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($category_id && isset($categories) && str_contains(strtolower($categories->firstWhere('id', $category_id)->name ?? ''), 'suplemento')): ?>
+                                Sabor
+                            <?php else: ?>
+                                Cor
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </label>
                         <select wire:model.lazy="product_color_id" class="form-select bg-white">
                             <option value="">Selecione...</option>
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $colors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>

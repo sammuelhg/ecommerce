@@ -17,7 +17,7 @@
                     
                     <h6 class="mt-4">Ações Rápidas:</h6>
                     <div class="list-group">
-                        <a href="{{ route('profile') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ route('customer.account.profile.edit') }}" class="list-group-item list-group-item-action">
                             <i class="bi bi-person me-2"></i>Editar Perfil
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">

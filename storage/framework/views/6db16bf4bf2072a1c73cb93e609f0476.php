@@ -176,7 +176,6 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
 
     </div>
     </form>
-</div>
 
 <?php $__env->startPush('scripts'); ?>
 <script>
@@ -194,7 +193,6 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     });
 </script>
 <?php $__env->stopPush(); ?>
-
 <?php $__env->startPush('styles'); ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 <style>
@@ -330,6 +328,10 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
             // For Livewire uploads, we need to convert to temp image
             // Send the base64 directly and let backend handle conversion
             window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('cropLivewireUpload', index, base64Data);
+        } else if (typeof currentImageIndex === 'string' && currentImageIndex.startsWith('existing-')) {
+            // Existing image from DB
+            const id = parseInt(currentImageIndex.replace('existing-', ''));
+            window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('cropExistingImage', id, base64Data);
         } else {
             // It's a temp image (from library/previous crop)
             window.Livewire.find('<?php echo e($_instance->getId()); ?>').updateCroppedImage(currentImageIndex, base64Data);
@@ -337,6 +339,28 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
 
         cropperModal.hide();
     });
+
+    // Helper functions for image actions
+    window.deleteProductImage = function(imageId) {
+        if (confirm('Tem certeza que deseja excluir esta imagem?')) {
+            const component = Livewire.find('<?php echo e($_instance->getId()); ?>');
+            if (component) {
+                component.call('deleteImage', imageId);
+            } else {
+                console.error('Livewire component not found');
+            }
+        }
+    };
+
+    window.setProductMainImage = function(imageId) {
+        const component = Livewire.find('<?php echo e($_instance->getId()); ?>');
+        if (component) {
+            component.call('setMainImage', imageId);
+        } else {
+            console.error('Livewire component not found');
+        }
+    };
 </script>
 <?php $__env->stopPush(); ?>
+</div>
 <?php /**PATH C:\xampp\htdocs\ecommerce\ecommerce-hp\resources\views/livewire/admin/product-form.blade.php ENDPATH**/ ?>

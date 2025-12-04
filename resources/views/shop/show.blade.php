@@ -140,7 +140,12 @@
                     @if(count($colorVariants) > 0)
                     <div class="mb-4">
                         <h6 class="fw-bold mb-2">
-                            Cor: <span class="text-primary">{{ $product->color }}</span>
+                            @if(str_contains(strtolower($product->category->name ?? ''), 'suplemento'))
+                                Sabor:
+                            @else
+                                Cor:
+                            @endif
+                            <span class="text-primary">{{ $product->color }}</span>
                         </h6>
                         <div class="d-flex gap-2 flex-wrap align-items-center">
                             @foreach($colorVariants as $color)

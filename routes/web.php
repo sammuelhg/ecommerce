@@ -22,11 +22,16 @@ Route::get('/loja/checkout', [App\Http\Controllers\CartController::class, 'check
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/perfil', App\Livewire\UserProfile::class)->name('profile');
+    Route::get('/conta/perfil', \App\Livewire\Customer\Profile\Edit::class)->name('customer.account.profile.edit');
     Route::view('/meus-pedidos', 'user.orders')->name('user.orders');
     Route::view('/enderecos', 'user.addresses')->name('user.addresses');
     Route::view('/pagamentos', 'user.payments')->name('user.payments');
     Route::view('/configuracoes', 'user.settings')->name('user.settings');
+    Route::view('/notificacoes', 'user.notifications')->name('user.notifications');
+    Route::view('/cupons', 'user.coupons')->name('user.coupons');
+    Route::view('/indique-amigos', 'user.referrals')->name('user.referrals');
+    Route::view('/presentes', 'user.gifts')->name('user.gifts');
+    Route::view('/clube', 'user.club')->name('user.club');
 });
 
 Auth::routes();

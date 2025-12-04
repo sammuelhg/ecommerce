@@ -1,18 +1,18 @@
 <div class="card product-card h-100" x-data='{ product: {!! json_encode($product, JSON_HEX_APOS | JSON_HEX_QUOT) !!} }'>
     <!-- Imagem do Produto -->
     <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="text-decoration-none">
-        @if($product->image)
-            <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" 
-                 class="card-img-top" 
-                 alt="{{ $product->name }}"
-                 style="height: 200px; object-fit: cover;"
-                 onerror="this.onerror=null;this.src='https://placehold.co/350x200/f0f8ff/1a1a1a?text=Imagem+Indispon%C3%ADvel';">
-        @else
-            <img src="https://placehold.co/350x200/f0f8ff/1a1a1a?text={{ urlencode($product->name) }}" 
-                 class="card-img-top" 
-                 alt="{{ $product->name }}"
-                 style="height: 200px; object-fit: cover;">
-        @endif
+        <div class="ratio ratio-1x1">
+            @if($product->image)
+                <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" 
+                     class="card-img-top object-fit-cover" 
+                     alt="{{ $product->name }}"
+                     onerror="this.onerror=null;this.src='https://placehold.co/500x500/f0f8ff/1a1a1a?text=Imagem+Indispon%C3%ADvel';">
+            @else
+                <img src="https://placehold.co/500x500/f0f8ff/1a1a1a?text={{ urlencode($product->name) }}" 
+                     class="card-img-top object-fit-cover" 
+                     alt="{{ $product->name }}">
+            @endif
+        </div>
     </a>
     
     <div class="card-body d-flex flex-column">

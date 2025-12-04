@@ -24,6 +24,8 @@
       @toggle-wishlist.window="toggleWishlist($event.detail)">
     <?php echo $__env->make('shop.partials.header', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <main class="container my-5">
+        <?php echo e($slot ?? ''); ?>
+
         <?php echo $__env->yieldContent('content'); ?>
     </main>
     <?php echo $__env->make('shop.partials.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>

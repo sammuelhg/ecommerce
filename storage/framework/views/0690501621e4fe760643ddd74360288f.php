@@ -1,18 +1,18 @@
 <div class="card product-card h-100" x-data='{ product: <?php echo json_encode($product, JSON_HEX_APOS | JSON_HEX_QUOT); ?> }'>
     <!-- Imagem do Produto -->
     <a href="<?php echo e(route('shop.show', $product->slug ?: $product->id)); ?>" class="text-decoration-none">
-        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($product->image): ?>
-            <img src="<?php echo e(Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image)); ?>" 
-                 class="card-img-top" 
-                 alt="<?php echo e($product->name); ?>"
-                 style="height: 200px; object-fit: cover;"
-                 onerror="this.onerror=null;this.src='https://placehold.co/350x200/f0f8ff/1a1a1a?text=Imagem+Indispon%C3%ADvel';">
-        <?php else: ?>
-            <img src="https://placehold.co/350x200/f0f8ff/1a1a1a?text=<?php echo e(urlencode($product->name)); ?>" 
-                 class="card-img-top" 
-                 alt="<?php echo e($product->name); ?>"
-                 style="height: 200px; object-fit: cover;">
-        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        <div class="ratio ratio-1x1">
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($product->image): ?>
+                <img src="<?php echo e(Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image)); ?>" 
+                     class="card-img-top object-fit-cover" 
+                     alt="<?php echo e($product->name); ?>"
+                     onerror="this.onerror=null;this.src='https://placehold.co/500x500/f0f8ff/1a1a1a?text=Imagem+Indispon%C3%ADvel';">
+            <?php else: ?>
+                <img src="https://placehold.co/500x500/f0f8ff/1a1a1a?text=<?php echo e(urlencode($product->name)); ?>" 
+                     class="card-img-top object-fit-cover" 
+                     alt="<?php echo e($product->name); ?>">
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        </div>
     </a>
     
     <div class="card-body d-flex flex-column">

@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12">
         <!-- Upload Area -->
-        <div class="mb-4 p-4 border border-2 border-dashed rounded text-center bg-light">
+        <div class="mb-4 p-4 border border-2 border-dashed rounded text-center bg-white">
             <i class="bi bi-cloud-upload fs-1 text-primary"></i>
             <h5 class="mt-3">Adicionar Imagens ao Produto</h5>
             <div class="mt-3 d-flex gap-2 justify-content-center flex-wrap">
@@ -100,34 +100,29 @@
             </h6>
             <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $existingImages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="col" wire:key="existing-<?php echo e($image->id); ?>">
-                        <div class="card h-100 <?php echo e($image->is_main ? 'border-primary border-3 shadow' : 'border'); ?> image-card">
-                            <div class="position-relative">
-                                <img src="<?php echo e(asset('storage/' . $image->path)); ?>" class="card-img-top" style="aspect-ratio: 1; object-fit: cover;" alt="Imagem do produto">
-                                
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($image->is_main): ?>
-                                    <span class="position-absolute top-0 start-0 m-2 badge bg-primary">
-                                        <i class="bi bi-star-fill"></i> Capa
-                                    </span>
-                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                                
-                                <!-- Actions Overlay -->
-                                <div class="image-actions">
-                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$image->is_main): ?>
-                                        <button type="button" wire:click="setMainImage(<?php echo e($image->id); ?>)" class="btn btn-sm btn-warning" title="Definir como Capa">
-                                            <i class="bi bi-star"></i>
-                                        </button>
-                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                                    <button type="button" wire:click="deleteImage(<?php echo e($image->id); ?>)" wire:confirm="Tem certeza que deseja excluir esta imagem?" class="btn btn-sm btn-danger" title="Excluir">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('admin.product-image-item', ['imageId' => $image->id, 'productId' => $productId]);
+
+$key = 'img-'.$image->id;
+
+$key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-3219166064-0', 'img-'.$image->id);
+
+$__html = app('livewire')->mount($__name, $__params, $key);
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
-        <?php elseif($isEditing && empty($images)): ?>
+        <?php elseif($isEditing && (!isset($existingImages) || count($existingImages) === 0)): ?>
             <div class="alert alert-secondary text-center py-5">
                 <i class="bi bi-images fs-1 text-muted d-block mb-3"></i>
                 <p class="mb-0">Nenhuma imagem na galeria. Adicione imagens usando os botões acima.</p>

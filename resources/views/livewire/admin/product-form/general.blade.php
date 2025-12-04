@@ -41,7 +41,13 @@
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Cor</label>
+                        <label class="form-label">
+                            @if($category_id && isset($categories) && str_contains(strtolower($categories->firstWhere('id', $category_id)->name ?? ''), 'suplemento'))
+                                Sabor
+                            @else
+                                Cor
+                            @endif
+                        </label>
                         <select wire:model.lazy="product_color_id" class="form-select bg-white">
                             <option value="">Selecione...</option>
                             @foreach($colors as $color)

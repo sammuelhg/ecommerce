@@ -142,7 +142,12 @@
                     <?php if(count($colorVariants) > 0): ?>
                     <div class="mb-4">
                         <h6 class="fw-bold mb-2">
-                            Cor: <span class="text-primary"><?php echo e($product->color); ?></span>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(str_contains(strtolower($product->category->name ?? ''), 'suplemento')): ?>
+                                Sabor:
+                            <?php else: ?>
+                                Cor:
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            <span class="text-primary"><?php echo e($product->color); ?></span>
                         </h6>
                         <div class="d-flex gap-2 flex-wrap align-items-center">
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $colorVariants; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $color): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>

@@ -1,22 +1,25 @@
-@extends('layouts.app')
+@extends('layouts.shop')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Meus Pedidos</h5>
+<div class="container py-4">
+    <div class="row">
+        <x-account-sidebar />
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Meus Pedidos</h5>
                 </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Esta funcionalidade será implementada na Fase IV (Checkout e Pagamentos).
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item p-5 text-center text-muted">
+                            <i class="bi bi-inbox fs-1 mb-3"></i>
+                            <h5 class="mb-2">Nenhum pedido realizado</h5>
+                            <p class="small">Quando você fizer uma compra, ela aparecerá aqui.</p>
+                            <a href="{{ route('shop.index') }}" class="btn btn-primary mt-3">
+                                <i class="bi bi-bag me-2"></i>Começar a comprar
+                            </a>
+                        </div>
                     </div>
-                    <p class="text-muted">Aqui você poderá visualizar o histórico de todos os seus pedidos.</p>
-                    <a href="{{ route('shop.index') }}" class="btn btn-primary">
-                        <i class="bi bi-shop me-2"></i>Continuar Comprando
-                    </a>
                 </div>
             </div>
         </div>

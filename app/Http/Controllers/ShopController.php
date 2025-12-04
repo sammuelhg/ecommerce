@@ -93,7 +93,7 @@ class ShopController extends Controller
                 return [
                     'name' => $name,
                     'hex' => $hex,
-                    'stock' => $group->sum('stock'),
+                    'stock' => $group->sum('stock'), // Total de estoque dessa cor (todos os tamanhos)
                     'slug' => $representative->slug, 
                     'active' => $isActive
                 ];
@@ -110,19 +110,28 @@ class ShopController extends Controller
             return $product->color == $item->color;
         });
 
-        $sizeVariants = $currentSiblings->map(function ($item) use ($product) {
-            $name = $item->productSize->name ?? $item->size;
+        $sizeVariants = $currentSiblings->groupBy(function($item) {
+            // Agrupa por nome do tamanho
+            return $item->productSize->name ?? $item->size ?? 'default';
+        })->map(function ($group) use ($product) {
+            $first = $group->first();
+            $name = $first->productSize->name ?? $first->size;
             
             if ($name) {
+                // Verifica se algum deste grupo é o produto atual
+                $isActive = $group->contains(function($item) use ($product) {
+                    return $item->id == $product->id;
+                });
+                
                 return [
                     'name' => $name,
-                    'stock' => $item->stock,
-                    'slug' => $item->slug,
-                    'active' => $item->id == $product->id
+                    'stock' => $first->stock, // Stock do produto representante (não soma)
+                    'slug' => $first->slug,
+                    'active' => $isActive
                 ];
             }
             return null;
-        })->filter()->unique('name')->values();
+        })->filter()->values();
 
         // Fallback se não houver variações (produto único)
         if ($colorVariants->isEmpty() && $product->color) {
@@ -173,7 +182,10 @@ class ShopController extends Controller
      */
     public function category(Category $category)
     {
-        $products = $category->products()
+        // Get all category IDs (current + children)
+        $categoryIds = $category->children()->pluck('id')->push($category->id);
+
+        $products = Product::whereIn('category_id', $categoryIds)
             ->where('is_active', true)
             ->get();
 

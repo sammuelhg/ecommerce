@@ -167,7 +167,6 @@
 
     </div>
     </form>
-</div>
 
 @push('scripts')
 <script>
@@ -185,7 +184,6 @@
     });
 </script>
 @endpush
-
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 <style>
@@ -321,6 +319,10 @@
             // For Livewire uploads, we need to convert to temp image
             // Send the base64 directly and let backend handle conversion
             @this.call('cropLivewireUpload', index, base64Data);
+        } else if (typeof currentImageIndex === 'string' && currentImageIndex.startsWith('existing-')) {
+            // Existing image from DB
+            const id = parseInt(currentImageIndex.replace('existing-', ''));
+            @this.call('cropExistingImage', id, base64Data);
         } else {
             // It's a temp image (from library/previous crop)
             @this.updateCroppedImage(currentImageIndex, base64Data);
@@ -328,5 +330,27 @@
 
         cropperModal.hide();
     });
+
+    // Helper functions for image actions
+    window.deleteProductImage = function(imageId) {
+        if (confirm('Tem certeza que deseja excluir esta imagem?')) {
+            const component = Livewire.find('{{ $_instance->getId() }}');
+            if (component) {
+                component.call('deleteImage', imageId);
+            } else {
+                console.error('Livewire component not found');
+            }
+        }
+    };
+
+    window.setProductMainImage = function(imageId) {
+        const component = Livewire.find('{{ $_instance->getId() }}');
+        if (component) {
+            component.call('setMainImage', imageId);
+        } else {
+            console.error('Livewire component not found');
+        }
+    };
 </script>
 @endpush
+</div>

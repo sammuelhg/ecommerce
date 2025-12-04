@@ -79,7 +79,7 @@
 
         <!-- Meu Perfil -->
         <div class="col-md-3">
-            <a href="{{ route('profile') }}" class="text-decoration-none">
+            <a href="{{ route('customer.account.profile.edit') }}" class="text-decoration-none">
                 <div class="card text-center h-100 shadow-sm hover-card">
                     <div class="card-body d-flex flex-column justify-content-center py-4">
                         <i class="bi bi-person-circle fs-1 mb-3 text-dark"></i>

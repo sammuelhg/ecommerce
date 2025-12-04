@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12">
         <!-- Upload Area -->
-        <div class="mb-4 p-4 border border-2 border-dashed rounded text-center bg-light">
+        <div class="mb-4 p-4 border border-2 border-dashed rounded text-center bg-white">
             <i class="bi bi-cloud-upload fs-1 text-primary"></i>
             <h5 class="mt-3">Adicionar Imagens ao Produto</h5>
             <div class="mt-3 d-flex gap-2 justify-content-center flex-wrap">
@@ -100,34 +100,10 @@
             </h6>
             <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
                 @foreach($existingImages as $image)
-                    <div class="col" wire:key="existing-{{ $image->id }}">
-                        <div class="card h-100 {{ $image->is_main ? 'border-primary border-3 shadow' : 'border' }} image-card">
-                            <div class="position-relative">
-                                <img src="{{ asset('storage/' . $image->path) }}" class="card-img-top" style="aspect-ratio: 1; object-fit: cover;" alt="Imagem do produto">
-                                
-                                @if($image->is_main)
-                                    <span class="position-absolute top-0 start-0 m-2 badge bg-primary">
-                                        <i class="bi bi-star-fill"></i> Capa
-                                    </span>
-                                @endif
-                                
-                                <!-- Actions Overlay -->
-                                <div class="image-actions">
-                                    @if(!$image->is_main)
-                                        <button type="button" wire:click="setMainImage({{ $image->id }})" class="btn btn-sm btn-warning" title="Definir como Capa">
-                                            <i class="bi bi-star"></i>
-                                        </button>
-                                    @endif
-                                    <button type="button" wire:click="deleteImage({{ $image->id }})" wire:confirm="Tem certeza que deseja excluir esta imagem?" class="btn btn-sm btn-danger" title="Excluir">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @livewire('admin.product-image-item', ['imageId' => $image->id, 'productId' => $productId], key('img-'.$image->id))
                 @endforeach
             </div>
-        @elseif($isEditing && empty($images))
+        @elseif($isEditing && (!isset($existingImages) || count($existingImages) === 0))
             <div class="alert alert-secondary text-center py-5">
                 <i class="bi bi-images fs-1 text-muted d-block mb-3"></i>
                 <p class="mb-0">Nenhuma imagem na galeria. Adicione imagens usando os botões acima.</p>

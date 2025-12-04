@@ -54,6 +54,12 @@ class ProductForm extends Component
 
     public $isEditing = false;
 
+    protected $listeners = [
+        'image-deleted' => 'refreshImages',
+        'main-image-updated' => 'refreshImages',
+        'refresh-gallery' => 'refreshImages'
+    ];
+
     public function rules()
     {
         return [
@@ -81,12 +87,18 @@ class ProductForm extends Component
 
     public function mount(Product $product = null)
     {
-        $this->activeTab = 'general';
+        // Check if tab parameter is in URL
+        $requestedTab = request()->query('tab');
+        $this->activeTab = in_array($requestedTab, ['general', 'images', 'pricing', 'inventory', 'seo', 'kit']) 
+            ? $requestedTab 
+            : 'general';
 
         \Log::info('ProductForm mount called', [
             'product_passed' => $product ? 'yes' : 'no',
             'product_id' => $product ? $product->id : 'null',
-            'product_exists' => $product && $product->exists ? 'yes' : 'no'
+            'product_exists' => $product && $product->exists ? 'yes' : 'no',
+            'requested_tab' => $requestedTab,
+            'active_tab' => $this->activeTab
         ]);
         
         if ($product && $product->exists) {
@@ -131,6 +143,20 @@ class ProductForm extends Component
 
         // Load existing images
         $this->existingImages = $product->images()->orderBy('is_main', 'desc')->get();
+        
+        // Migration for legacy image: if gallery is empty but product has main image
+        if ($this->existingImages->isEmpty() && $product->image) {
+            \App\Models\ProductImage::create([
+                'product_id' => $product->id,
+                'path' => $product->image,
+                'is_main' => true,
+                'order' => 0
+            ]);
+            
+            // Reload images
+            $this->existingImages = $product->images()->orderBy('is_main', 'desc')->get();
+        }
+
         \Log::info('ProductForm: Loaded images', ['count' => $this->existingImages->count(), 'images' => $this->existingImages->toArray()]);
         
         // Check if kit
@@ -428,20 +454,30 @@ class ProductForm extends Component
     public function refreshImages()
     {
         if ($this->productId) {
-            $product = Product::find($this->productId);
-            if ($product) {
-                $this->existingImages = $product->images()->orderBy('is_main', 'desc')->get();
-            }
+            // Directly query to avoid any caching issues
+            $this->existingImages = \App\Models\ProductImage::where('product_id', $this->productId)
+                ->orderBy('is_main', 'desc') // Main image first
+                ->orderBy('created_at', 'desc') // Then newest first
+                ->get();
+                
+            \Log::info('ProductForm: Gallery refreshed', [
+                'product_id' => $this->productId,
+                'count' => $this->existingImages->count()
+            ]);
         }
     }
 
     public function deleteImage($imageId)
     {
+        \Log::info('ProductForm: Deleting image', ['imageId' => $imageId, 'productId' => $this->productId]);
         $success = app(\App\Services\ProductImageService::class)->deleteImage($imageId, $this->productId);
         
         if ($success) {
+            \Log::info('ProductForm: Image deleted successfully');
             $this->refreshImages(); // Only reload images
             $this->dispatch('switch-tab', 'images');
+        } else {
+            \Log::error('ProductForm: Failed to delete image');
         }
     }
 
@@ -579,6 +615,39 @@ class ProductForm extends Component
         
         // Add to tempImages
         $this->tempImages[] = $newFilename;
+        
+        $this->dispatch('image-cropped-success');
+    }
+
+    public function cropExistingImage($existingImageId, $base64Data)
+    {
+        // Decode base64
+        $image_parts = explode(";base64,", $base64Data);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type = $image_type_aux[1];
+        $image_base64 = base64_decode($image_parts[1]);
+
+        // Ensure temp directory exists
+        if (!\Storage::disk('public')->exists('temp')) {
+            \Storage::disk('public')->makeDirectory('temp');
+        }
+
+        // Create temp file in PUBLIC storage
+        $newFilename = 'temp/' . uniqid() . '.' . $image_type;
+        \Storage::disk('public')->put($newFilename, $image_base64);
+        
+        // Add to tempImages
+        $this->tempImages[] = $newFilename;
+        $newIndex = count($this->tempImages) - 1;
+
+        // Check if original image was main
+        $originalImage = \App\Models\ProductImage::find($existingImageId);
+        if ($originalImage && $originalImage->is_main) {
+            $this->newMainImageIndex = $newIndex;
+            session()->flash('success', 'Imagem recortada criada e definida como nova capa.');
+        } else {
+            session()->flash('success', 'Imagem recortada adicionada como nova imagem.');
+        }
         
         $this->dispatch('image-cropped-success');
     }

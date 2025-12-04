@@ -33,7 +33,7 @@
 
             <!-- Menu do Usuário -->
             <div class="list-group list-group-flush">
-                <a href="<?php echo e(route('profile')); ?>" class="list-group-item list-group-item-action">
+                <a href="<?php echo e(route('customer.account.profile.edit')); ?>" class="list-group-item list-group-item-action">
                     <i class="bi bi-person me-2 text-primary"></i> Meu Perfil
                 </a>
                 <a href="<?php echo e(route('user.orders')); ?>" class="list-group-item list-group-item-action">

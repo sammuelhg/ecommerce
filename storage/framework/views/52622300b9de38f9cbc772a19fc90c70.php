@@ -1,7 +1,7 @@
 <div>
     <div class="row mb-4">
         <div class="col-md-6">
-            <input wire:model.live="search" type="text" class="form-control" placeholder="Buscar categorias...">
+            <input wire:model.live="search" type="text" class="form-control bg-white" placeholder="Buscar categorias...">
         </div>
         <div class="col-md-6 text-end">
             <button wire:click="$set('showCreateForm', true)" class="btn btn-primary">
@@ -98,7 +98,7 @@ if (isset($__slots)) unset($__slots);
             </table>
 
             <div class="mt-4">
-                <?php echo e($categories->links()); ?>
+                <?php echo e($categories->links('pagination::bootstrap-5')); ?>
 
             </div>
         </div>

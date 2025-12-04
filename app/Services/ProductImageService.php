@@ -68,11 +68,30 @@ class ProductImageService
      */
     public function deleteImage(int $imageId, int $productId)
     {
+        \Log::info('ProductImageService: deleteImage called', [
+            'imageId' => $imageId,
+            'productId' => $productId
+        ]);
+
         $image = ProductImage::find($imageId);
         
-        if (!$image || $image->product_id !== $productId) {
+        if (!$image) {
+            \Log::warning('ProductImageService: Image not found', ['imageId' => $imageId]);
             return false;
         }
+
+        if ($image->product_id !== $productId) {
+            \Log::warning('ProductImageService: Product ID mismatch', [
+                'imageProductId' => $image->product_id,
+                'requestedProductId' => $productId
+            ]);
+            return false;
+        }
+
+        \Log::info('ProductImageService: Image found, proceeding with deletion', [
+            'is_main' => $image->is_main,
+            'path' => $image->path
+        ]);
 
         // If it's the main image, clear it from product and try to set another
         if ($image->is_main) {
@@ -91,6 +110,7 @@ class ProductImageService
         // Storage::disk('public')->delete($image->path);
         
         $image->delete();
+        \Log::info('ProductImageService: Image deleted successfully');
         return true;
     }
 

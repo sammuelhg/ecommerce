@@ -307,6 +307,14 @@
             </div>
             <div class="toast-body" id="validationToastBody"></div>
         </div>
+
+        <!-- Generic Live Toast -->
+        <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="liveToastBody"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
     </div>
 
     @livewireScripts
@@ -316,12 +324,19 @@
         document.addEventListener('livewire:init', () => {
 
             window.Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
-                fail(({ status, response }) => {
+                fail((response) => {
+                    // Check if response exists (network errors may pass undefined)
+                    if (!response) {
+                        console.warn('Livewire network error detected');
+                        return;
+                    }
 
-                    if (status === 422 && response?.errors) {
+                    const { status, response: responseData } = response;
+
+                    if (status === 422 && responseData?.errors) {
                         let errorHtml = '<ul class="mb-0 ps-3">';
 
-                        Object.values(response.errors).forEach(errorArray => {
+                        Object.values(responseData.errors).forEach(errorArray => {
                             errorArray.forEach(error => {
                                 errorHtml += `<li>${error}</li>`;
                             });
@@ -368,6 +383,38 @@
                     toast.show();
                 }
 
+            });
+
+            // Generic Toast Listener
+            window.Livewire.on('show-toast', (event) => {
+                // Handle both array (from PHP named args sometimes) and object formats
+                const data = event[0] || event;
+                const type = data.type || 'info';
+                const message = data.message || '';
+                
+                const toastEl = document.getElementById('liveToast');
+                const toastBody = document.getElementById('liveToastBody');
+                
+                // Reset classes
+                toastEl.className = 'toast align-items-center text-white border-0';
+                
+                // Add type class
+                if (type === 'success') toastEl.classList.add('bg-success');
+                else if (type === 'error') toastEl.classList.add('bg-danger');
+                else if (type === 'warning') toastEl.classList.add('bg-warning');
+                else toastEl.classList.add('bg-info');
+                
+                // Set content
+                let icon = '';
+                if (type === 'success') icon = '<i class="bi bi-check-circle-fill me-2"></i>';
+                else if (type === 'error') icon = '<i class="bi bi-exclamation-circle-fill me-2"></i>';
+                else if (type === 'warning') icon = '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
+                else icon = '<i class="bi bi-info-circle-fill me-2"></i>';
+                
+                toastBody.innerHTML = icon + message;
+                
+                const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                toast.show();
             });
 
         });

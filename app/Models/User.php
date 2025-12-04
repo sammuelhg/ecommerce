@@ -28,6 +28,7 @@ class User extends Authenticatable
         'google_id',
         'facebook_id',
         'avatar',
+        'taxvat',
     ];
 
     /**
@@ -52,5 +53,18 @@ class User extends Authenticatable
             'password' => 'hashed',
             'birth_date' => 'date',
         ];
+    }
+
+    /**
+     * Get the user's avatar URL.
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return \Illuminate\Support\Facades\Storage::url($this->avatar);
+        }
+        
+        $name = urlencode($this->name);
+        return "https://ui-avatars.com/api/?name={$name}&color=7F9CF5&background=EBF4FF";
     }
 }
