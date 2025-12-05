@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -28,7 +29,46 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/loja';
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
+    {
+        $products = Product::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $productsJson = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => (float) $product->price,
+                'imageText' => $product->image ?? 'Produto',
+                'isOffer' => (bool) $product->is_offer,
+                'oldPrice' => $product->old_price ? (float) $product->old_price : null,
+                'stock' => $product->stock,
+                'category' => $product->category?->name ?? 'Geral'
+            ];
+        })->toJson();
+
+        return view('auth.register', compact('products', 'productsJson'));
+    }
+
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function registered(\Illuminate\Http\Request $request, $user)
+    {
+        session()->flash('success', 'Bem-vindo, ' . $user->name . '! Sua conta foi criada com sucesso.');
+    }
 
     /**
      * Create a new controller instance.

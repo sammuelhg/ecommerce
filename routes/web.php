@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::view('/meus-pedidos', 'user.orders')->name('user.orders');
     Route::view('/enderecos', 'user.addresses')->name('user.addresses');
     Route::view('/pagamentos', 'user.payments')->name('user.payments');
-    Route::view('/configuracoes', 'user.settings')->name('user.settings');
+
     Route::view('/notificacoes', 'user.notifications')->name('user.notifications');
     Route::view('/cupons', 'user.coupons')->name('user.coupons');
     Route::view('/indique-amigos', 'user.referrals')->name('user.referrals');
@@ -94,3 +94,8 @@ Route::get('/teste-main', function () {
 Route::get('/test-livewire', function () {
     return view('test_livewire');
 });
+
+Route::get('/test-buttons', function () {
+    return view('test-buttons');
+});
+

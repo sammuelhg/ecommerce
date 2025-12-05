@@ -1,6 +1,6 @@
 /* Copied from shop-styles.css */
 :root {
-    --bs-primary: #005691;
+    --bs-primary: #000000;
     --bs-secondary: #FFC72C;
     --bs-danger: #e74c3c;
 }
@@ -127,3 +127,48 @@
 .sticky-top { position: sticky; }
 .thumbnail.active img { border-color: var(--bs-primary); border-width: 2px; }
 .thumbnail:hover img { opacity: 1 !important; }
+
+/* Gold/Warning Close Button Style */
+.btn-close-warning {
+    background-color: transparent;
+    border: 2px solid #C5A059 !important;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.btn-close-warning::before {
+    content: "\2715";
+    font-size: 16px;
+    color: #C5A059;
+    font-weight: normal;
+}
+
+.btn-close-warning:hover {
+    transform: rotate(90deg);
+    border-color: #fff !important;
+}
+
+.btn-close-warning:hover::before {
+    color: #fff;
+}
+
+/* Hide default X on warning close */
+.btn-close-warning.btn-close {
+    background-image: none !important;
+}
+
+/* Fix border-radius overflow issue */
+.list-group-item {
+    overflow: hidden;
+}
+
+.card {
+    overflow: hidden;
+}

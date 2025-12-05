@@ -1,14 +1,14 @@
 <div class="col-md-3 mb-4">
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white border-bottom-0 pt-4 pb-0">
             <div class="d-flex align-items-center mb-3">
                 <div class="flex-shrink-0">
                     <img src="<?php echo e(auth()->user()->avatar_url); ?>" 
                          class="rounded-circle border" width="50" height="50" style="object-fit: cover;">
                 </div>
                 <div class="flex-grow-1 ms-3 overflow-hidden">
-                    <h6 class="mb-0 text-truncate fw-bold text-dark"><?php echo e(auth()->user()->name); ?></h6>
-                    <small class="text-muted text-truncate"><?php echo e(auth()->user()->email); ?></small>
+                    <h6 class="mb-0 text-truncate fw-bold text-white"><?php echo e(auth()->user()->name); ?></h6>
+                    <small class="text-white text-truncate"><?php echo e(auth()->user()->email); ?></small>
                 </div>
             </div>
         </div>

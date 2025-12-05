@@ -40,25 +40,24 @@
             <div>
                 <!-- Ícone Favoritar -->
                 <button @click="$dispatch('toggle-wishlist', product)" 
-                        class="btn btn-link text-decoration-none p-0 action-icon me-3" 
-                        :class="isInWishlist(product.id) ? 'text-danger' : 'text-secondary'"
+                        class="btn btn-warning btn-icon-shape btn-sm rounded-circle d-flex align-items-center justify-content-center me-2" 
+                        :class="isInWishlist(product.id) ? 'text-danger' : 'text-dark'"
                         title="Adicionar aos Favoritos">
                     <i class="bi" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
                 </button>
                 
                 <!-- Ícone Compartilhar -->
-                <a href="#" 
-                   class="text-secondary action-icon text-decoration-none" 
-                   title="Compartilhar este item"
-                   @click.prevent="navigator.share ? navigator.share({title: '<?php echo e($product->name); ?>', url: '<?php echo e(route('shop.show', $product->slug ?: $product->id)); ?>'}) : alert('Compartilhamento não suportado')">
+                <button class="btn btn-warning btn-icon-shape btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+                        title="Compartilhar este item"
+                        @click.prevent="navigator.share ? navigator.share({title: '<?php echo e($product->name); ?>', url: '<?php echo e(route('shop.show', $product->slug ?: $product->id)); ?>'}) : alert('Compartilhamento não suportado')">
                     <i class="bi bi-share-fill"></i>
-                </a>
+                </button>
             </div>
         </div>
         
         <!-- Botão Adicionar ao Carrinho -->
         <button @click="$dispatch('add-to-cart', { product: product, quantity: 1 })" 
-                class="btn btn-primary d-flex align-items-center justify-content-center py-2 mt-auto">
+                class="btn btn-warning w-100 d-flex align-items-center justify-content-center py-2 mt-auto">
             <i class="bi bi-cart-plus-fill me-2"></i>
             <span>Adicionar</span>
         </button>

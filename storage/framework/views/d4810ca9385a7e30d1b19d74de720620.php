@@ -51,8 +51,8 @@
                 <a href="<?php echo e(route('user.payments')); ?>" class="list-group-item list-group-item-action">
                     <i class="bi bi-credit-card me-2 text-primary"></i> Formas de Pagamento
                 </a>
-                <a href="<?php echo e(route('user.settings')); ?>" class="list-group-item list-group-item-action">
-                    <i class="bi bi-gear me-2 text-primary"></i> Configurações
+                <a href="<?php echo e(route('admin.dashboard')); ?>" class="list-group-item list-group-item-action">
+                    <i class="bi bi-speedometer2 me-2 text-primary"></i> Admin
                 </a>
                 <!-- Logout -->
                 <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">

@@ -9,3 +9,300 @@
 
 // Bootstrap Icons
 @import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// --------------------------------------------------
+// Custom Button Styles & Animations
+// --------------------------------------------------
+
+:root {
+    // Gradiente Dourado Principal (Estado Normal)
+    --gold-bar-gradient: linear-gradient(to bottom,
+            #fefefe 0%,
+            #ffee99 20%,
+            #fcd567 50%,
+            #a88215 75%,
+            #fcd567 100%);
+
+
+    // Gradiente Dourado Claro (Estado HOVER) - Animado
+    --light-gold-bar-gradient: linear-gradient(0deg,
+            #fefefe 0%,
+            #ffee99 20%,
+            #fcd567 50%,
+            #a88215 75%,
+            #fcd567 100%);
+
+
+    --gold-color-solid: #fcd567;
+    --border-gap: 3px;
+    --dark-text-color: #402b0c;
+}
+
+// Base Button Styles
+.btn-base {
+    font-weight: bold;
+    // font-size: 1.25rem; // Optional: adjust as needed or keep Bootstrap default
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    // padding: 1rem 2.5rem; // Optional: adjust as needed
+    border: 2px solid transparent;
+    overflow: hidden;
+    transition: background-image 0.3s, color 0.3s, border-radius 0.3s, border-color 0.3s;
+}
+
+// .btn-warning Override (Solid Gold)
+.btn-warning {
+    @extend .btn-base;
+    color: var(--dark-text-color);
+    background-image: var(--gold-bar-gradient);
+    border: 1px solid #a88215; // Borda para definir melhor o círculo
+
+    &:hover {
+        color: var(--dark-text-color);
+        background-image: var(--light-gold-bar-gradient);
+        background-size: 100% 200%;
+        background-position: center 0%;
+        border-color: transparent;
+        animation: gradient-wave 0.6s ease-out forwards;
+    }
+}
+
+// .btn-outline-warning Override (Outline Gold)
+.btn-outline-warning {
+    @extend .btn-base;
+    color: var(--gold-color-solid);
+    background-color: transparent;
+    border: 2px solid var(--gold-color-solid);
+
+    &:hover {
+        color: var(--dark-text-color);
+        background-image: var(--light-gold-bar-gradient);
+        background-size: 100% 200%;
+        background-position: center 0%;
+        border: 1px solid #a88215 !important; // Forçar borda no hover
+        animation: gradient-wave 0.6s ease-out forwards;
+        box-shadow: 0 4px 15px rgba(168, 130, 21, 0.4); // Glow dourado no hover
+    }
+
+    &:active {
+        transform: scale(0.98); // Efeito de clique físico
+    }
+
+    &.animating-to-cart {
+        animation: premium-pulse 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        pointer-events: none;
+        border-color: #a88215 !important;
+    }
+}
+
+@keyframes premium-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(168, 130, 21, 0.7);
+    }
+
+    50% {
+        transform: scale(0.95); // Encolhe levemente
+        box-shadow: 0 0 0 10px rgba(168, 130, 21, 0); // Onda de choque
+    }
+
+    70% {
+        transform: scale(1.02); // Rebote
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(168, 130, 21, 0);
+    }
+}
+
+// Animation Keyframes
+@keyframes gradient-wave {
+    0% {
+        background-position: center 100%;
+    }
+
+    100% {
+        background-position: center -100%;
+    }
+}
+
+// Animation Classes - Sweep Effect (original)
+.btn-animated-effect {
+    overflow: hidden; // Important for sweep to work
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: -10%;
+        left: -10%;
+        height: 120%;
+        width: 40%;
+        z-index: 10;
+        background: linear-gradient(0deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(255, 255, 255, 0) 100%);
+        transform: translateX(-100%) rotate(20deg);
+        border-radius: inherit;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &:hover::after {
+        opacity: 1;
+        // The sweep-light animation is removed as per instruction.
+        // This effect will no longer animate unless a new animation is defined or applied.
+    }
+}
+
+// Alternative: Gradient Animation (smoother for circular buttons)
+.btn-gradient-animated {
+    background-size: 200% 100%;
+
+    &:hover {
+        animation: gradient-move 1s ease infinite;
+    }
+}
+
+// Shape Utilities
+.btn-icon-shape {
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important; // Allow badges to show outside button bounds
+
+    // Default size (matches standard btn)
+    width: 3rem; // Fixed width
+    height: 3rem; // Fixed height (same as width for perfect circle)
+    flex-shrink: 0 !important; // Prevent squashing (oval shape)
+
+    &.btn-sm {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.875rem;
+    }
+
+    &.btn-lg {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.25rem;
+    }
+
+    // Custom circle size from user request
+    &.btn-circle {
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 50%;
+        font-size: 1.5rem;
+    }
+
+    // Extra small size for navbar (60% smaller)
+    &.btn-icon-xs {
+        width: 1.4rem;
+        height: 1.4rem;
+        font-size: 0.7rem;
+    }
+}
+
+// Helper for pill shape
+.btn-pill {
+    border-radius: 50rem; // Bootstrap's rounded-pill uses 50rem
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+// Custom notification badge (small gold circle)
+.notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    min-height: 1.25rem;
+    padding: 0.2rem 0.35rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--dark-text-color);
+    background-image: var(--gold-bar-gradient);
+    border: 1px solid var(--gold-color-solid);
+    border-radius: 50%;
+    position: absolute;
+    top: -0.35rem;
+    right: -0.35rem;
+    z-index: 20;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+// --------------------------------------------------
+// Global Card Styles
+// --------------------------------------------------
+
+// All cards get 1px primary (blue) border
+.card {
+    border: 1px solid #000066 !important;
+    border-radius: 0.375rem !important;
+}
+
+// All card headers get primary theme (blue)
+.card-header {
+    background-color: $primary !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid darken($primary, 10%) !important;
+    font-weight: 600 !important;
+
+    // Ensure headings and text inside headers also have proper color
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    a {
+        color: #ffffff !important;
+        border: none !important;
+    }
+
+    // Ensure buttons inside headers remain visible
+    .btn {
+        font-weight: 600;
+    }
+}
+
+// --------------------------------------------------
+// Close Button Styles
+// --------------------------------------------------
+
+// All close buttons get warning color and circular shape
+.btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fcd567'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    border-radius: 50% !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    opacity: 1 !important;
+    background-color: rgba(252, 213, 103, 0.1) !important;
+    transition: all 0.2s ease-in-out !important;
+
+    &:hover {
+        background-color: rgba(252, 213, 103, 0.3) !important;
+        transform: scale(1.1) !important;
+    }
+}
+
+// Close button on primary background (white X)
+.bg-primary .btn-close,
+.card-header .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.3) !important;
+    }
+}

@@ -9,6 +9,9 @@
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Card Styles -->
+    <link href="{{ asset('css/card-styles.css') }}" rel="stylesheet">
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @livewireStyles

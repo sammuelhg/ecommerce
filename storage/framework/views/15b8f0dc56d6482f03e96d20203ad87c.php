@@ -32,15 +32,10 @@
 
             <!-- Ícones de Ação -->
             <div class="d-flex order-lg-3 me-2">
-                <!-- Busca Mobile -->
-                <a class="nav-link p-2 text-white d-lg-none" href="#" title="Buscar" @click.prevent="showMobileSearch = !showMobileSearch">
-                    <i class="bi bi-search fs-5"></i>
-                </a>
-                
                 <!-- Conta -->
-                <a class="nav-link p-2 text-white position-relative" href="#" title="Minha Conta"
+                <a class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2" href="#" title="Minha Conta"
                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasUser">
-                    <i class="bi bi-person-circle fs-5"></i>
+                    <i class="bi bi-person-circle"></i>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
                         <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                             <span class="visually-hidden">Logado</span>
@@ -49,9 +44,9 @@
                 </a>
                 
                 <!-- Carrinho -->
-                <button class="nav-link p-2 text-white position-relative bg-transparent border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
-                    <i class="bi bi-cart4 fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary" 
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
+                    <i class="bi bi-cart4"></i>
+                    <span class="notification-badge" 
                           x-show="cartTotalItems > 0" 
                           x-text="cartTotalItems"
                           style="display: none;">
@@ -59,9 +54,9 @@
                 </button>
 
                 <!-- Wishlist -->
-                <button class="nav-link p-2 text-white position-relative bg-transparent border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWishlist">
-                    <i class="bi fs-5" :class="wishlist.length > 0 ? 'bi-heart-fill' : 'bi-heart'" :style="wishlist.length > 0 ? 'color: #ffc107;' : ''"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWishlist">
+                    <i class="bi" :class="wishlist.length > 0 ? 'bi-heart-fill' : 'bi-heart'"></i>
+                    <span class="notification-badge" 
                           x-show="wishlist.length > 0" 
                           x-text="wishlist.length"
                           style="display: none;">
@@ -69,8 +64,8 @@
                 </button>
 
                 <!-- Menu Hambúrguer (Mobile) -->
-                <button class="navbar-toggler border-0 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav">
+                    <i class="bi bi-list"></i>
                 </button>
             </div>
 
@@ -79,7 +74,7 @@
                 <!-- Busca Desktop -->
                 <form class="d-flex flex-grow-1 me-lg-4 my-2 my-lg-0 d-none d-lg-flex" @submit.prevent="performSearch()">
                     <input class="form-control bg-white me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
-                    <button class="btn rounded-circle" type="submit" style="background-color: #ffc107; border: none; color: #1a1a1a; width: 40px; height: 40px;">
+                    <button class="btn btn-outline-warning btn-icon-shape rounded-circle" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
                 </form>
@@ -113,9 +108,10 @@
     </div>
 
     <!-- Offcanvas Menu Mobile -->
-    <div class="offcanvas offcanvas-start bg-white d-lg-none" tabindex="-1" id="offcanvasNav">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title text-primary fw-bold">
+    <div class="offcanvas offcanvas-end bg-white" tabindex="-1" id="offcanvasNav" 
+         style="width: 280px; max-width: 85vw;">
+        <div class="offcanvas-header bg-primary text-white border-bottom">
+            <h5 class="offcanvas-title fw-bold">
                 <i class="bi bi-grid-3x3-gap-fill me-2"></i> Navegação
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
@@ -161,19 +157,17 @@
 
                 <!-- Ações Rápidas -->
                 <li class="nav-item border-top mt-3 pt-3">
-                    <a class="nav-link text-muted" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasUser">
+                    <a class="nav-link text-muted" href="<?php echo e(route('customer.account.profile.edit')); ?>">
                         <i class="bi bi-person-circle me-2"></i>Minha Conta
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-muted" href="#" data-bs-toggle="offcanvas" 
-                       data-bs-target="#offcanvasWishlist">
+                    <a class="nav-link text-muted" href="<?php echo e(route('shop.index')); ?>">
                         <i class="bi bi-heart-fill me-2"></i>Lista de Desejos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-muted" href="#" data-bs-toggle="offcanvas" 
-                       data-bs-target="#offcanvasCart">
+                    <a class="nav-link text-muted" href="<?php echo e(route('shop.index')); ?>">
                         <i class="bi bi-cart-fill me-2"></i>Meu Carrinho
                     </a>
                 </li>

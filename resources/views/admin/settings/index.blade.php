@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header bg-primary text-white border-bottom">
                     <h4 class="mb-0"><i class="bi bi-gear me-2"></i>Configurações da Loja</h4>
                 </div>
                 <div class="card-body">

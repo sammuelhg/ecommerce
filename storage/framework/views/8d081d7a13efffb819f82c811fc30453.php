@@ -194,10 +194,10 @@
                         <div class="d-flex flex-wrap gap-2">
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $sizeVariants; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <a href="<?php echo e(route('shop.show', $size['slug'])); ?>" 
-                                   class="btn <?php echo e($size['active'] ? 'btn-primary' : 'btn-outline-secondary'); ?> <?php echo e($size['stock'] <= 0 ? 'disabled opacity-50' : ''); ?>"
-                                   style="min-width: 60px;">
-                                    <span class="fw-bold"><?php echo e($size['name']); ?></span>
-                                    <small class="d-block" style="font-size: 0.7rem;">(<?php echo e($size['stock']); ?>)</small>
+                                   class="btn <?php echo e($size['active'] ? 'btn-warning' : 'btn-outline-secondary'); ?> <?php echo e($size['stock'] <= 0 ? 'disabled opacity-50' : ''); ?> d-flex flex-column align-items-center justify-content-center"
+                                   style="min-width: 60px; height: auto; padding: 0.5rem;">
+                                    <span class="fw-bold lh-1"><?php echo e($size['name']); ?></span>
+                                    <small class="d-block mt-1 lh-1" style="font-size: 0.7rem;">(<?php echo e($size['stock']); ?>)</small>
                                 </a>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
@@ -209,11 +209,8 @@
                 <!-- Seção de Quantidade e Ações -->
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($product->stock > 0): ?>
                     <div class="mb-4">
-                        <label class="form-label fw-bold mb-2">Quantidade:</label>
-                        
                         <!-- Client-Side Add to Cart (Pure Alpine.js) -->
-                        <div class="d-flex gap-3 align-items-stretch" 
-                             x-data="{ 
+                        <div x-data="{ 
                                  quantity: 1, 
                                  maxStock: <?php echo e($product->stock); ?>,
                                  product: {
@@ -224,36 +221,55 @@
                                      slug: '<?php echo e($product->slug); ?>'
                                  }
                              }">
-                            <!-- Seletor de Quantidade -->
-                            <div class="input-group" style="width: 140px;">
-                                <button class="btn btn-outline-secondary" type="button" @click="quantity = Math.max(1, quantity - 1)">
-                                    <i class="bi bi-dash"></i>
-                                </button>
-                                <input type="number" class="form-control text-center border-secondary" 
-                                       x-model.number="quantity" min="1" :max="maxStock" 
-                                       style="-moz-appearance: textfield;"
-                                       @input="quantity = Math.max(1, Math.min(maxStock, parseInt(quantity) || 1))">
-                                <button class="btn btn-outline-secondary" type="button" @click="quantity = Math.min(maxStock, quantity + 1)">
-                                    <i class="bi bi-plus"></i>
-                                </button>
+                            
+                            <!-- Linha Superior: Quantidade e Ações -->
+                            <div class="d-flex justify-content-between align-items-end mb-3">
+                                <!-- Seletor de Quantidade -->
+                                <div>
+                                    <label class="form-label fw-bold mb-1 d-block">Quantidade:</label>
+                                    <div class="input-group" style="width: 140px;">
+                                        <button class="btn btn-outline-secondary" type="button" @click="quantity = Math.max(1, quantity - 1)">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" class="form-control text-center border-secondary" 
+                                               x-model.number="quantity" min="1" :max="maxStock" 
+                                               style="-moz-appearance: textfield;"
+                                               @input="quantity = Math.max(1, Math.min(maxStock, parseInt(quantity) || 1))">
+                                        <button class="btn btn-outline-secondary" type="button" @click="quantity = Math.min(maxStock, quantity + 1)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Botões de Ação (Favorito e Compartilhar) -->
+                                <div class="d-flex gap-2">
+                                    <button @click="toggleWishlist(product)" 
+                                            class="btn btn-warning btn-icon-shape rounded-circle d-flex align-items-center justify-content-center"
+                                            :class="{ 'text-danger': isInWishlist(product.id) }"
+                                            title="Adicionar aos Favoritos">
+                                        <i class="bi fs-4" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
+                                    </button>
+                                    
+                                    <button class="btn btn-warning btn-icon-shape rounded-circle d-flex align-items-center justify-content-center"
+                                            title="Compartilhar"
+                                            @click.prevent="navigator.share ? navigator.share({title: '<?php echo e(addslashes($product->name)); ?>', url: '<?php echo e(route('shop.show', $product->slug)); ?>'}) : alert('Compartilhamento não suportado')">
+                                        <i class="bi bi-share-fill fs-5"></i>
+                                    </button>
+                                </div>
                             </div>
 
-                            <!-- Botões de Ação -->
-                            <div class="flex-grow-1 d-flex gap-2">
-                                <button @click="addToCart(product, quantity); 
-                                                showAlert('<?php echo e(addslashes($product->name)); ?> adicionado ao carrinho!', 'success')" 
-                                        class="btn btn-primary flex-grow-1 d-flex align-items-center justify-content-center py-2">
-                                    <i class="bi bi-cart-plus-fill me-2"></i>
-                                    <span>Adicionar ao Carrinho</span>
-                                </button>
-                                
-                                <button @click="toggleWishlist(product)" 
-                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-center px-3"
-                                        :class="{ 'text-danger': isInWishlist(product.id) }"
-                                        title="Adicionar aos Favoritos">
-                                    <i class="bi fs-5" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
-                                </button>
-                            </div>
+                            <!-- Linha Inferior: Botão Adicionar (Full Width) -->
+                            <button x-ref="addToCartBtn"
+                                    @click="
+                                        $el.classList.add('animating-to-cart');
+                                        setTimeout(() => $el.classList.remove('animating-to-cart'), 800);
+                                        addToCart(product, quantity); 
+                                        showAlert('<?php echo e(addslashes($product->name)); ?> adicionado ao carrinho!', 'success')
+                                    " 
+                                    class="btn btn-warning w-100 d-flex align-items-center justify-content-center py-3">
+                                <i class="bi bi-cart-plus-fill me-2 fs-4"></i>
+                                <span class="fs-5 fw-bold">Adicionar ao Carrinho</span>
+                            </button>
                         </div>
 
                         <small class="text-muted mt-2 d-block">
@@ -433,14 +449,14 @@
                                     <!-- Ícones de Ação -->
                                     <div>
                                         <button @click="toggleWishlist(product)" 
-                                                class="btn btn-link text-decoration-none p-0 action-icon me-3" 
-                                                :class="isInWishlist(product.id) ? 'text-danger' : 'text-secondary'"
+                                                class="btn btn-warning btn-icon-shape rounded-circle p-0 action-icon me-2" 
+                                                :class="isInWishlist(product.id) ? 'text-danger' : 'text-dark'"
                                                 title="Adicionar aos Favoritos">
                                             <i class="bi" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
                                         </button>
                                         
                                         <a href="#" 
-                                           class="text-secondary action-icon text-decoration-none" 
+                                           class="btn btn-warning btn-icon-shape rounded-circle text-dark action-icon text-decoration-none" 
                                            title="Compartilhar"
                                            @click.prevent="navigator.share ? navigator.share({title: '<?php echo e(addslashes($related->name)); ?>', url: '<?php echo e(route('shop.show', $related->slug)); ?>'}) : alert('Compartilhamento não suportado')">
                                             <i class="bi bi-share-fill"></i>
@@ -450,7 +466,7 @@
                                 
                                 <!-- Botão Adicionar ao Carrinho -->
                                 <button @click="addToCart(product, 1); showAlert('<?php echo e(addslashes($related->name)); ?> adicionado!', 'success')" 
-                                        class="btn btn-primary d-flex align-items-center justify-content-center py-2 mt-auto">
+                                        class="btn btn-warning d-flex align-items-center justify-content-center py-2 mt-auto">
                                     <i class="bi bi-cart-plus-fill me-2"></i>
                                     <span>Adicionar</span>
                                 </button>

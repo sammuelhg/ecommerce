@@ -10,7 +10,7 @@
             <h2 class="fw-bold mb-4">Finalizar Compra</h2>
             
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
+                <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-geo-alt me-2"></i>Endereço de Entrega</h5>
                 </div>
                 <div class="card-body">
@@ -53,7 +53,7 @@
             </div>
 
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
+                <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-credit-card me-2"></i>Pagamento</h5>
                 </div>
                 <div class="card-body">

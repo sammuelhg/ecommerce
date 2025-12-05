@@ -20,6 +20,12 @@ class Edit extends Component
     public $password_confirmation = '';
     public $avatar;
     public $currentAvatar;
+    public $isGoogleUser = false;
+    public $isFacebookUser = false;
+    public $socialProvider = null;
+    public $hasPassword = true;
+    public $showPasswordModal = false;
+    public $googleSuggestedName = null;
 
     protected $rules = [
         'name'  => 'required|string|max:255',
@@ -33,11 +39,56 @@ class Edit extends Component
     public function mount()
     {
         $user = auth()->user();
+        
+        // Always pre-fill name (either from DB or social suggestion)
         $this->name = $user->name;
+        
+        // Store suggestion if available for reference
+        if ($user->google_id || $user->facebook_id) {
+            $this->googleSuggestedName = $user->name;
+        }
+        
         $this->email = $user->email;
         $this->phone = $user->phone;
         $this->taxvat = $user->taxvat;
         $this->currentAvatar = $user->avatar_url;
+        
+        // Check if user has a password set
+        $this->hasPassword = !empty($user->password);
+        
+        // Check social login
+        if ($user->google_id) {
+            $this->isGoogleUser = true;
+            $this->socialProvider = 'Google';
+        } elseif ($user->facebook_id) {
+            $this->isFacebookUser = true;
+            $this->socialProvider = 'Facebook';
+        }
+    }
+
+    public function setPassword()
+    {
+        $this->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = auth()->user();
+        $user->update(['password' => Hash::make($this->password)]);
+        
+        $this->hasPassword = true;
+        
+        // Dispatch event to close modal via JS
+        $this->dispatch('password-set');
+        
+        $this->dispatch('toast', [
+            'title' => 'Sucesso!',
+            'text'  => 'Senha definida com sucesso. Agora você pode fazer login com email e senha.',
+            'icon'  => 'success'
+        ]);
+        
+        // Reset password fields
+        $this->password = '';
+        $this->password_confirmation = '';
     }
 
     public function updatedAvatar()
@@ -50,9 +101,12 @@ class Edit extends Component
         $this->validate();
 
         $user = auth()->user();
+        
+        // Use suggested name if user didn't enter one
+        $finalName = !empty($this->name) ? $this->name : ($this->googleSuggestedName ?? $user->name);
 
         $data = [
-            'name'  => $this->name,
+            'name'  => $finalName,
             'email' => $this->email,
             'phone' => $this->phone,
             'taxvat'=> $this->taxvat,

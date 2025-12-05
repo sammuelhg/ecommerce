@@ -5,8 +5,8 @@
     <div class="row">
         <x-account-sidebar />
         <div class="col-md-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0 fw-bold">Indique Amigos</h5>
                 </div>
                 <div class="card-body p-5 text-center">

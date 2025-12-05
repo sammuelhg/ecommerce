@@ -1,5 +1,7 @@
 <!-- Logo & Newsletter Section -->
-<div class="py-5" style="background-color: {{ $storeSettings['color_category_bar'] ?? '#f0f8ff' }}; color: #212529;">
+<div class="py-5 position-relative" style="background-color: {{ $storeSettings['color_category_bar'] ?? '#fff9f0ff' }}; color: #212529;">
+    <!-- Gradient Top Border (same as buttons) -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 8px; background: linear-gradient(-0.5deg, #fefefe 0%, #ffee99 20%, #fcd567 50%, #a88215 75%, #fcd567 100%);"></div>
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 text-center text-md-start mb-4 mb-md-0">

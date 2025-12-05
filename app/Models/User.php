@@ -61,6 +61,11 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute()
     {
         if ($this->avatar) {
+            // Check if it's an external URL (social login)
+            if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
+                return $this->avatar;
+            }
+            // Otherwise it's a local file
             return \Illuminate\Support\Facades\Storage::url($this->avatar);
         }
         

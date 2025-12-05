@@ -1,6 +1,6 @@
-@extends('layouts.app')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10">
@@ -17,7 +17,7 @@
                     
                     <h6 class="mt-4">Ações Rápidas:</h6>
                     <div class="list-group">
-                        <a href="{{ route('customer.account.profile.edit') }}" class="list-group-item list-group-item-action">
+                        <a href="<?php echo e(route('customer.account.profile.edit')); ?>" class="list-group-item list-group-item-action">
                             <i class="bi bi-person me-2"></i>Editar Perfil
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
@@ -32,4 +32,6 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\ecommerce\ecommerce-hp\resources\views/user/settings.blade.php ENDPATH**/ ?>

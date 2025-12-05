@@ -1,0 +1,65 @@
+/* --------------------------------------------------
+   Global Card Styles Patch
+   -------------------------------------------------- */
+
+/* All cards get 1px primary (blue) border */
+.card {
+    border: 1px solid #000066 !important;
+    border-radius: 0.375rem !important;
+}
+
+/* All card headers get primary theme (blue) */
+.card-header {
+    background-color: #000066 !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #000044 !important;
+    font-weight: 600 !important;
+}
+
+/* Ensure headings and text inside headers have proper color and no borders */
+.card-header h1,
+.card-header h2,
+.card-header h3,
+.card-header h4,
+.card-header h5,
+.card-header h6,
+.card-header p,
+.card-header span,
+.card-header a {
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Buttons inside headers remain visible */
+.card-header .btn {
+    font-weight: 600;
+}
+
+/* --------------------------------------------------
+   Close Button Styles - Warning Gradient + Black X
+   -------------------------------------------------- */
+
+/* ALL close buttons get warning gradient with black X */
+.btn-close {
+    width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 50% !important;
+    border: 1px solid #a88215 !important;
+    opacity: 1 !important;
+    transition: all 0.2s ease-in-out !important;
+    filter: none !important;
+    /* Double background: X on top, gradient below */
+    background-image:
+        url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23402b0c'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e"),
+        linear-gradient(to bottom, #fefefe 0%, #ffee99 20%, #fcd567 50%, #a88215 75%, #fcd567 100%) !important;
+    background-position: center, center !important;
+    background-size: 1em auto, 100% 100% !important;
+    background-repeat: no-repeat, no-repeat !important;
+}
+
+.btn-close:hover {
+    background-image:
+        url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23402b0c'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e"),
+        linear-gradient(0deg, #fefefe 0%, #ffee99 20%, #fcd567 50%, #a88215 75%, #fcd567 100%) !important;
+    transform: scale(1.1) !important;
+}

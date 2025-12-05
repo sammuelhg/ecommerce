@@ -5,10 +5,10 @@
     <div class="row">
         <x-account-sidebar />
         <div class="col-md-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold">Meus Endereços</h5>
-                    <button class="btn btn-primary">
+                    <button class="btn btn-success">
                         <i class="bi bi-plus-circle me-2"></i>Adicionar Endereço
                     </button>
                 </div>

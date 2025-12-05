@@ -1,7 +1,32 @@
 // Theme Colors
-$primary: #000066;
+$primary: #000000;
 $secondary: #6c757d;
-$warning: #ffc107;
+// --------------------------------------------------
+// 1) Definição do tema metálico
+// --------------------------------------------------
+$metallic-gold: #C9A04B;
+$metallic-gold-dark: #A9843F;
+
+// Gradiente metálico – substitui o warning
+$warning: $metallic-gold !default;
+$warning-bg-subtle: $metallic-gold !default;
+$warning-border-subtle: $metallic-gold-dark !default;
+
+$warning-gradient: linear-gradient(135deg,
+                $metallic-gold 0%,
+                lighten($metallic-gold, 8%) 35%,
+                lighten($metallic-gold, 18%) 70%,
+                $metallic-gold-dark 100%);
+
+// Componentes que usam o esquema de gradiente
+$btn-warning-bg: $warning-gradient;
+$btn-warning-border-color: $metallic-gold-dark;
+$btn-warning-color: #000; // contraste
+
+// Para alertas
+$alert-warning-bg: $warning-gradient;
+$alert-warning-border-color: $metallic-gold-dark;
+$alert-warning-color: #000;
 
 // Body
 $body-bg: #ffffff;
