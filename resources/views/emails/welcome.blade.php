@@ -1,43 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #1a1a1a; padding: 20px; text-align: center; }
-        .logo { color: #ffd700; font-size: 24px; font-weight: bold; text-decoration: none; }
-        .content { padding: 30px 20px; background-color: #f9f9f9; }
-        .button { display: inline-block; padding: 10px 20px; background-color: #ffd700; color: #1a1a1a; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; }
-        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <a href="{{ route('shop.index') }}" class="logo">LosFit</a>
-        </div>
-        <div class="content">
-            <h2>Olá, {{ $user->name }}!</h2>
-            <p>Seja muito bem-vindo(a) à LosFit!</p>
-            
-            <p>Estamos muito felizes em tê-lo(a) conosco. Sua conta foi criada com sucesso através do 
-                <strong>{{ $registrationType }}</strong>.
-            </p>
+@extends('emails.layout')
 
-            <p>Agora você pode:</p>
-            <ul>
-                <li>Acompanhar seus pedidos</li>
-                <li>Salvar seus produtos favoritos</li>
-                <li>Receber ofertas exclusivas</li>
-            </ul>
+@section('content')
+    <!-- Título -->
+    <h1 style="margin: 0; color: #000000; font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.2;">
+        Bem-vindo(a)!
+    </h1>
+    <p style="margin: 5px 0 20px 0; color: #555555; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">
+        {{ $user->name }}
+    </p>
 
-            <center>
-                <a href="{{ route('shop.index') }}" class="button">Começar a Comprar</a>
-            </center>
-        </div>
-        <div class="footer">
-            <p>&copy; {{ date('Y') }} LosFit. Todos os direitos reservados.</p>
-        </div>
+    <div style="border-top: 1px solid #e0e0e0; margin-bottom: 20px; width: 100%;"></div>
+
+    <p style="color: #333; font-size: 15px; line-height: 1.6;">
+        Sua conta foi criada com sucesso! Aproveite nossas ofertas exclusivas.
+    </p>
+
+    <!-- Credenciais -->
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 3px solid #000;">
+        <p style="margin: 5px 0; font-size: 13px; color: #555;"><strong>EMAIL</strong></p>
+        <p style="margin: 0 0 10px 0; font-size: 15px; font-weight: 600;">{{ $user->email }}</p>
+        
+        @if($password)
+        <p style="margin: 5px 0; font-size: 13px; color: #555;"><strong>SENHA</strong></p>
+        <p style="margin: 0; font-size: 15px; font-weight: 600;">{{ $password }}</p>
+        @endif
     </div>
-</body>
-</html>
+
+    <div style="text-align: center; margin: 25px 0;">
+        <a href="{{ $loginUrl }}" class="btn-primary">Acessar Loja</a>
+    </div>
+@endsection
+

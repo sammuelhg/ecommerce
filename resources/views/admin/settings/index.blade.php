@@ -46,6 +46,11 @@
                                     <i class="bi bi-shield-check me-2"></i>Segurança
                                 </button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button">
+                                    <i class="bi bi-envelope me-2"></i>Emails
+                                </button>
+                            </li>
                         </ul>
 
                         <!-- Tab Content -->
@@ -205,8 +210,48 @@
                                                     </div>
                                                 @endforeach
                                             </div>
-                                        </div>
+
                                     @endif
+                                </div>
+                            </div>
+
+
+                            <!-- Emails -->
+                            <div class="tab-pane fade" id="email" role="tabpanel">
+                                <h5 class="mb-4 text-primary border-bottom pb-2">Card de Email</h5>
+                                <p class="text-muted mb-4">Selecione o card que será usado nos emails enviados pelo sistema.</p>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Card para Emails</label>
+                                        <select name="email_card_id" class="form-select bg-white">
+                                            @foreach(\App\Models\EmailCard::active()->get() as $card)
+                                                <option value="{{ $card->id }}" {{ ($settings['email_card_id'] ?? '') == $card->id ? 'selected' : '' }}>
+                                                    {{ $card->name }} - {{ $card->sender_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="form-text">Escolha qual card aparecerá na assinatura dos emails.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3 d-flex align-items-end">
+                                        <a href="{{ route('admin.email-cards.index') }}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-gear me-2"></i>Gerenciar Cards
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <h5 class="mb-4 text-primary border-bottom pb-2 mt-5">Visualização de Emails</h5>
+                                <p class="text-muted mb-3">Visualize os modelos de email utilizados pelo sistema:</p>
+                                <div class="d-grid gap-3 d-md-flex">
+                                    <a href="{{ route('admin.emails.preview', 'welcome') }}" target="_blank" class="btn btn-outline-primary">
+                                        <i class="bi bi-envelope-check me-2"></i>Boas-vindas
+                                    </a>
+                                    <a href="{{ route('admin.emails.preview', 'reset') }}" target="_blank" class="btn btn-outline-danger">
+                                        <i class="bi bi-key me-2"></i>Redefinição de Senha
+                                    </a>
+                                    <a href="{{ route('admin.emails.preview', 'reset-confirmation') }}" target="_blank" class="btn btn-outline-success">
+                                        <i class="bi bi-check-circle me-2"></i>Senha Alterada
+                                    </a>
                                 </div>
                             </div>
 

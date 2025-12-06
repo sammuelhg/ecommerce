@@ -13,10 +13,10 @@ $warning-bg-subtle: $metallic-gold !default;
 $warning-border-subtle: $metallic-gold-dark !default;
 
 $warning-gradient: linear-gradient(135deg,
-                $metallic-gold 0%,
-                lighten($metallic-gold, 8%) 35%,
-                lighten($metallic-gold, 18%) 70%,
-                $metallic-gold-dark 100%);
+        $metallic-gold 0%,
+        lighten($metallic-gold, 8%) 35%,
+        lighten($metallic-gold, 18%) 70%,
+        $metallic-gold-dark 100%);
 
 // Componentes que usam o esquema de gradiente
 $btn-warning-bg: $warning-gradient;
@@ -33,5 +33,5 @@ $body-bg: #ffffff;
 
 // Typography
 $font-family-sans-serif: 'Nunito', sans-serif;
-$font-size-base: 1.1rem;
+$font-size-base: 1.0rem;
 $line-height-base: 1.6;

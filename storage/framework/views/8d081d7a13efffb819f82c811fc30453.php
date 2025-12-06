@@ -22,7 +22,7 @@
             <!-- Coluna de Imagens (Esquerda) -->
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <!-- Imagem Principal -->
-                <div class="mb-3">
+                <div class="mb-3 overflow-hidden rounded">
                     <img id="mainProductImage" 
                          src="<?php echo e($product->image ? (Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image)) : 'https://placehold.co/800x800/f0f8ff/1a1a1a?text='.urlencode($product->name)); ?>" 
                          class="main-image shadow-sm w-100 rounded" 
@@ -194,10 +194,10 @@
                         <div class="d-flex flex-wrap gap-2">
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $sizeVariants; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <a href="<?php echo e(route('shop.show', $size['slug'])); ?>" 
-                                   class="btn <?php echo e($size['active'] ? 'btn-warning' : 'btn-outline-secondary'); ?> <?php echo e($size['stock'] <= 0 ? 'disabled opacity-50' : ''); ?> d-flex flex-column align-items-center justify-content-center"
-                                   style="min-width: 60px; height: auto; padding: 0.5rem;">
+                                   class="btn <?php echo e($size['active'] ? 'btn-primary' : 'btn-outline-secondary'); ?> <?php echo e($size['stock'] <= 0 ? 'disabled opacity-50' : ''); ?> d-flex flex-column align-items-center justify-content-center rounded"
+                                   style="width: 50px; height: 50px; padding: 0;">
                                     <span class="fw-bold lh-1"><?php echo e($size['name']); ?></span>
-                                    <small class="d-block mt-1 lh-1" style="font-size: 0.7rem;">(<?php echo e($size['stock']); ?>)</small>
+                                    <small class="d-block lh-1" style="font-size: 0.7rem;">(<?php echo e($size['stock']); ?>)</small>
                                 </a>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
@@ -505,6 +505,30 @@ function changeMainImage(src) {
         event.target.style.opacity = '1';
     }
 }
+
+// Zoom functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mainImage = document.getElementById('mainProductImage');
+    
+    if (mainImage) {
+        mainImage.addEventListener('mousemove', function(e) {
+            const { left, top, width, height } = this.getBoundingClientRect();
+            const x = e.clientX - left;
+            const y = e.clientY - top;
+            
+            const xPercent = (x / width) * 100;
+            const yPercent = (y / height) * 100;
+            
+            this.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            this.style.transform = 'scale(2)';
+        });
+
+        mainImage.addEventListener('mouseleave', function() {
+            this.style.transformOrigin = 'center center';
+            this.style.transform = 'scale(1)';
+        });
+    }
+});
 </script>
 <?php $__env->stopSection(); ?>
 

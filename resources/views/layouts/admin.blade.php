@@ -260,6 +260,14 @@
                                 <i class="bi bi-people"></i> Usuários Clientes
                             </a>
                         </li>
+
+                        <!-- Links Bio -->
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.links.*') ? 'active' : '' }}" 
+                               href="{{ route('admin.links.index') }}">
+                                <i class="bi bi-link-45deg"></i> Links da Bio
+                            </a>
+                        </li>
                     </ul>
 
                     <!-- Home Link -->

@@ -27,7 +27,9 @@ class ShopController extends Controller
             return [
                 'id' => $product->id,
                 'name' => $product->name,
+                'slug' => $product->slug,
                 'price' => (float) $product->price,
+                'image' => $product->image,
                 'imageText' => $product->image ?? 'Produto',
                 'isOffer' => (bool) $product->is_offer,
                 'oldPrice' => $product->old_price ? (float) $product->old_price : null,
@@ -195,7 +197,9 @@ class ShopController extends Controller
             return [
                 'id' => $product->id,
                 'name' => $product->name,
+                'slug' => $product->slug,
                 'price' => (float) $product->price,
+                'image' => $product->image,
                 'imageText' => $product->image ?? 'Produto',
                 'isOffer' => (bool) $product->is_offer,
                 'oldPrice' => $product->old_price ? (float) $product->old_price : null,
@@ -220,7 +224,9 @@ class ShopController extends Controller
             return [
                 'id' => $product->id,
                 'name' => $product->name,
+                'slug' => $product->slug,
                 'price' => (float) $product->price,
+                'image' => $product->image,
                 'imageText' => $product->image ?? 'Produto',
                 'isOffer' => (bool) $product->is_offer,
                 'oldPrice' => $product->old_price ? (float) $product->old_price : null,

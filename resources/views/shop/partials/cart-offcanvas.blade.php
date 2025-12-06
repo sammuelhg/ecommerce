@@ -13,7 +13,7 @@
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
-    <div class="offcanvas-body d-flex flex-column">
+    <div class="offcanvas-body d-flex flex-column overflow-hidden">
         <!-- Estado Vazio -->
         <div x-show="cart.length === 0" class="p-5 text-center text-muted flex-grow-1">
             <i class="bi bi-cart-x fs-1 mb-3"></i>
@@ -21,21 +21,53 @@
         </div>
 
         <!-- Lista de Produtos -->
-        <div class="list-group list-group-flush flex-grow-1 overflow-y-auto" x-show="cart.length > 0">
+        <div class="list-group flex-grow-1 overflow-y-auto pb-3" x-show="cart.length > 0">
             <template x-for="item in cart" :key="item.id">
-                <div class="list-group-item d-flex p-3 align-items-start">
-                    <img :src="`https://placehold.co/80x80/2c3e50/ffffff?text=${item.imageText}`"
-                         class="rounded me-3 flex-shrink-0" style="width: 80px; height: 80px;">
-                    <div class="flex-grow-1 overflow-hidden me-2">
-                        <p class="mb-1 fw-bold text-dark line-clamp-2" x-text="item.name"></p>
-                        <small class="text-muted d-block">Preço: <span x-text="formatCurrency(item.price)"></span></small>
-                        <small class="text-primary fw-semibold d-block">Total: <span x-text="formatCurrency(item.price * item.qty)"></span></small>
+                <div class="list-group-item list-group-item-action p-3 border-bottom">
+                    <!-- Row 1: Product Name (Full Width) -->
+                    <div class="mb-2">
+                        <a :href="`/loja/produto/${item.slug || item.id}`" class="text-decoration-none text-dark">
+                            <h6 class="mb-0 text-wrap text-break lh-sm" x-text="item.name"></h6>
+                        </a>
+                        <!-- Subtitle removed to duplicate info -->
                     </div>
-                    <div class="ms-auto d-flex flex-column align-items-end">
-                        <input type="number" class="form-control bg-white form-control-sm text-center mb-2"
-                               x-model.number="item.qty" @change="updateQty(item)" min="1" style="width: 60px;">
-                        <button class="btn btn-sm btn-outline-danger" @click="removeFromCart(item.id)">
-                            <i class="bi bi-trash"></i>
+
+                    <!-- Row 2: Image, Qty, Price, Remove -->
+                    <div class="d-flex align-items-center justify-content-between">
+                        <!-- Left: Image -->
+                        <a :href="`/loja/produto/${item.slug || item.id}`" class="flex-shrink-0 me-3">
+                            <img :src="item.image 
+                                    ? (item.image.startsWith('http') ? item.image : `/storage/${item.image}`) 
+                                    : `https://placehold.co/60x60/f0f8ff/1a1a1a?text=${encodeURIComponent(item.name?.substring(0,10) || 'Produto')}`"
+                                 class="rounded" 
+                                 style="width: 50px; height: 50px; object-fit: cover;"
+                                 :alt="item.name"
+                                 x-on:error="$el.src = 'https://placehold.co/60x60/f0f8ff/1a1a1a?text=Imagem'">
+                        </a>
+
+                        <!-- Center: Quantity Selector (Primary + Rounded) -->
+                        <div class="input-group input-group-sm flex-nowrap me-3 rounded overflow-hidden border" style="width: 90px;">
+                            <button class="btn btn-dark px-2 border-0 rounded-0" type="button" 
+                                    @click="item.qty > 1 ? item.qty-- : null; updateQty(item)">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="text" class="form-control text-center px-1 border-0 bg-white" x-model="item.qty" readonly style="min-width: 0;">
+                            <button class="btn btn-dark px-2 border-0 rounded-0" type="button" 
+                                    @click="item.qty++; updateQty(item)">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+
+                        <!-- Center-Right: Price -->
+                        <div class="flex-grow-1 text-end me-3">
+                            <span class="fw-bold text-dark" x-text="formatCurrency(item.price)"></span>
+                        </div>
+
+                        <!-- Right: Delete Button -->
+                        <button class="btn btn-outline-danger btn-sm rounded flex-shrink-0" 
+                                @click.prevent="removeFromCart(item.id)"
+                                title="Remover">
+                            <i class="bi bi-trash-fill"></i>
                         </button>
                     </div>
                 </div>

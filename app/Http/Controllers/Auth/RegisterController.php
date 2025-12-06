@@ -109,8 +109,11 @@ class RegisterController extends Controller
             'password' => $data['password'], // Model handles hashing via cast
         ]);
 
+        // Envia email de boas-vindas com a senha original (antes de hash)
         try {
-            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeEmail($user, 'cadastro via email'));
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(
+                new \App\Mail\WelcomeEmail($user, $data['password'])
+            );
         } catch (\Exception $e) {
             // Log error but don't stop registration
             \Illuminate\Support\Facades\Log::error('Erro ao enviar email de boas-vindas: ' . $e->getMessage());

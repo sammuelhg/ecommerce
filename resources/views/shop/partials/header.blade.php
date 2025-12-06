@@ -72,6 +72,7 @@
             <!-- Navegação Desktop -->
             <div class="collapse navbar-collapse order-lg-2">
                 <!-- Busca Desktop -->
+                <!-- Busca Desktop -->
                 <form class="d-flex flex-grow-1 me-lg-4 my-2 my-lg-0 d-none d-lg-flex" @submit.prevent="performSearch()">
                     <input class="form-control bg-white me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
                     <button class="btn btn-outline-warning btn-icon-shape rounded-circle" type="submit">
@@ -176,7 +177,7 @@
 
     <!-- Barra de Categorias -->
     <div class="shadow-sm d-none d-md-block" style="background-color: {{ $storeSettings['color_category_bar'] ?? '#f0f8ff' }} !important; border-top: 1px solid rgba(0,0,0,0.05) !important;">
-        <div class="container" style="max-width: 1200px;">
+        <div class="container py-2" style="max-width: 1200px;">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-dark fw-bold" href="{{ route('shop.index', ['sort' => 'latest']) }}" style="transition: color 0.3s;" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#212529'">Novidades</a></li>
                 <li class="nav-item"><a class="nav-link text-dark fw-bold" href="{{ route('shop.category', 'fit') }}" style="transition: color 0.3s;" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#212529'">ModaFit</a></li>

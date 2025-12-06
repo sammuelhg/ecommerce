@@ -27,6 +27,8 @@ class Product extends Model
         'size',
     ];
 
+    protected $appends = ['image'];
+
     public function category()
     {
         return $this->belongsTo(Category::class);

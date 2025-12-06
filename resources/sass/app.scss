@@ -249,6 +249,24 @@
     border-radius: 0.375rem !important;
 }
 
+// Specific card body styles for product cards in grid
+.product-card {
+    .card-body {
+        // Reduce font size of product details by 10%
+        // Assuming base font is 1rem, we reduce contextually. 
+        // 1.25rem * 0.9 = 1.125rem
+
+        .card-title {
+            font-size: 1.125rem !important; // Was h5 default (~1.25rem)
+        }
+
+        .fs-5 {
+            font-size: 1.125rem !important; // Was fs-5 default (~1.25rem)
+        }
+    }
+}
+
+
 // All card headers get primary theme (blue)
 .card-header {
     background-color: $primary !important;
@@ -273,36 +291,5 @@
     // Ensure buttons inside headers remain visible
     .btn {
         font-weight: 600;
-    }
-}
-
-// --------------------------------------------------
-// Close Button Styles
-// --------------------------------------------------
-
-// All close buttons get warning color and circular shape
-.btn-close {
-    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fcd567'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
-    border-radius: 50% !important;
-    width: 2rem !important;
-    height: 2rem !important;
-    opacity: 1 !important;
-    background-color: rgba(252, 213, 103, 0.1) !important;
-    transition: all 0.2s ease-in-out !important;
-
-    &:hover {
-        background-color: rgba(252, 213, 103, 0.3) !important;
-        transform: scale(1.1) !important;
-    }
-}
-
-// Close button on primary background (white X)
-.bg-primary .btn-close,
-.card-header .btn-close {
-    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
-
-    &:hover {
-        background-color: rgba(255, 255, 255, 0.3) !important;
     }
 }

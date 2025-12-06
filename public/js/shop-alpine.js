@@ -1,5 +1,3 @@
-// public/js/shop-alpine.js
-
 function shopApp() {
     return {
         products: [],
@@ -121,9 +119,6 @@ function shopApp() {
                 if (response.ok) {
                     const data = await response.json();
                     if (data.redirect_url) {
-                        // Clear cart after successful sync if you want, or keep it until order is confirmed
-                        // localStorage.removeItem('myShopCart'); 
-                        // this.cart = [];
                         window.location.href = data.redirect_url;
                     }
                 } else {
@@ -135,6 +130,7 @@ function shopApp() {
                 this.showAlert('Erro ao conectar com o servidor.', 'danger');
             }
         },
+
         loadSearchHistory() { const s = localStorage.getItem('recentSearches'); if (s) this.recentSearches = JSON.parse(s); }
     };
 }

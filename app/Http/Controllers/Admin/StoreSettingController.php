@@ -57,7 +57,9 @@ class StoreSettingController extends Controller
             'color_secondary', 
             'color_accent', 
             'color_background',
-            'color_category_bar'
+            'color_category_bar',
+            // Email Settings
+            'email_card_id'
         ];
 
         foreach ($textFields as $field) {
@@ -100,5 +102,48 @@ class StoreSettingController extends Controller
         StoreSetting::set('security_certificates', array_values($certificates), 'json');
 
         return redirect()->back()->with('success', 'Certificado removido com sucesso!');
+    }
+    public function previewEmail($type)
+    {
+        switch ($type) {
+            case 'welcome':
+                $user = new \App\Models\User([
+                    'name' => 'Usuário Exemplo',
+                    'email' => 'usuario@exemplo.com'
+                ]);
+                
+                // Produtos de exemplo
+                $products = \App\Models\Product::inRandomOrder()->take(3)->get();
+                if ($products->isEmpty()) {
+                    $products = collect([
+                        new \App\Models\Product(['name' => 'Produto Exemplo 1', 'price' => 99.90, 'slug' => 'produto-1', 'image' => '']),
+                        new \App\Models\Product(['name' => 'Produto Exemplo 2', 'price' => 149.90, 'slug' => 'produto-2', 'image' => '']),
+                    ]);
+                }
+
+                return view('emails.welcome', [
+                    'user' => $user,
+                    'password' => 'Senha123',
+                    'loginUrl' => route('login'),
+                    'products' => $products,
+                    'subject' => 'Bem-vindo à ' . config('app.name')
+                ]);
+
+            case 'reset':
+                return view('emails.password-reset-request', [
+                    'resetUrl' => url(route('password.reset', ['token' => 'token-exemplo', 'email' => 'user@example.com'], false)),
+                    'subject' => 'Redefinição de Senha'
+                ]);
+
+            case 'reset-confirmation':
+                return view('emails.password-reset-confirmation', [
+                    'newPassword' => 'NovaSenha123',
+                    'loginUrl' => route('login'),
+                    'subject' => 'Senha Alterada com Sucesso'
+                ]);
+
+            default:
+                abort(404);
+        }
     }
 }

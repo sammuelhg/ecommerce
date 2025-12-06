@@ -21,8 +21,13 @@
                 <div class="list-group list-group-flush">
                     <template x-for="product in offerProducts.slice(0, 3)" :key="product.id">
                         <div class="list-group-item d-flex align-items-center p-2 bg-light rounded-3 mb-2">
-                            <img :src="`https://placehold.co/60x60/3498db/ffffff?text=${product.imageText}`" 
-                                 class="rounded me-2 flex-shrink-0" style="width: 60px; height: 60px;">
+                            <img :src="product.image 
+                                    ? (product.image.startsWith('http') ? product.image : `/storage/${product.image}`) 
+                                    : `https://placehold.co/60x60/3498db/ffffff?text=${encodeURIComponent(product.name?.substring(0,10) || 'Oferta')}`" 
+                                 class="rounded me-2 flex-shrink-0" 
+                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                 :alt="product.name"
+                                 x-on:error="$el.src = 'https://placehold.co/60x60/3498db/ffffff?text=Imagem'">
                             <div class="flex-grow-1 me-2 overflow-hidden"> 
                                 <p class="mb-0 small fw-bold text-dark line-clamp-2" x-text="product.name"></p>
                                 <span class="text-danger fw-semibold small" x-text="formatCurrency(product.price)"></span>
@@ -40,8 +45,13 @@
         <div class="list-group list-group-flush" x-show="wishlist.length > 0">
             <template x-for="item in wishlist" :key="item.id">
                 <div class="list-group-item d-flex align-items-center p-3">
-                    <img :src="`https://placehold.co/80x80/CCCCCC/333333?text=${item.imageText}`" 
-                         class="rounded me-3 flex-shrink-0" style="width: 80px; height: 80px; object-fit: cover;">
+                    <img :src="item.image 
+                            ? (item.image.startsWith('http') ? item.image : `/storage/${item.image}`) 
+                            : `https://placehold.co/80x80/CCCCCC/333333?text=${encodeURIComponent(item.name?.substring(0,10) || 'Produto')}`" 
+                         class="rounded me-3 flex-shrink-0" 
+                         style="width: 80px; height: 80px; object-fit: cover;"
+                         :alt="item.name"
+                         x-on:error="$el.src = 'https://placehold.co/80x80/CCCCCC/333333?text=Imagem'">
                     
                     <div class="flex-grow-1 me-2 overflow-hidden"> 
                         <p class="mb-1 fw-bold text-dark line-clamp-2" x-text="item.name" :title="item.name"></p>

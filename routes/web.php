@@ -71,6 +71,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/settings', [App\Http\Controllers\Admin\StoreSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [App\Http\Controllers\Admin\StoreSettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/remove-certificate', [App\Http\Controllers\Admin\StoreSettingController::class, 'removeCertificate'])->name('settings.remove-certificate');
+    
+    // Email Previews
+    Route::get('/emails/preview/{type}', [App\Http\Controllers\Admin\StoreSettingController::class, 'previewEmail'])->name('emails.preview');
+    
+    // Email Cards
+    Route::view('/email-cards', 'admin.email-cards.index')->name('email-cards.index');
+    
+    // Links Bio
+    Route::view('/links', 'admin.links.index')->name('links.index');
 });
 
 
@@ -98,4 +107,14 @@ Route::get('/test-livewire', function () {
 Route::get('/test-buttons', function () {
     return view('test-buttons');
 });
+
+
+// Digital Card & Linktree
+Route::get('/card', function () {
+    return view('card');
+})->name('card');
+
+Route::get('/links', function () {
+    return view('links');
+})->name('links');
 
