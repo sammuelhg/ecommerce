@@ -68,6 +68,12 @@ class User extends Authenticatable
             // Otherwise it's a local file
             return \Illuminate\Support\Facades\Storage::url($this->avatar);
         }
+
+        // Check for Store Profile Logo
+        $profileLogo = \App\Models\StoreSetting::get('profile_logo');
+        if ($profileLogo) {
+            return $profileLogo;
+        }
         
         $name = urlencode($this->name);
         return "https://ui-avatars.com/api/?name={$name}&color=7F9CF5&background=EBF4FF";

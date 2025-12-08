@@ -151,29 +151,29 @@
                             </a>
                         </li>
 
-                        <!-- Dados de Itens (Data Items) -->
+                        <!-- Catálogo (Antigo Dados de Itens) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex justify-content-between align-items-center" 
                                data-bs-toggle="collapse" 
-                               href="#dataItemsMenu" 
+                               href="#catalogMenu" 
                                role="button" 
-                               aria-expanded="{{ request()->routeIs('admin.categories.*', 'admin.products.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-database"></i> Dados de Itens</span>
+                               aria-expanded="{{ request()->routeIs('admin.products.*', 'admin.categories.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'true' : 'false' }}">
+                                <span><i class="bi bi-tag"></i> Catálogo</span>
                                 <i class="bi bi-chevron-down"></i>
                             </a>
-                            <div class="collapse {{ request()->routeIs('admin.categories.*', 'admin.products.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'show' : '' }}" 
-                                 id="dataItemsMenu">
+                            <div class="collapse {{ request()->routeIs('admin.products.*', 'admin.categories.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'show' : '' }}" 
+                                 id="catalogMenu">
                                 <ul class="nav flex-column ms-3">
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.categories.index') }}">
-                                            <i class="bi bi-folder"></i> Categorias
-                                        </a>
-                                    </li>
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" 
                                            href="{{ route('admin.products.index') }}">
                                             <i class="bi bi-box"></i> Produtos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.categories.index') }}">
+                                            <i class="bi bi-folder"></i> Categorias
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -210,18 +210,18 @@
                             </div>
                         </li>
 
-                        <!-- Pedidos (Orders) -->
+                        <!-- Vendas (Antigo Pedidos) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex justify-content-between align-items-center" 
                                data-bs-toggle="collapse" 
-                               href="#ordersMenu" 
+                               href="#salesMenu" 
                                role="button" 
                                aria-expanded="{{ request()->routeIs('admin.orders.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-cart-check"></i> Pedidos</span>
+                                <span><i class="bi bi-cart"></i> Vendas</span>
                                 <i class="bi bi-chevron-down"></i>
                             </a>
                             <div class="collapse {{ request()->routeIs('admin.orders.*') ? 'show' : '' }}" 
-                                 id="ordersMenu">
+                                 id="salesMenu">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.orders.incoming') ? 'active' : '' }}" 
@@ -245,27 +245,66 @@
                             </div>
                         </li>
 
+                        <!-- Marketing & Conteúdo -->
+                        <li class="nav-item">
+                            <a class="nav-link d-flex justify-content-between align-items-center" 
+                               data-bs-toggle="collapse" 
+                               href="#marketingMenu" 
+                               role="button" 
+                               aria-expanded="{{ request()->routeIs('admin.stories.*', 'admin.newsletter.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'true' : 'false' }}">
+                                <span><i class="bi bi-megaphone"></i> Marketing</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </a>
+                            <div class="collapse {{ request()->routeIs('admin.stories.*', 'admin.newsletter.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'show' : '' }}" 
+                                 id="marketingMenu">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.stories.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.stories.index') }}">
+                                            <i class="bi bi-instagram"></i> Stories
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.grid.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.grid.index') }}">
+                                            <i class="bi bi-grid-3x3"></i> Layout do Grid
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.newsletter.campaigns') }}">
+                                            <i class="bi bi-envelope"></i> Newsletter
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.email-cards.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.email-cards.index') }}">
+                                            <i class="bi bi-card-image"></i> Cards de Email
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.links.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.links.index') }}">
+                                            <i class="bi bi-link-45deg"></i> Links da Bio
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <!-- Clientes -->
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" 
+                               href="{{ route('admin.users.index') }}">
+                                <i class="bi bi-people"></i> Clientes
+                            </a>
+                        </li>
+
                         <!-- Configurações -->
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" 
                                href="{{ route('admin.settings.index') }}">
                                 <i class="bi bi-gear"></i> Configurações
-                            </a>
-                        </li>
-
-                        <!-- Usuários Clientes -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.users.index') }}">
-                                <i class="bi bi-people"></i> Usuários Clientes
-                            </a>
-                        </li>
-
-                        <!-- Links Bio -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.links.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.links.index') }}">
-                                <i class="bi bi-link-45deg"></i> Links da Bio
                             </a>
                         </li>
                     </ul>

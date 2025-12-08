@@ -1,7 +1,7 @@
 <header>
     <style>
         /* Fix para telas muito pequenas (344px) - logo absoluta, ícones sobrepõem */
-        @media (max-width: 400px) {
+        @media (max-width: 480px) {
             .navbar .container {
                 position: relative;
                 min-height: 90px;
@@ -27,24 +27,107 @@
         <div class="container" style="max-width: 1200px;">
             <!-- Logo -->
             <a class="navbar-brand me-2" href="<?php echo e(route('shop.index')); ?>" title="Página Inicial">
-                <img src="<?php echo e(asset('logo.svg')); ?>" alt="Logo" style="height: 90px; width: auto;">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($storeSettings['store_logo']) && $storeSettings['store_logo']): ?>
+                    <img src="<?php echo e($storeSettings['store_logo']); ?>" alt="Logo" style="height: 90px; width: auto;">
+                <?php else: ?>
+                    <img src="<?php echo e(asset('logo.svg')); ?>" alt="Logo" style="height: 90px; width: auto;">
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
 
             <!-- Ícones de Ação -->
             <div class="d-flex order-lg-3 me-2">
                 <!-- Conta -->
-                <a class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2" href="#" title="Minha Conta"
-                   data-bs-toggle="offcanvas" data-bs-target="#offcanvasUser">
-                    <i class="bi bi-person-circle"></i>
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
-                            <span class="visually-hidden">Logado</span>
-                        </span>
-                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                </a>
+                <!-- Conta (Story Ring / Avatar Button) -->
+                <div class="nav-item me-2 position-relative" 
+                     x-data="{
+                        latestStoryTimestamp: '<?php echo e($storyStatus->latestStoryTimestamp); ?>',
+                        hasActiveStories: <?php echo e($storyStatus->hasActiveStories ? 'true' : 'false'); ?>,
+                        isUnseen: false,
+                        
+                        init() {
+                            if (this.hasActiveStories && this.latestStoryTimestamp) {
+                                const lastViewed = localStorage.getItem('lastViewedStoryTimestamp');
+                                // If no last viewed OR server timestamp is newer > unseen
+                                this.isUnseen = !lastViewed || new Date(this.latestStoryTimestamp) > new Date(lastViewed);
+                            }
+                        },
+                        
+                        handleClick() {
+                            if (this.hasActiveStories && this.isUnseen) {
+                                // Open Story Viewer
+                                const storyModal = new bootstrap.Modal(document.getElementById('storyViewerModal'));
+                                storyModal.show();
+                                
+                                // Mark as seen immediately (or could do it when modal closes)
+                                localStorage.setItem('lastViewedStoryTimestamp', new Date().toISOString());
+                                this.isUnseen = false;
+                            } else {
+                                // Open Offcanvas
+                                const offcanvasFn = new bootstrap.Offcanvas(document.getElementById('offcanvasUser'));
+                                offcanvasFn.show();
+                            }
+                        }
+                     }">
+                     
+                     <!-- 1. O Aro (Externo e com gap) - Exibe apenas se TIVER stories E for NÃO VISTO -->
+                     <!-- Se já viu, o aro some, igual Instagram -->
+                     <template x-if="hasActiveStories && isUnseen">
+                        <div class="story-ring"></div>
+                     </template>
+
+                    <button class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative p-0 d-flex align-items-center justify-content-center" 
+                            type="button" 
+                            @click="handleClick()"
+                            title="<?php echo e(Auth::check() ? 'Minha Conta' : 'Entrar'); ?>"
+                            style="width: 40px; height: 40px; z-index: 2; background-color: #1a1a1a;">
+                        
+                        <!-- 2. O Conteúdo (Avatar ou Ícone) -->
+                        <div class="d-flex align-items-center justify-content-center w-100 h-100 rounded-circle overflow-hidden">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::user()->avatar): ?>
+                                    <img src="<?php echo e(Auth::user()->avatar); ?>" class="w-100 h-100 object-fit-cover" alt="Avatar">
+                                <?php else: ?>
+                                    <span class="fw-bold fs-6"><?php echo e(substr(Auth::user()->name, 0, 1)); ?></span>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->guest()): ?>
+                                <i class="bi bi-person-fill fs-5"></i>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </div>
+                    </button>
+
+                    <style>
+                        /* O Aro Colorido (Anel Externo - Estático) */
+                        .story-ring {
+                            position: absolute;
+                            /* Centralizar perfeitamente sobre o botão */
+                            top: 50%; left: 50%;
+                            transform: translate(-50%, -50%);
+                            
+                            /* Tamanho do Anel: 46px */
+                            width: 46px;
+                            height: 46px;
+                            
+                            border-radius: 50%;
+                            background: linear-gradient(45deg, #FFD600 0%, #FF7A00 25%, #FF0069 50%, #D300C5 75%, #833AB4 100%);
+                            z-index: 1;
+                            
+                            /* Máscara "Tuck Under": Começa em 38px (19px raio) para entrar sob o botão de 40px (20px raio) */
+                            /* Ring Radius: 23px. Inner Radius: 19px. */
+                            /* 19/23 = ~82.6% */
+                            -webkit-mask: radial-gradient(farthest-side, transparent 82%, black 84%);
+                            mask: radial-gradient(farthest-side, transparent 82%, black 84%);
+                        }
+                    </style>
+                </div>
                 
                 <!-- Carrinho -->
-                <button class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2 d-flex align-items-center justify-content-center" 
+                        type="button" 
+                        data-bs-toggle="offcanvas" 
+                        data-bs-target="#offcanvasCart"
+                        style="width: 40px; height: 40px;">
                     <i class="bi bi-cart4"></i>
                     <span class="notification-badge" 
                           x-show="cartTotalItems > 0" 
@@ -54,7 +137,11 @@
                 </button>
 
                 <!-- Wishlist -->
-                <button class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWishlist">
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle position-relative me-2 d-flex align-items-center justify-content-center" 
+                        type="button" 
+                        data-bs-toggle="offcanvas" 
+                        data-bs-target="#offcanvasWishlist"
+                        style="width: 40px; height: 40px;">
                     <i class="bi" :class="wishlist.length > 0 ? 'bi-heart-fill' : 'bi-heart'"></i>
                     <span class="notification-badge" 
                           x-show="wishlist.length > 0" 
@@ -64,7 +151,11 @@
                 </button>
 
                 <!-- Menu Hambúrguer (Mobile) -->
-                <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav">
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center" 
+                        type="button" 
+                        data-bs-toggle="offcanvas" 
+                        data-bs-target="#offcanvasNav"
+                        style="width: 40px; height: 40px;">
                     <i class="bi bi-list"></i>
                 </button>
             </div>

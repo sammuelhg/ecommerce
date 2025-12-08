@@ -12,24 +12,102 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body p-0">
+        <!-- 1. BLOCO DE STORY (Condicional) -->
+        @if(isset($storyStatus) && $storyStatus->hasActiveStories)
+            <div class="p-3">
+                <div class="story-card p-4 d-flex align-items-center justify-content-between shadow-sm" 
+                     data-bs-toggle="modal" 
+                     data-bs-target="#storyViewerModal"
+                     style="cursor: pointer;">
+                    <div>
+                        <span class="badge bg-white text-dark mb-2 text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">Novidades</span>
+                        <h4 class="fw-bold mb-0 lh-sm text-white">Ver Stories<br>da Loja</h4>
+                    </div>
+                    
+                    <!-- Play Button with Pulse Effect -->
+                    <div class="play-icon-wrapper rounded-circle bg-white d-flex align-items-center justify-content-center shadow" style="width: 48px; height: 48px;">
+                        <i class="bi bi-play-fill fs-2" style="color: #d300c5; margin-left: 3px;"></i>
+                    </div>
+                </div>
+                <style>
+                    .story-card {
+                        /* Faithful Instagram Gradient */
+                        background: linear-gradient(45deg, #FFD600 0%, #FF7A00 25%, #FF0069 50%, #D300C5 75%, #833AB4 100%);
+                        color: white;
+                        border-radius: 16px;
+                        transition: all 0.3s ease;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .story-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+                    }
+                    .story-card:active {
+                        transform: scale(0.98);
+                    }
+                    .play-icon-wrapper {
+                        transition: transform 0.3s ease;
+                    }
+                    .story-card:hover .play-icon-wrapper {
+                        transform: scale(1.1);
+                    }
+                </style>
+            </div>
+        @endif
         @auth
             <!-- Usuário Logado -->
             <div class="p-4 border-bottom bg-light">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 overflow-hidden"
-                         style="width: 60px; height: 60px; font-size: 24px;">
-                        @if(Auth::user()->avatar)
-                            <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" class="w-100 h-100 object-fit-cover">
-                        @else
-                            <i class="bi bi-person-fill"></i>
+                    
+                    <!-- Avatar Trigger Wrapper -->
+                    <div class="position-relative me-3" 
+                         @if(isset($storyStatus) && $storyStatus->hasActiveStories)
+                             style="cursor: pointer;"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#storyViewerModal"
+                         @endif
+                    >
+                        <!-- Story Ring for Offcanvas (Active if stories exist) -->
+                        @if(isset($storyStatus) && $storyStatus->hasActiveStories)
+                            <div class="offcanvas-story-ring"></div>
                         @endif
+
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center overflow-hidden position-relative"
+                             style="width: 60px; height: 60px; font-size: 24px; z-index: 2; @if(isset($storyStatus) && $storyStatus->hasActiveStories) background-color: #1a1a1a !important; @endif">
+                            <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="w-100 h-100 object-fit-cover">
+                        </div>
                     </div>
+
                     <div>
                         <h6 class="mb-0 fw-bold">{{ Auth::user()->name }}</h6>
                         <small class="text-muted">{{ Auth::user()->email }}</small>
                     </div>
                 </div>
             </div>
+
+            <!-- Styles for Offcanvas Ring -->
+            <style>
+                .offcanvas-story-ring {
+                    position: absolute;
+                    top: 50%; left: 50%;
+                    transform: translate(-50%, -50%);
+                    /* Avatar 60px. Gap 2px (start 58px). Ring 3px. */
+                    /* Width = 60 + (2*2) + (3*2) ?? No, similar proprotion. */
+                    /* Let's aim for 70px outer size to wrap 60px nicely */
+                    width: 68px;
+                    height: 68px;
+                    border-radius: 50%;
+                    background: linear-gradient(45deg, #FFD600 0%, #FF7A00 25%, #FF0069 50%, #D300C5 75%, #833AB4 100%);
+                    z-index: 1;
+                    /* Mask: 60px avatar. Ring starts at 60px? No "gap" inside. */
+                    /* Let's do the "tuck under" trick again for seamless look */
+                    /* Avatar 60px (R30). Mask start 28px (56px). */
+                    /* Ring 68px (R34). 28/34 = 82% */
+                    -webkit-mask: radial-gradient(farthest-side, transparent 82%, black 84%);
+                    mask: radial-gradient(farthest-side, transparent 82%, black 84%);
+                }
+            </style>
 
             <!-- Menu do Usuário -->
             <div class="list-group list-group-flush">
@@ -66,7 +144,11 @@
             <!-- Usuário NÃO Logado -->
             <div class="p-4">
                 <div class="text-center mb-4">
-                    <i class="bi bi-person-circle text-muted" style="font-size: 64px;"></i>
+                    @if(isset($storeSettings['profile_logo']))
+                        <img src="{{ $storeSettings['profile_logo'] }}" alt="Logo Perfil" class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+                    @else
+                        <i class="bi bi-person-circle text-muted" style="font-size: 64px;"></i>
+                    @endif
                     <p class="text-muted mt-3">Faça login para acessar sua conta e aproveitar todos os benefícios.</p>
                 </div>
 

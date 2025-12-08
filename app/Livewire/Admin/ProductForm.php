@@ -43,7 +43,9 @@ class ProductForm extends Component
     public $product_size_id = '';
     public $color = ''; // Deprecated, mantido para compatibilidade temporária
     public $attribute = '';
+    public $attribute = '';
     public $size = ''; // Deprecated, mantido para compatibilidade temporária
+    public $card_type = 'product_standard'; // Default card type
 
 
 
@@ -140,6 +142,7 @@ class ProductForm extends Component
         $this->color = $product->color; // Legacy field
         $this->size = $product->size; // Legacy field
         $this->attribute = $product->attribute;
+        $this->card_type = $product->card_type ?: 'product_standard';
 
         // Load existing images
         $this->existingImages = $product->images()->orderBy('is_main', 'desc')->get();
@@ -376,6 +379,7 @@ class ProductForm extends Component
                 'is_active' => $this->is_active,
                 'is_featured' => $this->is_featured,
                 'is_offer' => $this->is_offer,
+                'card_type' => $this->card_type,
             ];
 
             if ($this->productId) {

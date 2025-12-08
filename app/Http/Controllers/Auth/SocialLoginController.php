@@ -1,15 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\Auth\SocialAuthService;
+use App\DTOs\Auth\SocialUserDTO;
+use App\Services\CartService;
+use App\Services\WishlistService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialLoginController extends Controller
 {
+    public function __construct(
+        protected SocialAuthService $socialAuthService,
+        protected CartService $cartService,
+        protected WishlistService $wishlistService
+    ) {}
+
     /**
      * Redirect the user to the provider authentication page.
      *
@@ -31,49 +42,30 @@ class SocialLoginController extends Controller
     {
         try {
             $socialUser = Socialite::driver($provider)->user();
+        } catch (InvalidStateException $e) {
+            return redirect()->route('login')->with('error', 'Erro na autenticação social. Tente novamente.');
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Erro ao conectar com ' . ucfirst($provider));
         }
 
-        $user = User::where('email', $socialUser->getEmail())->first();
+        // Cria DTO com dados normalizados
+        $dto = new SocialUserDTO(
+            name: $socialUser->getName() ?? $socialUser->getNickname() ?? 'Usuário',
+            email: $socialUser->getEmail(),
+            providerId: $socialUser->getId(),
+            providerName: $provider,
+            avatar: $socialUser->getAvatar()
+        );
 
-        if ($user) {
-            // Update existing user with social ID if not present
-            if ($provider === 'google' && !$user->google_id) {
-                $user->update(['google_id' => $socialUser->getId()]);
-            } elseif ($provider === 'facebook' && !$user->facebook_id) {
-                $user->update(['facebook_id' => $socialUser->getId()]);
-            }
-            
-            // Update avatar if missing
-            if (!$user->avatar) {
-                $user->update(['avatar' => $socialUser->getAvatar()]);
-            }
+        // Processa usuário via Service
+        $user = $this->socialAuthService->handleSocialUser($dto);
 
-            Auth::login($user);
-        } else {
-            // Create new user
-            $user = User::create([
-                'name' => $socialUser->getName(),
-                'email' => $socialUser->getEmail(),
-                'password' => null, // Social login users don't have a password initially
-                $provider . '_id' => $socialUser->getId(),
-                'avatar' => $socialUser->getAvatar(),
-                'email_verified_at' => now(), // Assume social email is verified
-            ]);
+        // Loga o usuário
+        Auth::login($user);
 
-            try {
-                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeEmail($user, 'login com ' . ucfirst($provider)));
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Erro ao enviar email de boas-vindas social: ' . $e->getMessage());
-            }
-
-            Auth::login($user);
-        }
-
-        // Merge session cart and wishlist to database
-        app(\App\Services\CartService::class)->mergeSessionToDatabase();
-        app(\App\Services\WishlistService::class)->mergeSessionToDatabase();
+        // Merge de carrinho e wishlist (mantido no controller pois lida com infra de Sessão/HTTP)
+        $this->cartService->mergeSessionToDatabase();
+        $this->wishlistService->mergeSessionToDatabase();
 
         return redirect()->route('shop.index')->with('success', 'Login realizado com sucesso!');
     }

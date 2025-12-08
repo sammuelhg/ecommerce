@@ -24,17 +24,14 @@ class CartController extends Controller
             'cart.*.qty' => 'required|integer|min:1',
         ]);
 
-        // Clear existing cart
-        $cartService->clear();
+        $items = array_map(function ($item) {
+            return new \App\DTOs\Cart\CartItemDTO(
+                productId: (int) $item['id'],
+                quantity: (int) $item['qty']
+            );
+        }, $request->cart);
 
-        // Add all items from client cart to server cart
-        foreach ($request->cart as $item) {
-            $product = Product::find($item['id']);
-            
-            if ($product && $product->stock >= $item['qty']) {
-                $cartService->add($product, $item['qty']);
-            }
-        }
+        $cartService->sync($items);
 
         // Return success and redirect URL
         return response()->json([

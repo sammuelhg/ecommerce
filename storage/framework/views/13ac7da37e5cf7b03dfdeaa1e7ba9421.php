@@ -9,6 +9,12 @@
         </div>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </div>
+<div class="row mt-5">
+    <div class="col-12 d-flex justify-content-center">
+        <?php echo e($products->withQueryString()->links()); ?>
+
+    </div>
+</div>
 <?php else: ?>
     <div class="col-12 text-center py-5">
         <h4 class="text-muted">Nenhum produto encontrado.</h4>

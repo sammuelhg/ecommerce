@@ -8,24 +8,11 @@ use App\Services\CartService;
 use App\Models\Product;
 use Livewire\Attributes\On;
 
+use App\DTOs\Cart\CartItemDTO;
+
 class Wishlist extends Component
 {
-    protected $wishlistService;
-    protected $cartService;
-
-    public function boot(WishlistService $wishlistService, CartService $cartService)
-    {
-        $this->wishlistService = $wishlistService;
-        $this->cartService = $cartService;
-    }
-
-    #[On('wishlistUpdated')]
-    public function render()
-    {
-        return view('livewire.shop.wishlist', [
-            'wishlistItems' => $this->wishlistService->get()
-        ]);
-    }
+    // ... items ...
 
     public function removeItem($id)
     {
@@ -40,7 +27,8 @@ class Wishlist extends Component
         if (isset($items[$id])) {
             $product = Product::find($id);
             if ($product) {
-                $this->cartService->add($product);
+                $dto = new CartItemDTO($product->id, 1);
+                $this->cartService->add($dto);
                 $this->dispatch('cartUpdated');
                 $this->dispatch('toast-success', 'Produto movido para o carrinho!');
             }

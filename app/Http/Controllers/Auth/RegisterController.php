@@ -1,43 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Services\Auth\RegistrationService;
+use App\DTOs\Auth\RegisterUserDTO;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use App\Models\Product;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
-    use RegistersUsers;
-
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/loja';
+    public function __construct(
+        protected RegistrationService $service
+    ) {
+        $this->middleware('guest');
+    }
 
     /**
      * Show the application registration form.
-     *
+     * 
      * @return \Illuminate\View\View
      */
-    public function showRegistrationForm()
+    public function showRegistrationForm(): View
     {
+        // Mantendo a lógica de carregar produtos para a vitrine da view de registro
         $products = Product::where('is_active', true)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -59,66 +50,22 @@ class RegisterController extends Controller
     }
 
     /**
-     * The user has been registered.
+     * Handle a registration request for the application.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
-     * @return mixed
+     * @param  \App\Http\Requests\Auth\RegisterRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    protected function registered(\Illuminate\Http\Request $request, $user)
+    public function register(RegisterRequest $request): RedirectResponse
     {
-        session()->flash('success', 'Bem-vindo, ' . $user->name . '! Sua conta foi criada com sucesso.');
-    }
+        // 1. Transforma Request validado em DTO
+        $dto = RegisterUserDTO::fromArray($request->validated());
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest');
-    }
+        // 2. Chama o Service
+        $user = $this->service->registerUser($dto);
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-    }
+        // 3. Lógica HTTP (Login e Redirect)
+        Auth::login($user);
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\Models\User
-     */
-    protected function create(array $data)
-    {
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => $data['password'], // Model handles hashing via cast
-        ]);
-
-        // Envia email de boas-vindas com a senha original (antes de hash)
-        try {
-            \Illuminate\Support\Facades\Mail::to($user->email)->send(
-                new \App\Mail\WelcomeEmail($user, $data['password'])
-            );
-        } catch (\Exception $e) {
-            // Log error but don't stop registration
-            \Illuminate\Support\Facades\Log::error('Erro ao enviar email de boas-vindas: ' . $e->getMessage());
-        }
-
-        return $user;
+        return redirect()->route('shop.index')->with('success', 'Cadastro realizado com sucesso!');
     }
 }

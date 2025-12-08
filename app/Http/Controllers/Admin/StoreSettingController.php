@@ -1,21 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\Admin\StoreSettingService;
+use App\DTOs\Admin\StoreSettingsDTO;
 
 class StoreSettingController extends Controller
 {
-    public function index()
+    public function __construct(
+        protected StoreSettingService $service
+    ) {}
+
+    public function index($tab = 'identity')
     {
+        $allowedTabs = ['identity', 'colors', 'info', 'ai', 'modals', 'security', 'email'];
+        if (!in_array($tab, $allowedTabs)) {
+            $tab = 'identity';
+        }
+
         $settings = StoreSetting::all()->pluck('value', 'key');
         
         return view('admin.settings.index', [
             'settings' => $settings,
-            'certificates' => StoreSetting::get('security_certificates', [])
+            'certificates' => StoreSetting::get('security_certificates', []),
+            'activeTab' => $tab
         ]);
     }
 
@@ -23,6 +36,10 @@ class StoreSettingController extends Controller
     {
         $request->validate([
             'store_logo' => 'nullable|image|max:2048',
+            'email_logo' => 'nullable|image|max:2048',
+            'profile_logo' => 'nullable|image|max:2048',
+            'footer_logo' => 'nullable|image|max:2048',
+            'favicon' => 'nullable|mimes:ico,png|max:1024',
             'store_address' => 'nullable|string',
             'store_cnpj' => 'nullable|string',
             'store_phone' => 'nullable|string',
@@ -33,73 +50,35 @@ class StoreSettingController extends Controller
             'modal_contact' => 'nullable|string',
             'modal_returns' => 'nullable|string',
             'modal_faq' => 'nullable|string',
+            'modal_privacy' => 'nullable|string',
+            'modal_blog' => 'nullable|string',
+            'modal_tracking' => 'nullable|string',
             'color_primary' => 'nullable|string',
             'color_secondary' => 'nullable|string',
             'color_accent' => 'nullable|string',
             'color_background' => 'nullable|string',
             'color_category_bar' => 'nullable|string',
-            'security_certificates.*' => 'image|max:2048'
+            'security_certificates.*' => 'image|max:2048',
+            'email_card_id' => 'nullable|integer'
         ]);
 
-        // Text Settings
-        $textFields = [
-            'store_address', 
-            'store_cnpj', 
-            'store_phone',
-            'google_maps_embed_url',
-            'ai_image_prompt_template',
-            'modal_about',
-            'modal_careers',
-            'modal_contact',
-            'modal_returns',
-            'modal_faq',
-            'color_primary', 
-            'color_secondary', 
-            'color_accent', 
-            'color_background',
-            'color_category_bar',
-            // Email Settings
-            'email_card_id'
-        ];
+        $dto = StoreSettingsDTO::fromRequest($request);
+        
+        $this->service->updateSettings($dto);
 
-        foreach ($textFields as $field) {
-            if ($request->has($field)) {
-                StoreSetting::set($field, $request->input($field), str_contains($field, 'color') ? 'color' : 'text');
-            }
-        }
+        $this->service->updateSettings($dto);
 
-        // Logo Upload
-        if ($request->hasFile('store_logo')) {
-            $path = $request->file('store_logo')->store('uploads/settings', 'public');
-            StoreSetting::set('store_logo', Storage::url($path), 'image');
-        }
-
-        // Certificates Upload (Append to existing)
-        if ($request->hasFile('security_certificates')) {
-            $currentCertificates = StoreSetting::get('security_certificates', []);
-            
-            foreach ($request->file('security_certificates') as $file) {
-                $path = $file->store('uploads/settings/certificates', 'public');
-                $currentCertificates[] = Storage::url($path);
-            }
-            
-            StoreSetting::set('security_certificates', $currentCertificates, 'json');
-        }
-
-        return redirect()->back()->with('success', 'Configurações atualizadas com sucesso!');
+        $tab = $request->input('redirect_tab', 'identity');
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações atualizadas com sucesso!');
     }
 
     public function removeCertificate(Request $request)
     {
         $path = $request->input('path');
-        $certificates = StoreSetting::get('security_certificates', []);
         
-        $certificates = array_filter($certificates, fn($c) => $c !== $path);
-        
-        // Optional: Delete file from storage if needed
-        // Storage::disk('public')->delete(str_replace('/storage/', '', $path));
-
-        StoreSetting::set('security_certificates', array_values($certificates), 'json');
+        if ($path) {
+            $this->service->removeCertificate($path);
+        }
 
         return redirect()->back()->with('success', 'Certificado removido com sucesso!');
     }

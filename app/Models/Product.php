@@ -25,6 +25,7 @@ class Product extends Model
         'color',
         'attribute',
         'size',
+        'card_type',
     ];
 
     protected $appends = ['image'];

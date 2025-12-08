@@ -35,6 +35,7 @@
     @include('shop.partials.cart-offcanvas')
     @include('shop.partials.wishlist-offcanvas')
     @include('shop.partials.user-offcanvas')
+    @include('shop.partials.story-viewer-modal')
     @include('shop.partials.toasts')
     
     <!-- Bootstrap Bundle JS (for Offcanvas and other components) - MUST load before Alpine -->

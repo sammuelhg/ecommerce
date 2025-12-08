@@ -60,4 +60,28 @@ window.addEventListener('toast-info', (e) => {
     showToast('info', e.detail.message || e.detail);
 });
 </script>
+
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('success', "<?php echo e(session('success')); ?>");
+    });
+</script>
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('error')): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('error', "<?php echo e(session('error')); ?>");
+    });
+</script>
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('info')): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('info', "<?php echo e(session('info')); ?>");
+    });
+</script>
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 <?php /**PATH C:\xampp\htdocs\ecommerce\ecommerce-hp\resources\views/shop/partials/toasts.blade.php ENDPATH**/ ?>

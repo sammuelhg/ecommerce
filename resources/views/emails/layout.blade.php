@@ -56,11 +56,21 @@
     }
     
     // Base URL for email assets
-    $emailAssetsUrl = config('app.url') . '/email-assets';
     
     // Get featured products for all emails
     $featuredProducts = $products ?? \App\Models\Product::where('is_active', true)->inRandomOrder()->take(3)->get();
-@endphp
+
+    // Determine Logo URL
+    $storeLogo = $emailSettings['store_logo'] ?? null;
+    if ($storeLogo) {
+        // If it's already absolute (http...), use it. Otherwise, assume relative storage path and prepend url()
+        $logoUrl = preg_match('/^http/', $storeLogo) ? $storeLogo : url($storeLogo);
+    } else {
+        $logoUrl = url('email-assets/logo.png');
+    }
+@endphp -> (Wait, I need to match the context exactly)
+
+Let's modify the php block first.
 
   <!-- Wrapper Principal -->
   <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #eef1f5; padding: 20px 0;">
@@ -86,7 +96,7 @@
                                <tr>
                                    <td width="60" valign="top" style="padding-bottom: 15px;">
                                        @if($product->image)
-                                           <img src="{{ \Illuminate\Support\Facades\Storage::url($product->image) }}" width="50" height="50" style="border-radius: 6px; object-fit: cover; border: 1px solid #eee;">
+                                           <img src="{{ url(\Illuminate\Support\Facades\Storage::url($product->image)) }}" width="50" height="50" style="display: block; border-radius: 6px; object-fit: cover; border: 1px solid #eee;">
                                        @else
                                            <div style="width: 50px; height: 50px; background-color: #eee; border-radius: 6px;"></div>
                                        @endif
@@ -122,7 +132,7 @@
             <!-- Coluna da Logo -->
             <td width="180" valign="middle" align="center" style="background-color: #f9f9f9; padding: 10px; border-right: 1px solid #eeeeee;">
               <a href="https://{{ $website }}" target="_blank" style="text-decoration: none;">
-                <img src="{{ $emailAssetsUrl }}/logo.png" alt="LosFit Logo" width="170" style="display: block; width: 170px; max-width: 100%; border: 0;" border="0">
+                <img src="{{ $logoUrl }}" alt="LosFit Logo" width="170" style="display: block; width: 170px; max-width: 100%; border: 0;" border="0">
               </a>
             </td>
 
@@ -146,7 +156,7 @@
               <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 12px;">
                 <tr>
                   <td width="30" valign="middle">
-                    <img src="{{ config('app.url') }}/Instagram_logo.svg" alt="IG" width="24" height="24" style="display: block; width: 24px; height: 24px; border: 0;" />
+                    <img src="{{ url('Instagram_logo.svg') }}" alt="IG" width="24" height="24" style="display: block; width: 24px; height: 24px; border: 0;" />
                   </td>
                   <td valign="middle">
                     <span style="font-size: 11px; color: #777777; display: block; line-height: 1;">Siga-nos no Instagram</span>

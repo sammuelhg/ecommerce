@@ -9,16 +9,26 @@
                 <p class="text-dark opacity-75 mb-0 fw-semibold">A Elegância veste o estilo com conforto e saúde!</p>
             </div>
             <div class="col-md-6 d-flex align-items-center justify-content-center justify-content-md-end">
-                <div class="w-100" style="max-width: 400px;">
-                    <h5 class="text-dark mb-3 fw-bold">📧 Newsletter</h5>
-                    <p class="text-dark small mb-3">Receba ofertas exclusivas e ganhe <strong class="text-danger">15% OFF</strong> na primeira compra!</p>
-                    <form class="d-flex">
-                        <input type="email" class="form-control bg-white border border-secondary" placeholder="seu@email.com" required>
-                        <button class="btn btn-danger text-white fw-bold px-4 ms-2" type="submit">
-                            Inscrever
-                        </button>
-                    </form>
-                </div>
+                <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('newsletter-footer');
+
+$key = null;
+
+$key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-467199474-0', null);
+
+$__html = app('livewire')->mount($__name, $__params, $key);
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
             </div>
         </div>
     </div>
@@ -88,7 +98,7 @@
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="#" class="text-light text-decoration-none d-flex align-items-center">
+                        <a href="#" class="text-light text-decoration-none d-flex align-items-center" onclick="openModal('blog'); return false;">
                             <i class="bi bi-chevron-right text-warning me-2 small"></i>Blog
                         </a>
                     </li>
@@ -115,7 +125,7 @@
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="<?php echo e(route('user.orders')); ?>" class="text-light text-decoration-none d-flex align-items-center">
+                        <a href="#" class="text-light text-decoration-none d-flex align-items-center" onclick="openModal('tracking'); return false;">
                             <i class="bi bi-chevron-right text-warning me-2 small"></i>Rastrear Pedido
                         </a>
                     </li>
@@ -154,8 +164,8 @@
         </div>
 
         <!-- Payment & Security Section -->
-        <div class="row py-4 border-top border-secondary border-opacity-25">
-            <div class="col-md-6 mb-3 mb-md-0 text-center text-md-start">
+        <div class="row py-4 border-top border-secondary border-opacity-25 align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
                 <h6 class="text-secondary text-uppercase small fw-bold mb-3">💳 Formas de Pagamento</h6>
                 <div class="d-flex gap-3 justify-content-center justify-content-md-start flex-wrap fs-3 text-light opacity-75">
                     <i class="bi bi-credit-card-2-front" title="Cartão de Crédito"></i>
@@ -165,7 +175,19 @@
                     <span class="badge bg-success px-3 py-2 fs-6 align-middle">PIX -5%</span>
                 </div>
             </div>
-            <div class="col-md-6 text-center text-md-end">
+            
+            <!-- Central Logo -->
+            <div class="col-md-4 mb-3 mb-md-0 text-center">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($storeSettings['footer_logo']) && $storeSettings['footer_logo']): ?>
+                    <img src="<?php echo e($storeSettings['footer_logo']); ?>" alt="Logo Rodapé" style="height: 60px; width: auto;">
+                <?php elseif(isset($storeSettings['store_logo']) && $storeSettings['store_logo']): ?>
+                    <img src="<?php echo e($storeSettings['store_logo']); ?>" alt="Logo" style="height: 60px; width: auto; filter: brightness(0) invert(1) opacity(0.8);">
+                <?php else: ?>
+                    <img src="<?php echo e(asset('logo.svg')); ?>" alt="Logo" style="height: 60px; width: auto; filter: brightness(0) invert(1) opacity(0.8);">
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </div>
+
+            <div class="col-md-4 text-center text-md-end">
                 <h6 class="text-secondary text-uppercase small fw-bold mb-3">🔒 Compra Segura</h6>
                 <div class="d-flex gap-3 justify-content-center justify-content-md-end align-items-center">
                     <i class="bi bi-shield-lock-fill text-success fs-3" title="Site Seguro"></i>
@@ -204,6 +226,40 @@
     </div>
 </div>
 
+<!-- Modal de Contato (Livewire) -->
+<div id="contactModal" class="modal fade" tabindex="-1" wire:ignore.self>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-dark fw-bold"> <i class="bi bi-envelope-fill me-2"></i>Fale Conosco</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('shop.contact-form', []);
+
+$key = null;
+
+$key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-467199474-1', null);
+
+$__html = app('livewire')->mount($__name, $__params, $key);
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const modalContents = {
         about: {
@@ -229,10 +285,25 @@
         privacy: {
             title: 'Política de Privacidade',
             content: `<?php echo addslashes($storeSettings['modal_privacy'] ?? 'Conteúdo não configurado. Configure em Admin > Configurações.'); ?>`
+        },
+        blog: {
+            title: 'Blog',
+            content: `<?php echo addslashes($storeSettings['modal_blog'] ?? 'Conteúdo não configurado. Configure em Admin > Configurações.'); ?>`
+        },
+        tracking: {
+            title: 'Rastrear Pedido',
+            content: `<?php echo addslashes($storeSettings['modal_tracking'] ?? 'Conteúdo não configurado. Configure em Admin > Configurações.'); ?>`
         }
     };
 
     function openModal(type) {
+        // Special handling for Contact Form (Livewire)
+        if (type === 'contact') {
+            const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
+            contactModal.show();
+            return;
+        }
+
         const modal = document.getElementById('infoModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalContent = document.getElementById('modalContent');

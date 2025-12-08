@@ -37,6 +37,11 @@
                 </div>
             @endforeach
         </div>
+        <div class="row mt-5">
+            <div class="col-12 d-flex justify-content-center">
+                {{ $products->withQueryString()->links() }}
+            </div>
+        </div>
     @else
         <div class="text-center py-5">
             <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>

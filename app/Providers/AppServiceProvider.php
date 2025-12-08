@@ -31,5 +31,14 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('storeSettings', $settings);
             }
         });
+
+        // Story Status Composer
+        view()->composer(['shop.partials.header', 'shop.partials.user-offcanvas'], function ($view) {
+            $service = app(\App\Services\Story\CheckUserStoriesService::class);
+            // Auth facade requires alias or full path if not imported. 
+            // It is not imported in the file view, so using full path or helping helper.
+            $userId = \Illuminate\Support\Facades\Auth::id();
+            $view->with('storyStatus', $service->handle($userId));
+        });
     }
 }

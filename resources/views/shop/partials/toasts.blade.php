@@ -60,3 +60,27 @@ window.addEventListener('toast-info', (e) => {
     showToast('info', e.detail.message || e.detail);
 });
 </script>
+
+@if(session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('success', "{{ session('success') }}");
+    });
+</script>
+@endif
+
+@if(session('error'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('error', "{{ session('error') }}");
+    });
+</script>
+@endif
+
+@if(session('info'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('info', "{{ session('info') }}");
+    });
+</script>
+@endif

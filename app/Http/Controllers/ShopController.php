@@ -1,160 +1,58 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Services\Shop\ProductService;
+use App\DTOs\Shop\ProductFilterDTO;
 
 class ShopController extends Controller
 {
+    public function __construct(
+        protected ProductService $service
+    ) {}
+
     /**
-     * Display the shop homepage with all products
+     * Display the shop homepage with filtered products
      */
-    public function index()
+    public function index(Request $request): \Illuminate\View\View
     {
-        // Busca todos os produtos ativos
-        $products = Product::where('is_active', true)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $filters = ProductFilterDTO::fromRequest($request);
+        
+        $products = $this->service->listProducts($filters, 12);
+        
+        // Since we are now paginating, we pass the products collection to JSON as before
+        $productsJson = $this->service->productsToJson(collect($products->items()));
 
-        // Busca categorias ativas
-        $categories = Category::where('is_active', true)
-            ->get();
-
-        // Prepara produtos para JSON (Alpine.js)
-        $productsJson = $products->map(function ($product) {
-            return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'price' => (float) $product->price,
-                'image' => $product->image,
-                'imageText' => $product->image ?? 'Produto',
-                'isOffer' => (bool) $product->is_offer,
-                'oldPrice' => $product->old_price ? (float) $product->old_price : null,
-                'stock' => $product->stock,
-                'category' => $product->category?->name ?? 'Geral'
-            ];
-        })->toJson();
+        $categories = $this->service->getActiveCategories();
 
         return view('shop.index', compact('products', 'categories', 'productsJson'));
     }
 
     /**
+     * Display the new shop homepage with dynamic grid
+     */
+    public function newShop(): \Illuminate\View\View
+    {
+        $categories = $this->service->getActiveCategories();
+        return view('shop.dynamic', compact('categories'));
+    }
+
+    /**
      * Display a single product
      */
-    public function show(Product $product)
+    public function show(Product $product): \Illuminate\View\View
     {
-        // Load product images, color and size relationships
-        $product->load(['images', 'productColor', 'productSize']);
+        $details = $this->service->getProductDetails($product);
         
-        // Produtos relacionados (mesma categoria)
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->where('is_active', true)
-            ->limit(4)
-            ->get();
-
-        // Buscar TODOS os produtos irmãos (mesmo modelo e tipo)
-        // Usando product_model_id como agrupador principal
-        $siblings = Product::where('product_model_id', $product->product_model_id)
-            ->where('product_type_id', $product->product_type_id)
-            ->where('is_active', true)
-            ->with(['productColor', 'productSize'])
-            ->get();
-
-        // 1. Agrupar Cores (para o seletor de cores)
-        $colorVariants = $siblings->groupBy(function($item) {
-            // Agrupa por ID da cor ou string da cor
-            return $item->product_color_id ?? $item->color ?? 'default';
-        })->map(function ($group) use ($product) {
-            $first = $group->first();
-            
-            // Determina nome e hex
-            $name = $first->productColor->name ?? $first->color;
-            $hex = $first->productColor->hex_code ?? ($name ? \App\Helpers\ColorHelper::getHex($name) : '#cccccc');
-            
-            // Tenta encontrar o produto representante desta cor que tenha o mesmo tamanho do produto atual
-            // Se não achar, pega o primeiro da lista
-            $representative = $group->filter(function($item) use ($product) {
-                $itemSize = $item->productSize->name ?? $item->size;
-                $currentSize = $product->productSize->name ?? $product->size;
-                return $itemSize == $currentSize;
-            })->first() ?? $group->first();
-
-            // Verifica se é a cor ativa
-            $isActive = false;
-            if ($product->product_color_id && $first->product_color_id) {
-                $isActive = $product->product_color_id == $first->product_color_id;
-            } else {
-                $isActive = $product->color == $first->color;
-            }
-
-            if ($name) {
-                return [
-                    'name' => $name,
-                    'hex' => $hex,
-                    'stock' => $group->sum('stock'), // Total de estoque dessa cor (todos os tamanhos)
-                    'slug' => $representative->slug, 
-                    'active' => $isActive
-                ];
-            }
-            return null;
-        })->filter()->values();
-
-        // 2. Agrupar Tamanhos (para o seletor de tamanhos)
-        // Filtra siblings para mostrar apenas tamanhos da COR ATUAL
-        $currentSiblings = $siblings->filter(function($item) use ($product) {
-            if ($product->product_color_id && $item->product_color_id) {
-                return $product->product_color_id == $item->product_color_id;
-            }
-            return $product->color == $item->color;
-        });
-
-        $sizeVariants = $currentSiblings->groupBy(function($item) {
-            // Agrupa por nome do tamanho
-            return $item->productSize->name ?? $item->size ?? 'default';
-        })->map(function ($group) use ($product) {
-            $first = $group->first();
-            $name = $first->productSize->name ?? $first->size;
-            
-            if ($name) {
-                // Verifica se algum deste grupo é o produto atual
-                $isActive = $group->contains(function($item) use ($product) {
-                    return $item->id == $product->id;
-                });
-                
-                return [
-                    'name' => $name,
-                    'stock' => $first->stock, // Stock do produto representante (não soma)
-                    'slug' => $first->slug,
-                    'active' => $isActive
-                ];
-            }
-            return null;
-        })->filter()->values();
-
-        // Fallback se não houver variações (produto único)
-        if ($colorVariants->isEmpty() && $product->color) {
-            $colorVariants = collect([[
-                'name' => $product->color,
-                'hex' => \App\Helpers\ColorHelper::getHex($product->color),
-                'stock' => $product->stock,
-                'slug' => $product->slug,
-                'active' => true
-            ]]);
-        }
-
-        if ($sizeVariants->isEmpty() && $product->size) {
-            $sizeVariants = collect([[
-                'name' => $product->size,
-                'stock' => $product->stock,
-                'slug' => $product->slug,
-                'active' => true
-            ]]);
-        }
-
+        $relatedProducts = $details['relatedProducts'];
+        $colorVariants = $details['colorVariants'];
+        $sizeVariants = $details['sizeVariants'];
+        
         if ($product->isKit()) {
             return view('shop.show-kit', compact('product', 'relatedProducts', 'colorVariants', 'sizeVariants'));
         }
@@ -165,16 +63,14 @@ class ShopController extends Controller
     /**
      * Search products
      */
-    public function search(Request $request)
+    public function search(Request $request): \Illuminate\View\View
     {
-        $query = $request->input('q');
+        $filters = ProductFilterDTO::fromRequest($request);
         
-        $products = Product::where('is_active', true)
-            ->where(function($q) use ($query) {
-                $q->where('name', 'LIKE', "%{$query}%")
-                  ->orWhere('description', 'LIKE', "%{$query}%");
-            })
-            ->get();
+        // Force search filter if using the specific route
+        $products = $this->service->listProducts($filters, 12);
+        
+        $query = $filters->search; // For view display
 
         return view('shop.search', compact('products', 'query'));
     }
@@ -182,29 +78,23 @@ class ShopController extends Controller
     /**
      * Filter by category
      */
-    public function category(Category $category)
+    public function category(Category $category, Request $request): \Illuminate\View\View
     {
-        // Get all category IDs (current + children)
-        $categoryIds = $category->children()->pluck('id')->push($category->id);
-
-        $products = Product::whereIn('category_id', $categoryIds)
-            ->where('is_active', true)
-            ->get();
-
-        $categories = Category::where('is_active', true)->get();
-
-        $productsJson = $products->map(function ($product) {
-            return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'price' => (float) $product->price,
-                'image' => $product->image,
-                'imageText' => $product->image ?? 'Produto',
-                'isOffer' => (bool) $product->is_offer,
-                'oldPrice' => $product->old_price ? (float) $product->old_price : null,
-            ];
-        })->toJson();
+        // manually construct DTO with categoryIds since we resolved the model already
+        $categoryIds = $category->children()->pluck('id')->push($category->id)->toArray();
+        
+        $filters = new ProductFilterDTO(
+            search: $request->input('q'),
+            minPrice: $request->input('min_price') ? (float)$request->input('min_price') : null,
+            maxPrice: $request->input('max_price') ? (float)$request->input('max_price') : null,
+            sortOrder: $request->input('sort', 'newest'),
+            categoryIds: $categoryIds
+        );
+        
+        $products = $this->service->listProducts($filters, 12);
+        $productsJson = $this->service->productsToJson(collect($products->items()));
+        
+        $categories = $this->service->getActiveCategories();
 
         return view('shop.category', compact('products', 'category', 'categories', 'productsJson'));
     }
@@ -212,26 +102,21 @@ class ShopController extends Controller
     /**
      * Filter by subcategory
      */
-    public function subcategory(Category $parent, Category $category)
+    public function subcategory(Category $parent, Category $category, Request $request): \Illuminate\View\View
     {
-        $products = $category->products()
-            ->where('is_active', true)
-            ->get();
+        // Just the subcategory products
+        $filters = new ProductFilterDTO(
+            search: $request->input('q'),
+            minPrice: $request->input('min_price') ? (float)$request->input('min_price') : null,
+            maxPrice: $request->input('max_price') ? (float)$request->input('max_price') : null,
+            sortOrder: $request->input('sort', 'newest'),
+            categoryIds: [$category->id]
+        );
 
-        $categories = Category::where('is_active', true)->get();
-
-        $productsJson = $products->map(function ($product) {
-            return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'price' => (float) $product->price,
-                'image' => $product->image,
-                'imageText' => $product->image ?? 'Produto',
-                'isOffer' => (bool) $product->is_offer,
-                'oldPrice' => $product->old_price ? (float) $product->old_price : null,
-            ];
-        })->toJson();
+        $products = $this->service->listProducts($filters, 12);
+        $productsJson = $this->service->productsToJson(collect($products->items()));
+        
+        $categories = $this->service->getActiveCategories();
 
         return view('shop.category', compact('products', 'category', 'categories', 'productsJson', 'parent'));
     }

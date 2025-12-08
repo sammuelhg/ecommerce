@@ -1,0 +1,48 @@
+/* Dynamic Grid System (5 Columns) */
+.grid-dynamic {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Mobile: 2 cols */
+    gap: 1.5rem;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .grid-dynamic {
+        grid-template-columns: repeat(3, 1fr);
+        /* Tablet: 3 cols */
+    }
+}
+
+@media (min-width: 992px) {
+    .grid-dynamic {
+        grid-template-columns: repeat(5, 1fr);
+        /* Desktop: 5 cols */
+    }
+}
+
+/* Span Utilities */
+.span-1 {
+    grid-column: span 1;
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+.span-3 {
+    grid-column: span 3;
+}
+
+.span-4 {
+    grid-column: span 4;
+}
+
+.span-5 {
+    grid-column: 1 / -1;
+}
+
+/* Full width */
+.span-full {
+    grid-column: 1 / -1;
+}

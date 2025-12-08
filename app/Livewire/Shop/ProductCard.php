@@ -7,19 +7,16 @@ use App\Models\Product;
 use App\Services\WishlistService;
 use App\Services\CartService;
 
+use App\DTOs\Cart\CartItemDTO;
+
 class ProductCard extends Component
 {
-    public Product $product;
-    public bool $inWishlist = false;
-
-    public function mount(WishlistService $wishlist)
-    {
-        $this->inWishlist = $wishlist->has($this->product->id);
-    }
+    // ... existed code ...
 
     public function addToCart(CartService $cart)
     {
-        $cart->add($this->product);
+        $dto = new CartItemDTO($this->product->id, 1);
+        $cart->add($dto);
         $this->dispatch('cartUpdated');
         $this->dispatch('toast-success', message: 'Produto adicionado ao carrinho!');
     }

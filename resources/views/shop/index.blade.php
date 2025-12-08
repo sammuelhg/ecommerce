@@ -9,6 +9,11 @@
         </div>
     @endforeach
 </div>
+<div class="row mt-5">
+    <div class="col-12 d-flex justify-content-center">
+        {{ $products->withQueryString()->links() }}
+    </div>
+</div>
 @else
     <div class="col-12 text-center py-5">
         <h4 class="text-muted">Nenhum produto encontrado.</h4>

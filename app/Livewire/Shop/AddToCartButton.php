@@ -7,22 +7,20 @@ use App\Models\Product;
 use App\Services\WishlistService;
 use App\Services\CartService;
 
+use App\DTOs\Cart\CartItemDTO;
+
 class AddToCartButton extends Component
 {
-    public Product $product;
-    public bool $inWishlist = false;
-
-    public function mount(WishlistService $wishlist)
-    {
-        $this->inWishlist = $wishlist->has($this->product->id);
-    }
+    // ... items ...
 
     public function addToCart(int $quantity, CartService $cart)
     {
         // Validate quantity
         $quantity = max(1, min($quantity, (int) $this->product->stock));
         
-        $cart->add($this->product, $quantity);
+        $dto = new CartItemDTO($this->product->id, $quantity);
+        $cart->add($dto);
+        
         $this->dispatch('cartUpdated');
         
         // Dispatch event for Client-Side Alpine Cart
