@@ -11,11 +11,32 @@ class ProductGrid extends Component
 {
     use WithPagination;
 
-    public $newsletterEmail;
-    public $newsletterSuccess = false;
+    public ?int $campaignId = null;
+    public $variant = 'A';
 
-    public function newsletterSubscribe()
+    public function mount()
     {
+        // Find a featured campaign (latest active with promo image)
+        // Using 'sending' or 'sent' or 'draft'? Usually 'active' or 'sent'. 
+        // Assuming 'sent' means it's live/running.
+        $campaign = \App\Models\NewsletterCampaign::where('status', \App\Enums\CampaignStatus::SENT) 
+            ->whereNotNull('promo_image_url')
+            ->latest()
+            ->first();
+            
+        if ($campaign) {
+            $this->campaignId = $campaign->id;
+        }
+    }
+
+    public $newsletterEmail = '';
+    public $newsletterSuccess = false;
+    public $source = 'grid';
+
+    public function newsletterSubscribe($campaignId = null)
+    {
+        $action = app(\App\Actions\SubscribeToNewsletterAction::class);
+
         $this->validate([
             'newsletterEmail' => 'required|email|unique:newsletter_subscribers,email'
         ], [
@@ -24,17 +45,9 @@ class ProductGrid extends Component
             'newsletterEmail.email' => 'Email inválido.'
         ]);
 
-        \App\Models\NewsletterSubscriber::create([
-            'email' => $this->newsletterEmail,
-            'source' => $this->source ?? 'grid'
-        ]);
+        $targetCampaignId = $campaignId ?: $this->campaignId;
 
-        try {
-            \Illuminate\Support\Facades\Mail::to($this->newsletterEmail)->send(new \App\Mail\WelcomeNewsletter());
-        } catch (\Exception $e) {
-            // Log error but show success message to user
-            \Illuminate\Support\Facades\Log::error('Newsletter email failed: ' . $e->getMessage());
-        }
+        $action->execute($this->newsletterEmail, $this->source, [], $targetCampaignId);
 
         $this->newsletterSuccess = true;
         $this->newsletterEmail = '';
@@ -49,29 +62,40 @@ class ProductGrid extends Component
                          ->orderBy('id', 'desc')
                          ->paginate(20);
 
-        $rules = [
-            0 => [ // Position 0 (First slot)
-                'type' => 'card.product_highlight',
-                'col_span' => 1, // Highlight card is 1 column wide usually, or 2? Let's try 1 first as it's a card.
-                'content' => $products->first() // Use first product as data source
-            ],
-            3 => [
-                'type' => 'marketing_banner',
-                'col_span' => 2,
-                'content' => [
-                    'title' => 'Oferta Especial',
-                    'bg_class' => 'bg-primary text-white',
-                    'text' => 'Confira nossas promoções exclusivas!'
-                ]
-            ]
-        ];
+        $rules = [];
+
+        // Disable rules for simple variant
+        if ($this->variant === 'simple') {
+            $rules = [];
+        }
+
+        // Inject Newsletter Card if Campaign Found (only if not simple variant)
+        if ($this->campaignId && $this->variant !== 'simple') {
+            $campaign = \App\Models\NewsletterCampaign::find($this->campaignId);
+            if ($campaign) {
+                // Determine position (e.g. 5)
+                $rules[5] = [
+                    'type' => 'card.newsletter_form', // This maps to components/cards/newsletter_form 
+                    // GridComposer maps 'card.newsletter' to a view. 
+                    // I need to ensure GridComposer handles this or use a generic 'raw' type.
+                    // Assuming 'newsletter_form' is the view name partially.
+                    // Let's assume 'card.newsletter' maps to 'components.cards.newsletter_form'.
+                    'col_span' => 1,
+                    'content' => [
+                        'image' => $campaign->promo_image_url,
+                        'title' => $campaign->subject,
+                    ]
+                ];
+            }
+        }
 
         // 3. Compose the Grid
-        $gridItems = $composer->merge($products, $rules);
+        $useDbRules = ($this->variant !== 'simple');
+        $gridItems = $composer->merge($products, $rules, $useDbRules);
 
         return view('livewire.shop.product-grid', [
             'gridItems' => $gridItems,
-            'products' => $products // Pass original paginator for links
+            'products' => $products 
         ]);
     }
 }

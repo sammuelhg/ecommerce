@@ -63,9 +63,9 @@
 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-warning btn-lg fw-bold text-uppercase"
-                            wire:loading.attr="disabled">
-                        <span wire:loading.remove>Enviar Mensagem</span>
-                        <span wire:loading>
+                            wire:loading.attr="disabled" wire:target="submit">
+                        <span wire:loading.remove wire:target="submit">Enviar Mensagem</span>
+                        <span wire:loading wire:target="submit">
                             <span class="spinner-border spinner-border-sm me-2"></span>Enviando...
                         </span>
                     </button>

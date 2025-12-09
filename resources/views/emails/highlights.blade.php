@@ -1,4 +1,4 @@
-@extends('emails.layout')
+@extends('emails.layouts.global')
 
 @section('content')
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">

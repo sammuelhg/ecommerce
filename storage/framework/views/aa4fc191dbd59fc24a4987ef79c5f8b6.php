@@ -297,7 +297,7 @@ if (isset($__slots)) unset($__slots);
     };
 
     function openModal(type) {
-        // Special handling for Contact Form (Livewire)
+        // Special handling for Contact Form
         if (type === 'contact') {
             const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
             contactModal.show();
@@ -316,5 +316,13 @@ if (isset($__slots)) unset($__slots);
             bsModal.show();
         }
     }
+
+    // Auto-open Contact Modal if there is a success/error message from Controller
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('contact_success') || session('contact_error') || $errors->any()): ?>
+            const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
+            contactModal.show();
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+    });
 </script>
 <?php /**PATH C:\xampp\htdocs\ecommerce\ecommerce-hp\resources\views/shop/partials/footer.blade.php ENDPATH**/ ?>

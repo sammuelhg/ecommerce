@@ -1,0 +1,80 @@
+{
+    "project_name": "High-Performance Email Marketing Engine",
+    "architecture_compliance": {
+        "php_version": "8.2+",
+        "strict_types": true,
+        "pattern": "Action-Domain-Responder (ADR) / Service Pattern",
+        "frontend": "Livewire 3 + Bootstrap 5 + Alpine.js",
+        "queue_driver": "Redis (Required for Pixel & Sending)"
+    },
+    "development_phases": [
+        {
+            "phase_id": 1,
+            "name": "Domain Core & Strict Contracts",
+            "goals": [
+                {
+                    "task": "Define DTOs",
+                    "details": "Create LeadDTO, CampaignDTO, and TrackingDataDTO. No associative arrays allowed."
+                },
+                {
+                    "task": "Database Migrations",
+                    "details": "Tables: leads (with indexes), campaigns (json structure), email_logs (partitioned if huge), subscription_cards."
+                },
+                {
+                    "task": "Enums Implementation",
+                    "details": "LeadStatus, TrafficSource, CampaignStatus (Avoid magic strings)."
+                }
+            ]
+        },
+        {
+            "phase_id": 2,
+            "name": "High-Velocity Ingestion (Backend)",
+            "goals": [
+                {
+                    "task": "CaptureLeadAction",
+                    "details": "Single Action Class. Receives LeadDTO. Handle validation separate from logic."
+                },
+                {
+                    "task": "UTM Parsing Service",
+                    "details": "Service to extract utm_* from request and hydrate the DTO."
+                },
+                {
+                    "task": "Pixel Tracking Controller (__invoke)",
+                    "details": "MUST return Base64 GIF in <50ms. Dispatch 'LogEmailOpenJob' to Redis immediately."
+                }
+            ]
+        },
+        {
+            "phase_id": 3,
+            "name": "Frontend & UI Strategy (Bootstrap 5)",
+            "goals": [
+                {
+                    "task": "Base Layouts",
+                    "details": "Implement Bootstrap 5 grid. No Tailwind. Use wire:navigate for SPA feel."
+                },
+                {
+                    "task": "Campaign Builder Component",
+                    "details": "Livewire component to manipulate JSON structure (Subject, Body, CardID). No HTML storage in DB."
+                },
+                {
+                    "task": "Dashboard Stats",
+                    "details": "Cached queries (Redis) for Open Rates and Lead Counts. No live COUNT(*) on huge tables."
+                }
+            ]
+        },
+        {
+            "phase_id": 4,
+            "name": "The Engine (Sending & Rendering)",
+            "goals": [
+                {
+                    "task": "CampaignRendererService",
+                    "details": "Converts Campaign JSON + Lead Data -> Final HTML (Outlook optimized)."
+                },
+                {
+                    "task": "SendCampaignJob",
+                    "details": "Chained Jobs/Batches. Handle rate limits and failure retries."
+                }
+            ]
+        }
+    ]
+}

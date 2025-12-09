@@ -59,7 +59,14 @@ class StoreSettingController extends Controller
             'color_background' => 'nullable|string',
             'color_category_bar' => 'nullable|string',
             'security_certificates.*' => 'image|max:2048',
-            'email_card_id' => 'nullable|integer'
+            'email_card_id' => 'nullable|integer',
+            'smtp_host' => 'nullable|string',
+            'smtp_port' => 'nullable|string',
+            'smtp_username' => 'nullable|string',
+            'smtp_password' => 'nullable|string',
+            'smtp_encryption' => 'nullable|string',
+            'email_subject_prefix' => 'nullable|string',
+            'global_showcase_products' => 'nullable|string', // JSON string
         ]);
 
         $dto = StoreSettingsDTO::fromRequest($request);

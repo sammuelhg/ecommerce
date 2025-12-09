@@ -39,7 +39,19 @@ class ShopController extends Controller
     public function newShop(): \Illuminate\View\View
     {
         $categories = $this->service->getActiveCategories();
-        return view('shop.dynamic', compact('categories'));
+        return view('shop.dynamic', compact('categories') + ['variant' => 'A']);
+    }
+
+    public function newShopB(): \Illuminate\View\View
+    {
+        $categories = $this->service->getActiveCategories();
+        return view('shop.dynamic', compact('categories') + ['variant' => 'B']);
+    }
+
+    public function newShopSimple(): \Illuminate\View\View
+    {
+        $categories = $this->service->getActiveCategories();
+        return view('shop.dynamic', compact('categories') + ['variant' => 'simple']);
     }
 
     /**

@@ -255,7 +255,7 @@
     };
 
     function openModal(type) {
-        // Special handling for Contact Form (Livewire)
+        // Special handling for Contact Form
         if (type === 'contact') {
             const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
             contactModal.show();
@@ -274,4 +274,12 @@
             bsModal.show();
         }
     }
+
+    // Auto-open Contact Modal if there is a success/error message from Controller
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('contact_success') || session('contact_error') || $errors->any())
+            const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
+            contactModal.show();
+        @endif
+    });
 </script>

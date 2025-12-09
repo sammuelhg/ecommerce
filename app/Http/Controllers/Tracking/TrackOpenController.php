@@ -21,7 +21,8 @@ class TrackOpenController extends Controller
             $campaign,
             $lead,
             $request->ip(),
-            $request->userAgent()
+            $request->userAgent(),
+            $request->input('email_id') // Pass email_id from query string
         );
 
         // Return a transparent 1x1 GIF

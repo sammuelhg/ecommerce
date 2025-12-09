@@ -1,4 +1,4 @@
-@extends('emails.layout')
+@extends('emails.layouts.global')
 
 @section('content')
     <p style="font-size: 18px; font-weight: bold; margin-top: 0;">Redefinição de Senha</p>

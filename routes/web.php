@@ -10,8 +10,9 @@ Route::get('/', function () {
 });
 
 // Loja routes (MVC)
-Route::get('/shop', [App\Http\Controllers\ShopController::class, 'newShop'])->name('shop.new');
-Route::get('/loja', [App\Http\Controllers\ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop', [App\Http\Controllers\ShopController::class, 'newShop'])->name('shop.new'); // Com regras
+Route::get('/loja', [App\Http\Controllers\ShopController::class, 'newShopSimple'])->name('shop.index'); // Sem regras, 1 col mobile
+Route::get('/loja2', [App\Http\Controllers\ShopController::class, 'newShopB'])->name('shop.index_b'); // Com regras, 2 col mobile
 Route::get('/loja/busca', [App\Http\Controllers\ShopController::class, 'search'])->name('shop.search');
 Route::get('/loja/categoria/{category}', [App\Http\Controllers\ShopController::class, 'category'])->name('shop.category');
 Route::get('/loja/categoria/{parent}/{category}', [App\Http\Controllers\ShopController::class, 'subcategory'])->name('shop.subcategory');
@@ -97,7 +98,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/settings/remove-certificate', [App\Http\Controllers\Admin\StoreSettingController::class, 'removeCertificate'])->name('settings.remove-certificate');
     
     // Email Previews
-    Route::get('/emails/preview/{type}', [App\Http\Controllers\Admin\StoreSettingController::class, 'previewEmail'])->name('emails.preview');
+    // Link to Preview Dashboard (Handled below)
+    Route::get('/emails/preview', [App\Http\Controllers\Admin\EmailPreviewController::class, 'index'])->name('emails.preview.dashboard');
+    Route::get('/emails/preview/{type}', [App\Http\Controllers\Admin\EmailPreviewController::class, 'previewType'])->name('emails.preview.type');
+
     
     // Email Cards
     Route::view('/email-cards', 'admin.email-cards.index')->name('email-cards.index');
@@ -109,13 +113,30 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/grid', \App\Livewire\Admin\Grid\GridManager::class)->name('grid.index');
 
     // Newsletter Campaign Manager
-    Route::get('/newsletter/campaigns', \App\Livewire\Admin\Newsletter\CampaignManager::class)->name('newsletter.campaigns');
+    Route::prefix('newsletter')->name('newsletter.')->group(function () {
+        // Dashboard Stats
+        Route::get('/', \App\Livewire\Admin\Newsletter\NewsletterDashboard::class)->name('dashboard');
+        // Subscribers Manager
+        Route::get('/subscribers', \App\Livewire\Admin\Newsletter\SubscriberManager::class)->name('subscribers');
+        // Campaign Manager
+        Route::get('/templates', \App\Livewire\Admin\Newsletter\TemplateManager::class)->name('templates');
+        Route::get('/campaigns', \App\Livewire\Admin\Newsletter\CampaignManager::class)->name('campaigns');
+        Route::get('/campaigns/{campaign}/builder', \App\Livewire\Admin\Newsletter\CampaignBuilder::class)->name('campaign.builder');
+    });
+
 
     // Stories (History)
     Route::resource('stories', App\Http\Controllers\Admin\StoryController::class)->only(['index', 'store', 'update']);
     Route::delete('/stories/{id}', [App\Http\Controllers\Admin\StoryController::class, 'destroy'])->name('stories.destroy');
     Route::patch('/stories/{id}/toggle', [App\Http\Controllers\Admin\StoryController::class, 'toggleStatus'])->name('stories.toggle');
 });
+
+// Public Newsletter Routes
+Route::get('/newsletter/c/{campaign}', [\App\Http\Controllers\NewsletterController::class, 'show'])->name('newsletter.show');
+Route::get('/newsletter/e/{email}', [\App\Http\Controllers\NewsletterController::class, 'preview'])->name('newsletter.email.preview');
+Route::get('/newsletter/unsubscribe/{subscriber}', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe')->middleware('signed');
+Route::post('/newsletter/resubscribe/{subscriber}', [\App\Http\Controllers\NewsletterController::class, 'resubscribe'])->name('newsletter.resubscribe');
+
 
 
 Route::get('/teste-main', function () {
@@ -139,30 +160,38 @@ Route::get('/test-livewire', function () {
     return view('test_livewire');
 });
 
-// Test Route for Highlights Email
-Route::get('/test-email', function (\Illuminate\Http\Request $request, \App\Actions\SendHighlightsEmailAction $action) {
-    $dto = new \App\DTOs\HighlightsDTO(
-        title: 'Novidades da Semana',
-        subtitle: 'Confira as peças que acabaram de chegar e estão bombando na LosFit!',
-        imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=500&auto=format&fit=crop&q=60', // Dummy Image
-        ctaText: 'Ver Coleção',
-        ctaUrl: url('/shop'),
-        items: [
-            ['name' => 'Top Fitness', 'price' => 'R$ 89,90', 'url' => '#', 'image' => 'https://via.placeholder.com/60'],
-            ['name' => 'Legging Pro', 'price' => 'R$ 129,90', 'url' => '#', 'image' => 'https://via.placeholder.com/60']
-        ]
-    );
+// Email Logs & Test Routes (Local Only)
+if (app()->isLocal()) {
 
-    // Get email from ?email=param or default to system admin
-    $email = $request->query('email', 'admin@losfit.com.br');
-    
-    try {
-        $action->execute($email, $dto);
-        return "Email de Destaques enviado com sucesso para: <strong>$email</strong>! <br>Verifique sua caixa de entrada (e Spam).";
-    } catch (\Exception $e) {
-        return "Erro ao enviar email: " . $e->getMessage();
-    }
-});
+
+    // Test Route for Highlights Email
+    Route::get('/test-email', function (\Illuminate\Http\Request $request, \App\Actions\SendHighlightsEmailAction $action) {
+        $dto = new \App\DTOs\HighlightsDTO(
+            title: 'Novidades da Semana',
+            subtitle: 'Confira as peças que acabaram de chegar e estão bombando na LosFit!',
+            imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=500&auto=format&fit=crop&q=60', // Dummy Image
+            ctaText: 'Ver Coleção',
+            ctaUrl: url('/shop'),
+            items: [
+                ['name' => 'Top Fitness', 'price' => 'R$ 89,90', 'url' => '#', 'image' => 'https://via.placeholder.com/60'],
+                ['name' => 'Legging Pro', 'price' => 'R$ 129,90', 'url' => '#', 'image' => 'https://via.placeholder.com/60']
+            ]
+        );
+
+        // Get email from ?email=param or default to system admin
+        $email = $request->query('email', 'admin@losfit.com.br');
+        
+        try {
+            $action->execute($email, $dto);
+            return "Email de Destaques enviado com sucesso para: <strong>$email</strong>! <br>Verifique sua caixa de entrada (e Spam).";
+        } catch (\Exception $e) {
+            return "Erro ao enviar email: " . $e->getMessage();
+        }
+    });
+}
+
+// Standard Contact Form Route
+Route::post('/contact', [App\Http\Controllers\Shop\ContactController::class, 'store'])->name('shop.contact.store');
 
 Route::get('/test-buttons', function () {
     return view('test-buttons');
@@ -180,3 +209,6 @@ Route::get('/links', function () {
 
 // Email Tracking Route
 Route::get('/t/{campaign}/{lead}/pixel.gif', App\Http\Controllers\Tracking\TrackOpenController::class)->name('tracking.open');
+
+// API Routes
+Route::post('/api/leads', [App\Http\Controllers\LeadCaptureController::class, 'store'])->name('api.leads.store');

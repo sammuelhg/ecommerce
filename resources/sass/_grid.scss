@@ -1,8 +1,10 @@
 /* Dynamic Grid System (5 Columns) */
 .grid-dynamic {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    /* Mobile: 2 cols */
+    grid-template-columns: repeat(1, 1fr);
+    grid-auto-flow: row dense;
+    /* Fix gaps by backfilling */
+    /* Mobile: 1 col */
     gap: 1.5rem;
     width: 100%;
 }
@@ -22,27 +24,93 @@
 }
 
 /* Span Utilities */
-.span-1 {
+/* Span Utilities with Responsive Caps */
+
+/* Mobile (2 Columns) */
+/* Force all items to occupy a single column (50% width) on mobile as requested */
+.span-1,
+.span-2,
+.span-3,
+.span-4,
+.span-5 {
     grid-column: span 1;
 }
 
-.span-2 {
-    grid-column: span 2;
+/* Tablet (3 Columns) */
+@media (min-width: 768px) {
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    /* Cap larger spans to full width (3) on tablet */
+    .span-4,
+    .span-5 {
+        grid-column: span 3;
+    }
 }
 
-.span-3 {
-    grid-column: span 3;
+/* Desktop (5 Columns) */
+@media (min-width: 992px) {
+    .span-2 {
+        grid-column: span 2;
+    }
+
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    .span-4 {
+        grid-column: span 4;
+    }
+
+    .span-5 {
+        grid-column: span 5;
+    }
 }
 
-.span-4 {
-    grid-column: span 4;
-}
-
-.span-5 {
-    grid-column: 1 / -1;
-}
-
-/* Full width */
+/* Full width utility */
 .span-full {
     grid-column: 1 / -1;
+}
+
+/* Variant B: Mobile 2 Columns & Compact Text */
+.grid-variant-b {
+
+    /* Apply 2 columns for all screens up to 768px (inclusive of large phones/small tablets) */
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+
+        .card-title {
+            font-size: 0.85rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+
+        .text-muted,
+        .small {
+            font-size: 0.75rem !important;
+        }
+
+        .price {
+            font-size: 0.9rem !important;
+        }
+
+        .btn {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+        }
+
+        /* Ensure standard cards take 1 column (50%) */
+        .span-1 {
+            grid-column: span 1 !important;
+        }
+
+        /* Force banners/large items to take full width */
+        .span-2,
+        .span-3,
+        .span-4,
+        .span-5 {
+            grid-column: 1 / -1 !important;
+        }
+    }
 }

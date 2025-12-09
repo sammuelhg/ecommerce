@@ -1,5 +1,5 @@
 <div class="container py-4">
-    <div class="grid-dynamic" id="product-grid">
+    <div class="grid-dynamic {{ $variant === 'B' ? 'grid-variant-b' : '' }}" id="product-grid">
         @foreach($gridItems as $item)
             @php
                 $componentName = $item['type'];
@@ -18,6 +18,8 @@
                     <x-dynamic-component :component="$componentName" :data="$item['content']" class="w-100" />
                 @elseif($item['type'] === 'card.newsletter_form')
                     <x-dynamic-component :component="$componentName" :data="$item['content']" class="w-100" />
+                @elseif($item['type'] === 'card.product_special')
+                     <x-dynamic-component :component="$componentName" :product="$item['content']['product']" :data="$item['content']['data']" class="w-100" />
                 @else
                     <x-dynamic-component :component="$componentName" :product="$item['content']" class="w-100" />
                 @endif

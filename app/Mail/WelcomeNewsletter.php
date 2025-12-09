@@ -16,18 +16,18 @@ class WelcomeNewsletter extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        public \App\Models\NewsletterSubscriber $subscriber
+    ) {}
 
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
+        $prefix = \App\Models\StoreSetting::get('email_subject_prefix', '[LosFit]');
         return new Envelope(
-            subject: 'Welcome Newsletter',
+            subject: $prefix . ' Bem-vindo à LosFit! 🎁',
         );
     }
 
@@ -37,7 +37,7 @@ class WelcomeNewsletter extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.newsletter.welcome',
+            view: 'emails.newsletter.welcome',
         );
     }
 

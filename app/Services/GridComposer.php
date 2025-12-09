@@ -13,44 +13,72 @@ class GridComposer
      * @param array $rules  Array of rules where key is the index and value is the card definition
      * @return Collection
      */
-    public function merge($products, array $rules = []): Collection
+    /**
+     * Merges products with layout rules to create a grid collection.
+     *
+     * @param \Illuminate\Pagination\LengthAwarePaginator $products
+     * @param array $rules  Array of rules where key is the index and value is the card definition
+     * @param bool $useDbRules Whether to fetch and merge rules from the database
+     * @return Collection
+     */
+    public function merge($products, array $rules = [], bool $useDbRules = true): Collection
     {
         // 1. Fetch Rules from Database (Active ones)
-        // We ignore the passed $rules argument now, or use it as fallback? 
-        // Let's merge DB rules into valid array structure.
-        $dbRules = \App\Models\GridRule::active()->get();
-        $rules = [];
-        foreach($dbRules as $r) {
-            $content = $r->configuration;
-            
-            // If the rule involves a specific product, we need to load it
-            if (isset($content['product_id'])) {
-                $product = \App\Models\Product::find($content['product_id']);
-                if ($product) {
-                    $content = $product;
-                } else {
-                    // Product not found (deleted?), skip this rule to avoid crashing the view
-                    continue;
+        // If useDbRules is true, we fetch DB rules and MERGE them with passed rules.
+        // Passed rules ($rules) take precedence if keys collide? Or DB?
+        // Let's assume passed rules override DB rules if same index.
+        
+        $finalRules = $rules;
+
+        if ($useDbRules) {
+            $dbRules = \App\Models\GridRule::active()->get();
+            foreach($dbRules as $r) {
+                // If this slot is already defined by passed $rules, skip DB rule? 
+                // Or overwrite? Let's say passed rules (hardcoded in controller) might be more specific.
+                if (isset($finalRules[$r->position])) {
+                    continue; 
                 }
-            }
 
-            // Safety check: specific types MUST have a Product object as content
-            if (str_contains($r->type, 'product') && is_array($content)) {
-                 // Double check: if it's still an array, it means we failed to hydrate (or it didn't have product_id).
-                 // Skip to prevents "property on array" error.
-                 continue;
-            }
-
-            if ($r->type === 'card.newsletter_form') {
                 $content = $r->configuration;
+                
+                // If the rule involves a specific product, we need to load it
+                if (isset($content['product_id'])) {
+                    $product = \App\Models\Product::find($content['product_id']);
+                    if ($product) {
+                        if ($r->type === 'card.product_special') {
+                             // Preserve config data (badge_type) along with the product
+                            $content = ['product' => $product, 'data' => $content];
+                        } else {
+                            $content = $product;
+                        }
+                    } else {
+                        // Product not found (deleted?), skip this rule to avoid crashing the view
+                        continue;
+                    }
+                }
+    
+                // Safety check: specific types MUST have a Product object as content (except special card which wraps it)
+                if (str_contains($r->type, 'product') && $r->type !== 'card.product_special' && is_array($content)) {
+                     // Double check: if it's still an array, it means we failed to hydrate (or it didn't have product_id).
+                     // Skip to prevents "property on array" error.
+                     continue;
+                }
+    
+                if ($r->type === 'card.newsletter_form') {
+                    $content = $r->configuration;
+                }
+    
+                $finalRules[$r->position] = [
+                    'type' => $r->type,
+                    'col_span' => (int) $r->col_span,
+                    'content' => $content
+                ];
             }
-
-            $rules[$r->position] = [
-                'type' => $r->type,
-                'col_span' => (int) $r->col_span,
-                'content' => $content
-            ];
         }
+        
+        $rules = $finalRules;
+
+        // ... Rest of logic stays same ...
 
         $gridItems = collect();
         $productIterator = $products->getIterator();
@@ -106,6 +134,41 @@ class GridComposer
             $index++;
         }
 
-        return $gridItems;
+
+
+        // Apply smart packing to prevent gaps on desktop
+        return $this->packItems($gridItems);
+    }
+
+    /**
+     * Adjusts item spans to ensure they fit perfectly into the desktop grid (5 columns)
+     * without creating gaps.
+     * 
+     * Logic: If a row has N columns remaining and the next item wants M columns (where M > N),
+     * shrink the item to N columns to fill the row exactly.
+     */
+    private function packItems(Collection $items): Collection
+    {
+        $desktopCols = 5;
+        $currentCol = 0;
+
+        return $items->map(function ($item) use ($desktopCols, &$currentCol) {
+            $span = $item['col_span'];
+            $remaining = $desktopCols - $currentCol;
+
+            // If the item is larger than the remaining space in the current row
+            if ($span > $remaining) {
+                // Shrink it to fit!
+                $span = $remaining;
+            }
+
+            // Update the span in the item array
+            $item['col_span'] = $span;
+
+            // Move the cursor forward
+            $currentCol = ($currentCol + $span) % $desktopCols;
+
+            return $item;
+        });
     }
 }

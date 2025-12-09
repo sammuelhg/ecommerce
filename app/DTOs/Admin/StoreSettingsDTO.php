@@ -27,7 +27,8 @@ class StoreSettingsDTO extends BaseDTO
             'google_maps_embed_url', 'ai_image_prompt_template',
             'modal_about', 'modal_careers', 'modal_contact', 'modal_returns', 'modal_faq',
             'color_primary', 'color_secondary', 'color_accent', 'color_background', 'color_category_bar',
-            'email_card_id'
+            'email_card_id',
+            'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'email_subject_prefix', 'global_showcase_products'
         ];
 
         $settings = [];

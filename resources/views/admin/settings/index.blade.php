@@ -334,50 +334,71 @@
 
                         <!-- Emails -->
                         @if($activeTab == 'email')
-                        <form action="{{ $formAction }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="redirect_tab" value="email">
-
-                            <h5 class="mb-4 text-primary border-bottom pb-2">Card de Email</h5>
-                            <p class="text-muted mb-4">Selecione o card que será usado nos emails enviados pelo sistema.</p>
-                            
+                            <h5 class="mb-4 text-primary border-bottom pb-2">Configuração Global</h5>
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Card para Emails</label>
-                                    <select name="email_card_id" class="form-select bg-white">
-                                        @foreach(\App\Models\EmailCard::active()->get() as $card)
-                                            <option value="{{ $card->id }}" {{ ($settings['email_card_id'] ?? '') == $card->id ? 'selected' : '' }}>
-                                                {{ $card->name }} - {{ $card->sender_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="form-text">Escolha qual card aparecerá na assinatura dos emails.</div>
+                                    <label class="form-label fw-bold">Prefixo do Assunto</label>
+                                    <input type="text" class="form-control bg-white" name="email_subject_prefix" value="{{ $settings['email_subject_prefix'] ?? '[LosFit]' }}">
+                                    <div class="form-text">Ex: [LosFit] Bem-vindo...</div>
                                 </div>
-                                <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Produtos em Destaque (IDs)</label>
+                                    <input type="text" class="form-control bg-white" name="global_showcase_products" value="{{ is_array($settings['global_showcase_products'] ?? null) ? implode(',', $settings['global_showcase_products']) : ($settings['global_showcase_products'] ?? '') }}" placeholder="1, 5, 12">
+                                    <div class="form-text">IDs dos produtos exibidos no rodapé dos emails (separados por vírgula).</div>
+                                </div>
+                            </div>
+
+                            <!-- Card Config Removed (Managed via Cards > Default) -->
+                            <div class="row mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <h5 class="mb-2 text-primary border-bottom pb-2">Card de Assinatura</h5>
+                                    <p class="text-muted">
+                                        O card utilizado nos emails é o definido como <strong>Padrão (Favorito)</strong> na galeria.
+                                    </p>
                                     <a href="{{ route('admin.email-cards.index') }}" class="btn btn-outline-secondary">
-                                        <i class="bi bi-gear me-2"></i>Gerenciar Cards
+                                        <i class="bi bi-gear me-2"></i>Gerenciar Cards & Definir Padrão
                                     </a>
                                 </div>
                             </div>
-                            
+
+                            <h5 class="mb-4 text-danger border-bottom pb-2"><i class="bi bi-hdd-network me-2"></i>Configuração SMTP (Avançado)</h5>
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i> <strong>Cuidado:</strong> Altere estas configurações apenas se quiser usar um servidor de email diferente do padrão (.env). Deixe em branco para usar o padrão.
+                            </div>
+                            <div class="row mb-4 p-3 bg-light rounded border mx-1">
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label">Host SMTP</label>
+                                    <input type="text" class="form-control" name="smtp_host" value="{{ $settings['smtp_host'] ?? '' }}" placeholder="Ex: smtp.hostinger.com">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Porta</label>
+                                    <input type="text" class="form-control" name="smtp_port" value="{{ $settings['smtp_port'] ?? '' }}" placeholder="465">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Usuário</label>
+                                    <input type="text" class="form-control" name="smtp_username" value="{{ $settings['smtp_username'] ?? '' }}" placeholder="email@dominio.com">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Senha</label>
+                                    <input type="password" class="form-control" name="smtp_password" value="{{ $settings['smtp_password'] ?? '' }}" placeholder="••••••••">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Criptografia</label>
+                                    <select name="smtp_encryption" class="form-select">
+                                        <option value="" {{ ($settings['smtp_encryption'] ?? '') == '' ? 'selected' : '' }}>Automático / Padrão</option>
+                                        <option value="ssl" {{ ($settings['smtp_encryption'] ?? '') == 'ssl' ? 'selected' : '' }}>SSL</option>
+                                        <option value="tls" {{ ($settings['smtp_encryption'] ?? '') == 'tls' ? 'selected' : '' }}>TLS</option>
+                                        <option value="null" {{ ($settings['smtp_encryption'] ?? '') == 'null' ? 'selected' : '' }}>Nenhuma</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="d-flex justify-content-end mt-4 pt-3 border-top">
                                 <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-2"></i>Salvar Emails</button>
                             </div>
                         </form>
 
-                        <h5 class="mb-4 text-primary border-bottom pb-2 mt-5">Visualização de Emails</h5>
-                        <p class="text-muted mb-3">Visualize os modelos de email utilizados pelo sistema:</p>
-                        <div class="d-grid gap-3 d-md-flex">
-                            <a href="{{ route('admin.emails.preview', 'welcome') }}" target="_blank" class="btn btn-outline-primary">
-                                <i class="bi bi-envelope-check me-2"></i>Boas-vindas
-                            </a>
-                            <a href="{{ route('admin.emails.preview', 'reset') }}" target="_blank" class="btn btn-outline-danger">
-                                <i class="bi bi-key me-2"></i>Redefinição de Senha
-                            </a>
-                            <a href="{{ route('admin.emails.preview', 'reset-confirmation') }}" target="_blank" class="btn btn-outline-success">
-                                <i class="bi bi-check-circle me-2"></i>Senha Alterada
-                            </a>
-                        </div>
+
                         @endif
 
                     </div>

@@ -1,17 +1,10 @@
-@extends('emails.layout')
+@extends('emails.layouts.global')
 
 @section('content')
-    <h1 style="color: #000; font-size: 24px; font-weight: 800; margin-bottom: 20px;">
-        {{ $campaign->subject }}
-    </h1>
-
-    <div style="color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-        {!! nl2br(e($campaign->body)) !!}
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333333; line-height: 1.6;">
+        {!! $content !!}
     </div>
 
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="{{ url('/shop') }}" class="btn-primary" style="color: #ffffff !important;">
-            Acessar Loja
-        </a>
-    </div>
+    <!-- Tracking Pixel -->
+    <img src="{{ $trackingUrl }}" width="1" height="1" style="display:none;" alt="" />
 @endsection

@@ -22,6 +22,18 @@
             background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
+
+        @media (min-width: 768px) {
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 100;
+                height: 100vh;
+                overflow-y: auto;
+            }
+        }
         
         .admin-logo {
             padding: 1.5rem;
@@ -122,7 +134,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block admin-sidebar p-0 position-relative">
+            <nav class="col-md-3 col-lg-2 d-md-block admin-sidebar p-0">
                 <div class="d-flex flex-column h-100">
                     <!-- Logo -->
                     <div class="admin-logo">
@@ -210,6 +222,20 @@
                             </div>
                         </li>
 
+                        <!-- Newsletter (Top Level) -->
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.newsletter.campaigns', 'admin.newsletter.campaign.*') ? 'active' : '' }}" 
+                               href="{{ route('admin.newsletter.campaigns') }}">
+                                <i class="bi bi-envelope-paper"></i> Newsletter
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.newsletter.templates') ? 'active' : '' }}" 
+                               href="{{ route('admin.newsletter.templates') }}">
+                                <i class="bi bi-file-earmark-text"></i> Modelos
+                            </a>
+                        </li>
+
                         <!-- Vendas (Antigo Pedidos) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex justify-content-between align-items-center" 
@@ -270,12 +296,7 @@
                                             <i class="bi bi-grid-3x3"></i> Layout do Grid
                                         </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.newsletter.campaigns') }}">
-                                            <i class="bi bi-envelope"></i> Newsletter
-                                        </a>
-                                    </li>
+
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.email-cards.*') ? 'active' : '' }}" 
                                            href="{{ route('admin.email-cards.index') }}">
@@ -320,7 +341,7 @@
             </nav>
 
             <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col-md-9 offset-md-3 col-lg-10 offset-lg-2 px-md-4">
                 <div class="admin-header">
                     <h1 class="h2 mb-0">@yield('title', 'Dashboard')</h1>
                 </div>
@@ -340,6 +361,7 @@
                 @endif
 
                 @yield('content')
+                {{ $slot ?? '' }}
             </main>
         </div>
     </div>

@@ -14,13 +14,17 @@ class CampaignMail extends Mailable
     use Queueable, SerializesModels;
 
     public $campaign;
+    public $subscriber;
+    public $emailStep;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(\App\Models\NewsletterCampaign $campaign)
+    public function __construct(\App\Models\NewsletterCampaign $campaign, $subscriber, $emailStep)
     {
         $this->campaign = $campaign;
+        $this->subscriber = $subscriber;
+        $this->emailStep = $emailStep;
     }
 
     /**
@@ -29,7 +33,7 @@ class CampaignMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->campaign->subject,
+            subject: $this->emailStep->subject ?? $this->campaign->subject,
         );
     }
 
@@ -38,8 +42,21 @@ class CampaignMail extends Mailable
      */
     public function content(): Content
     {
+        $trackingUrl = route('newsletter.track', [
+            'campaign' => $this->campaign->id, 
+            'lead' => $this->subscriber->id,
+            'email_id' => $this->emailStep->id
+        ]);
+
+        // Process placeholder replacements if needed (e.g. {{ name }})
+        $body = str_replace('{{ name }}', $this->subscriber->name ?? 'Cliente', $this->emailStep->body);
+
         return new Content(
             markdown: 'emails.newsletter.campaign',
+            with: [
+                'content' => $body,
+                'trackingUrl' => $trackingUrl,
+            ],
         );
     }
 

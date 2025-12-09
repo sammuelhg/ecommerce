@@ -181,56 +181,9 @@
 @if($cards->count() > 0)
 <div class="cards-grid">
   @foreach($cards as $card)
-  <div class="custom-card">
-    <div class="card-main-content">
-      <!-- Image Section (Left) -->
-      <div class="card-image-section">
-        @if($card->photo)
-          <img src="{{ asset($card->photo) }}" alt="{{ $card->sender_name }}" class="photo">
-        @else
-          <img src="{{ asset('email-assets/logo.png') }}" alt="Logo" class="logo">
-        @endif
-      </div>
-      
-      <!-- Text Section (Right) -->
-      <div class="card-text-section">
-        <h2 class="card-title">{{ $card->sender_name }}</h2>
-        <p class="card-subtitle">{{ $card->sender_role }}</p>
-
-        <div class="contact-list">
-          @if($card->instagram)
-          <div class="contact-item">
-            <img src="{{ asset('Instagram_logo.svg') }}" alt="Instagram">
-            <a href="https://www.instagram.com/{{ ltrim($card->instagram, '@') }}" target="_blank" class="contact-link">{{ '@' . ltrim($card->instagram, '@') }}</a>
-          </div>
-          @endif
-
-          @if($card->whatsapp)
-          <div class="contact-item">
-            <img src="{{ asset('WhatsApp.svg') }}" alt="WhatsApp">
-            <a href="https://wa.me/55{{ $card->whatsapp }}" target="_blank" class="contact-link">{{ $card->whatsapp }}</a>
-          </div>
-          @endif
-          
-          @if($card->website)
-          <div class="contact-item">
-            <img src="{{ asset('globe.svg') }}" alt="Website" style="width: 16px; height: 16px;">
-            <a href="https://{{ $card->website }}" target="_blank" class="contact-link">{{ $card->website }}</a>
-          </div>
-          @endif
-        </div>
-      </div>
-
-      <!-- Logo in bottom right corner (only if card has photo) -->
-      @if($card->photo)
-      <img src="{{ asset('email-assets/logo.png') }}" alt="Logo" class="card-logo-corner">
-      @endif
+    <div style="margin-bottom: 2rem;">
+        <x-email.digital-card :card="$card" />
     </div>
-
-    <div class="card-footer">
-      {{ $card->slogan ?? 'Saúde • Foco • Resultado' }}
-    </div>
-  </div>
   @endforeach
 </div>
 @else
