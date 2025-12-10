@@ -93,7 +93,7 @@
 
     <!-- Analytics Chart Section -->
     <div class="card shadow-sm border-0">
-        <div class="card-header bg-white py-3 border-bottom">
+        <div class="card-header py-3 border-bottom">
             <h5 class="mb-0 card-title fw-bold"><i class="bi bi-bar-chart-line me-2"></i>Performance Recente</h5>
         </div>
         <div class="card-body">

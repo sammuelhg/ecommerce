@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'LosFit') }}</title>
+    <meta name="description" content="{{ $storeSettings['store_seo_description'] ?? 'A LosFit oferece o melhor da moda fitness com conforto, estilo e tecnologia. Descubra leggins, tops, shorts e acessórios para seus treinos.' }}">
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
@@ -19,6 +20,12 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @livewireStyles
+    <style>
+        /* Performance Fix: Avoid transition on 'color' for icon buttons to prevent CLS/Paint issues */
+        .btn-icon-shape {
+            transition-property: transform, background-color, border-color, opacity !important;
+        }
+    </style>
 </head>
 <body>
     <div id="app">

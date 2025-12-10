@@ -5,11 +5,19 @@
                 <div class="col-md-6">
                     <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Buscar por email...">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <select wire:model.live="filter" class="form-select">
                         <option value="all">Todos os Status</option>
                         <option value="active">Ativos</option>
                         <option value="unsubscribed">Cancelados</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select wire:model.live="utmSource" class="form-select">
+                        <option value="">Todas as Origens (UTM)</option>
+                        @foreach($utmSources as $source)
+                            <option value="{{ $source }}">{{ $source }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-2 text-end">

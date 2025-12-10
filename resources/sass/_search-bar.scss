@@ -1,0 +1,122 @@
+// Search Bar & Suggestions Styling
+.search-container-relative {
+    position: relative;
+    flex-grow: 1;
+    z-index: 1000;
+}
+
+// Override sizing for this specific input group to match the "Pill" design
+// Override sizing for this specific input group to match the "Pill" design
+.search-container-relative .search-group-pill {
+    border-radius: 50rem;
+    box-shadow: 0 0 0 1px #dee2e6;
+    background-color: #fff;
+
+    // Focus ring simulation
+    &:focus-within {
+        box-shadow: 0 0 0 1px #dee2e6, 0 0 0 0.2rem rgba(var(--bs-warning-rgb), 0.25);
+    }
+
+    // First element (Select)
+    .form-select {
+        border-top-left-radius: 50rem !important;
+        border-bottom-left-radius: 50rem !important;
+        border: none;
+        box-shadow: none;
+        height: 40px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #eee;
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+
+    // Middle element (Input)
+    .form-control {
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        height: 40px;
+        background-color: transparent;
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+
+    // Last element (Button) properties
+    .btn {
+        border-top-right-radius: 50rem !important;
+        border-bottom-right-radius: 50rem !important;
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        height: 40px;
+        border: none;
+
+        &:focus,
+        &:active {
+            box-shadow: none !important;
+        }
+    }
+}
+
+
+// Dropdown Styling
+.search-suggestions-dropdown {
+    position: absolute !important;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 12px; // Distinct separation
+    background: white;
+    border: none; // Remove border for cleaner float
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05); // "Float" effect
+    border-radius: 12px; // Softer corners
+    z-index: 10000;
+    overflow: hidden;
+    text-align: left;
+
+    // Animation
+    animation: fadeInUp 0.2s ease-out;
+
+    // Use Bootstrap list group
+    .list-group-item {
+        border: none; // Completely borderless items for card look
+        padding: 12px 20px;
+
+        &.bg-light {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #6c757d;
+        }
+    }
+
+    // "The active item is hover" -> Apply active styles on hover
+    .list-group-item-action:hover,
+    .list-group-item-action:focus {
+        z-index: 2;
+        color: #fff;
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        cursor: pointer;
+        transform: translateX(5px); // Subtle movement on float
+        transition: all 0.2s;
+
+        i {
+            color: #fff !important;
+        }
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

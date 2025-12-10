@@ -22,7 +22,7 @@
     @endif
 
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white">
+        <div class="card-header">
             <h5 class="mb-0">Lista de Tamanhos</h5>
         </div>
         <div class="card-body p-0">

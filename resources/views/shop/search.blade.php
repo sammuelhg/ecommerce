@@ -12,7 +12,18 @@
 
     <!-- Resultado da Busca -->
     <div class="mb-4">
-        <h2>Resultados para: <span class="text-primary">"{{ $query }}"</span></h2>
+        @if($query)
+            <h2>Resultados para: <span class="text-primary">"{{ $query }}"</span>
+            @if(isset($category))
+                <small class="text-muted"> em {{ $category->name }}</small>
+            @endif
+            </h2>
+        @elseif(isset($category))
+            <h2>Categoria: <span class="text-primary">{{ $category->name }}</span></h2>
+        @else
+            <h2>Todos os Produtos</h2>
+        @endif
+        
         <p class="text-muted">{{ $products->count() }} produto(s) encontrado(s)</p>
     </div>
 

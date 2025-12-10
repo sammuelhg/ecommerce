@@ -21,14 +21,19 @@ class CreateLeadAction
         $lead->source = $dto->source ?? $lead->source;
         $lead->status = $dto->status ?? $lead->status;
 
-        // UTM Tracking
-        $lead->utm_source = $dto->utm_source ?? $lead->utm_source;
-        $lead->utm_medium = $dto->utm_medium ?? $lead->utm_medium;
-        $lead->utm_campaign = $dto->utm_campaign ?? $lead->utm_campaign;
-        $lead->utm_content = $dto->utm_content ?? $lead->utm_content;
-        
-        // Update/Merge meta JSON if needed (simplified for now)
-        $lead->meta = array_merge($lead->meta ?? [], $dto->meta);
+        // UTM Tracking (Store in META since table lacks columns)
+        $utmData = [
+            'utm_source' => $dto->utm_source,
+            'utm_medium' => $dto->utm_medium,
+            'utm_campaign' => $dto->utm_campaign,
+            'utm_content' => $dto->utm_content,
+        ];
+
+        // Clean nulls
+        $utmData = array_filter($utmData, fn($v) => !is_null($v));
+
+        // Update/Merge meta JSON
+        $lead->meta = array_merge($lead->meta ?? [], $dto->meta, $utmData);
 
         $lead->save();
 

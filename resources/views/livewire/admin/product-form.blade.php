@@ -97,10 +97,10 @@
             </div>
         </div>
 
-        <!-- AlpineJS Tabs -->
-        <div class="card border-0 shadow-sm" x-data="{ activeTab: 'general' }" x-init="$watch('activeTab', value => $wire.set('activeTab', value))">
-            <div class="card-header bg-white border-bottom-0 pt-3 px-3">
-                <ul class="nav nav-tabs nav-fill card-header-tabs" id="productTabs" role="tablist">
+        <!-- AlpineJS Tabs        <div class="card border-0 shadow-sm" x-data="{ activeTab: 'general' }" x-init="$watch('activeTab', value => $wire.set('activeTab', value))">
+            <!-- Removed bg-white, kept border-bottom-0 to merge with body -->
+            <div class="card-header border-bottom-0 pt-3 px-3">
+                <ul class="nav nav-tabs nav-fill card-header-tabs nav-tabs-dark-mode" id="productTabs" role="tablist">
                     <li class="nav-item">
                         <button class="nav-link fw-bold py-3" 
                                 :class="{ 'active': activeTab === 'general' }"
@@ -187,24 +187,28 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 <style>
-    .nav-tabs .nav-link {
-        color: #6c757d;
-        border: none;
-        border-bottom: 3px solid transparent;
+    /* Custom Tab Styling for Primary Header */
+    .nav-tabs-dark-mode {
+        border-bottom: none; /* Card body handles the border */
+    }
+    .nav-tabs-dark-mode .nav-link {
+        color: rgba(255, 255, 255, 0.85);
+        border: 1px solid transparent;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
         padding: 1rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.2s;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
     }
-    .nav-tabs .nav-link:hover {
-        color: #0d6efd;
+    .nav-tabs-dark-mode .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
         border-color: transparent;
-        background: rgba(13, 110, 253, 0.05);
+        color: #fff;
     }
-    .nav-tabs .nav-link.active {
-        color: #0d6efd;
-        border: none;
-        border-bottom: 3px solid #0d6efd;
-        background: transparent;
+    .nav-tabs-dark-mode .nav-link.active {
+        color: var(--bs-primary);
+        background-color: #fff;
+        border-color: #fff #fff #fff; /* Match card body background */
     }
 </style>
 @endpush

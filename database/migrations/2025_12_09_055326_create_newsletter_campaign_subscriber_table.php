@@ -19,6 +19,7 @@ return new class extends Migration
             $table->timestamp('started_at')->useCurrent();
             $table->timestamp('last_email_sent_at')->nullable();
             $table->timestamp('completed_at')->nullable();
+            $table->timestamps();
             
             $table->unique(['newsletter_campaign_id', 'newsletter_subscriber_id'], 'camp_sub_unique_enrollment');
         });

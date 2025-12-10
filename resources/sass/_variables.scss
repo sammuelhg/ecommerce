@@ -4,6 +4,7 @@ $secondary: #6c757d;
 // --------------------------------------------------
 // 1) Definição do tema metálico
 // --------------------------------------------------
+$enable-rounded: true;
 $metallic-gold: #C9A04B;
 $metallic-gold-dark: #A9843F;
 
@@ -13,10 +14,10 @@ $warning-bg-subtle: $metallic-gold !default;
 $warning-border-subtle: $metallic-gold-dark !default;
 
 $warning-gradient: linear-gradient(135deg,
-        $metallic-gold 0%,
-        lighten($metallic-gold, 8%) 35%,
-        lighten($metallic-gold, 18%) 70%,
-        $metallic-gold-dark 100%);
+                $metallic-gold 0%,
+                lighten($metallic-gold, 8%) 35%,
+                lighten($metallic-gold, 18%) 70%,
+                $metallic-gold-dark 100%);
 
 // Componentes que usam o esquema de gradiente
 $btn-warning-bg: $warning-gradient;

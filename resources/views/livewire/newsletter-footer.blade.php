@@ -1,6 +1,6 @@
 <div class="w-100" style="max-width: 400px;">
     <h5 class="text-dark mb-3 fw-bold">📧 Newsletter</h5>
-    <p class="text-dark small mb-3">Receba ofertas exclusivas e ganhe <strong class="text-danger">15% OFF</strong> na primeira compra!</p>
+    <p class="text-dark small mb-3">Receba ofertas exclusivas e ganhe <strong class="text-danger fw-bold">15% OFF</strong> na primeira compra!</p>
     
     @if($success)
         <div class="alert alert-success small mb-0">

@@ -27,7 +27,19 @@ class AppServiceProvider extends ServiceProvider
             // Cache settings for performance if needed, but for now direct query
             // Check if table exists to avoid errors during migration
             if (\Schema::hasTable('store_settings')) {
-                $settings = \App\Models\StoreSetting::all()->pluck('value', 'key');
+                $settings = \App\Models\StoreSetting::all()->mapWithKeys(function ($item) {
+                     // Fix for localhost URLs in production dump (Handle standard and port 8000 and double port edge case)
+                     $value = str_replace(
+                        [
+                            'http://localhost:8000/:8000', 'https://localhost:8000/:8000', // Double port edge case
+                            'http://localhost:8000', 'https://localhost:8000', 
+                            'http://localhost', 'https://localhost'
+                        ], 
+                        '', 
+                        $item->value
+                     );
+                     return [$item->key => $value];
+                });
                 $view->with('storeSettings', $settings);
             }
         });

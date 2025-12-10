@@ -19,7 +19,7 @@
         @forelse($templates as $template)
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm border-0">
-                    <div class="card-header bg-white border-bottom-0 pt-3">
+                    <div class="card-header border-bottom-0 pt-3">
                          <div class="d-flex justify-content-between align-items-start">
                              <h5 class="card-title fw-bold mb-0 text-truncate" title="{{ $template->name }}">{{ $template->name }}</h5>
                              <div class="dropdown">

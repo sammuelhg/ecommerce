@@ -82,11 +82,143 @@
         </div>
     </div>
 
+    <!-- CRM & Marketing Stats -->
+    <div class="row g-4 mb-4">
+        <!-- Leads -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2">Leads Capturados</h6>
+                            <h2 class="mb-0">{{ $totalLeads }}</h2>
+                            <small class="text-primary">Novas oportunidades</small>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-funnel text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulários -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2">Formulários</h6>
+                            <h2 class="mb-0">{{ $totalForms }}</h2>
+                            <small class="text-info">Campanhas ativas</small>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-ui-checks text-info" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Best Sellers -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                 <div class="card-header bg-white">
+                    <h5 class="mb-0 text-primary"><i class="bi bi-trophy-fill me-2 text-warning"></i>Top Produtos Mais Vendidos</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Produto</th>
+                                <th class="text-center">Vendas</th>
+                                <th class="text-center">Estoque</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($bestSellers as $item)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if($item->product->image)
+                                                <img src="{{ asset('storage/'.$item->product->image) }}" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                            @else
+                                                <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-box text-muted"></i>
+                                                </div>
+                                            @endif
+                                            <span class="fw-bold text-dark">{{ $item->product->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary rounded-pill">{{ $item->total_qty }} un</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-{{ $item->product->stock > 10 ? 'success' : 'warning' }} bg-opacity-10 text-{{ $item->product->stock > 10 ? 'success' : 'warning' }}">
+                                            {{ $item->product->stock }} em estoque
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">Nenhum produto vendido recentemente.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Leads Table -->
+    <div class="row mb-4">
+         <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                     <h5 class="mb-0">Últimos Leads</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Email</th>
+                                <th>Origem (Formulário)</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentLeads as $lead)
+                                <tr>
+                                    <td>{{ $lead->email }}</td>
+                                    <td>{{ $lead->form->title ?? 'N/A' }}</td>
+                                    <td>{{ $lead->created_at->diffForHumans() }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ $lead->status->color() }}">
+                                            {{ $lead->status->label() }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">Nenhum lead encontrado.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+         </div>
+    </div>
+
     <!-- Ações Rápidas -->
     <div class="row g-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
+                <div class="card-header">
                     <h5 class="mb-0">Ações Rápidas</h5>
                 </div>
                 <div class="card-body">

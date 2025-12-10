@@ -43,7 +43,6 @@ class ProductForm extends Component
     public $product_size_id = '';
     public $color = ''; // Deprecated, mantido para compatibilidade temporária
     public $attribute = '';
-    public $attribute = '';
     public $size = ''; // Deprecated, mantido para compatibilidade temporária
     public $card_type = 'product_standard'; // Default card type
 

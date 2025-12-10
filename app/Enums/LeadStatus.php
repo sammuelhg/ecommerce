@@ -12,6 +12,12 @@ enum LeadStatus: string
     case BOUNCED = 'bounced';
     case COMPLAINED = 'complained';
 
+    // Sales Pipeline Statuses
+    case NEW = 'new';
+    case OPENED = 'opened';
+    case CLICKED = 'clicked';
+    case CONVERTED = 'converted';
+
     public function label(): string
     {
         return match($this) {
@@ -20,6 +26,10 @@ enum LeadStatus: string
             self::UNSUBSCRIBED => 'Cancelado',
             self::BOUNCED => 'Email Inválido',
             self::COMPLAINED => 'Denúncia',
+            self::NEW => 'Novo',
+            self::OPENED => 'Aberto',
+            self::CLICKED => 'Clicou',
+            self::CONVERTED => 'Convertido',
         };
     }
 }

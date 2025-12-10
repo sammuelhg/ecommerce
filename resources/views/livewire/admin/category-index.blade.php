@@ -26,17 +26,6 @@
             <h5 class="mb-0">Lista de Categorias</h5>
         </div>
         <div class="card-body">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Slug</th>
-                        <th>Produtos</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
                 <tbody>
                     @forelse($categories as $category)
                         <tr>

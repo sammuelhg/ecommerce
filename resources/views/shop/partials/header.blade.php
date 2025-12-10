@@ -28,9 +28,9 @@
             <!-- Logo -->
             <a class="navbar-brand me-2" href="{{ route('shop.index') }}" title="Página Inicial">
                 @if(isset($storeSettings['store_logo']) && $storeSettings['store_logo'])
-                    <img src="{{ $storeSettings['store_logo'] }}" alt="Logo" style="height: 90px; width: auto;">
+                    <img src="{{ $storeSettings['store_logo'] }}" alt="Logo" style="height: 70px; width: auto;">
                 @else
-                    <img src="{{ asset('logo.svg') }}" alt="Logo" style="height: 90px; width: auto;">
+                    <img src="{{ asset('logo.svg') }}" alt="Logo" style="height: 70px; width: auto;">
                 @endif
             </a>
 
@@ -79,6 +79,7 @@
                             type="button" 
                             @click="handleClick()"
                             title="{{ Auth::check() ? 'Minha Conta' : 'Entrar' }}"
+                            aria-label="{{ Auth::check() ? 'Minha Conta' : 'Entrar' }}"
                             style="width: 40px; height: 40px; z-index: 2; background-color: #1a1a1a;">
                         
                         <!-- 2. O Conteúdo (Avatar ou Ícone) -->
@@ -127,6 +128,7 @@
                         type="button" 
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasCart"
+                        aria-label="Carrinho de Compras"
                         style="width: 40px; height: 40px;">
                     <i class="bi bi-cart4"></i>
                     <span class="notification-badge" 
@@ -141,6 +143,7 @@
                         type="button" 
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasWishlist"
+                        aria-label="Lista de Desejos"
                         style="width: 40px; height: 40px;">
                     <i class="bi" :class="wishlist.length > 0 ? 'bi-heart-fill' : 'bi-heart'"></i>
                     <span class="notification-badge" 
@@ -155,6 +158,7 @@
                         type="button" 
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasNav"
+                        aria-label="Menu Navegação"
                         style="width: 40px; height: 40px;">
                     <i class="bi bi-list"></i>
                 </button>
@@ -162,14 +166,19 @@
 
             <!-- Navegação Desktop -->
             <div class="collapse navbar-collapse order-lg-2">
-                <!-- Busca Desktop -->
-                <!-- Busca Desktop -->
-                <form class="d-flex flex-grow-1 me-lg-4 my-2 my-lg-0 d-none d-lg-flex" @submit.prevent="performSearch()">
-                    <input class="form-control bg-white me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
-                    <button class="btn btn-outline-warning btn-icon-shape rounded-circle" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
+                
+                <!-- Wrapper para Busca (Fake Layout + Real Absolute) -->
+                <div class="d-none d-lg-block flex-grow-1 me-lg-4 position-relative">
+                    <!-- 1. Fake Bar (Invisível) para determinar altura/largura no fluxo -->
+                    <div style="visibility: hidden; pointer-events: none;" aria-hidden="true">
+                        <x-shop.header-search />
+                    </div>
+
+                    <!-- 2. Real Bar (Absoluta) Interativa -->
+                    <div class="position-absolute top-0 start-0 w-100 h-100">
+                        <x-shop.header-search />
+                    </div>
+                </div>
 
                 <!-- Links de Navegação -->
                 <ul class="navbar-nav mb-2 mb-lg-0">

@@ -14,12 +14,6 @@
         </nav>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body text-center py-5">
-            <i class="bi bi-people" style="font-size: 3rem; color: #6c757d;"></i>
-            <h4 class="mt-3">Gerenciamento de Usuários</h4>
-            <p class="text-muted">Esta seção será implementada em breve.</p>
-        </div>
-    </div>
+    <livewire:admin.users.user-manager />
 </div>
 @endsection

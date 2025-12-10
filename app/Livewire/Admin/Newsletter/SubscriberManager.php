@@ -18,6 +18,7 @@ class SubscriberManager extends Component
 
     public string $search = '';
     public string $filter = 'all'; // all, active, unsubscribed, bounced
+    public string $utmSource = '';
 
     // Reset pagination when searching
     public function updatedSearch(): void
@@ -26,6 +27,11 @@ class SubscriberManager extends Component
     }
 
     public function updatedFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedUtmSource(): void
     {
         $this->resetPage();
     }
@@ -59,9 +65,20 @@ class SubscriberManager extends Component
         } elseif ($this->filter === 'unsubscribed') {
             $query->where('is_active', false);
         }
+        
+        if ($this->utmSource) {
+            $query->where('utm_source', $this->utmSource);
+        }
+        
+        // Get unique UTM Sources for filter
+        $utmSources = NewsletterSubscriber::select('utm_source')
+            ->whereNotNull('utm_source')
+            ->distinct()
+            ->pluck('utm_source');
 
         return view('livewire.admin.newsletter.subscriber-manager', [
-            'subscribers' => $query->paginate(20)
+            'subscribers' => $query->paginate(20),
+            'utmSources' => $utmSources
         ]);
     }
 }

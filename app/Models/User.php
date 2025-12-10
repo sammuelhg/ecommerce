@@ -89,4 +89,9 @@ class User extends Authenticatable
     {
         $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
+
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Order::class);
+    }
 }

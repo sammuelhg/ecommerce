@@ -5,7 +5,11 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 text-center text-md-start mb-4 mb-md-0">
-                <img src="{{ asset('logo.svg') }}" alt="LosFit" style="height: 90px; width: auto;" class="mb-3">
+                @if(isset($storeSettings['store_logo']) && $storeSettings['store_logo'])
+                    <img src="{{ $storeSettings['store_logo'] }}" alt="LosFit" style="height: 90px; width: auto;" class="mb-3">
+                @else
+                    <img src="{{ asset('logo.svg') }}" alt="LosFit" style="height: 90px; width: auto;" class="mb-3">
+                @endif
                 <p class="text-dark opacity-75 mb-0 fw-semibold">A Elegância veste o estilo com conforto e saúde!</p>
             </div>
             <div class="col-md-6 d-flex align-items-center justify-content-center justify-content-md-end">
@@ -22,10 +26,10 @@
         <div class="rounded-4 overflow-hidden shadow-lg border border-white">
             @if(str_contains($storeSettings['google_maps_embed_url'], '<iframe'))
                 <div class="ratio ratio-21x9" style="max-height: 400px;">
-                    {!! $storeSettings['google_maps_embed_url'] !!}
+                    {!! str_replace('<iframe', '<iframe title="Mapa da Localização"', $storeSettings['google_maps_embed_url']) !!}
                 </div>
             @else
-                <iframe src="{{ $storeSettings['google_maps_embed_url'] }}" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <iframe src="{{ $storeSettings['google_maps_embed_url'] }}" title="Mapa da Localização" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             @endif
         </div>
     </div>
@@ -143,13 +147,13 @@
         <!-- Payment & Security Section -->
         <div class="row py-4 border-top border-secondary border-opacity-25 align-items-center">
             <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
-                <h6 class="text-secondary text-uppercase small fw-bold mb-3">💳 Formas de Pagamento</h6>
+                <h6 class="text-white-50 text-uppercase small fw-bold mb-3">💳 Formas de Pagamento</h6>
                 <div class="d-flex gap-3 justify-content-center justify-content-md-start flex-wrap fs-3 text-light opacity-75">
                     <i class="bi bi-credit-card-2-front" title="Cartão de Crédito"></i>
                     <i class="bi bi-credit-card" title="Débito"></i>
                     <i class="bi bi-bank" title="Boleto"></i>
                     <i class="bi bi-qr-code" title="PIX"></i>
-                    <span class="badge bg-success px-3 py-2 fs-6 align-middle">PIX -5%</span>
+                    <span class="badge bg-success px-3 py-2 fs-6 align-middle text-white fw-bold">PIX -5%</span>
                 </div>
             </div>
             
@@ -165,11 +169,11 @@
             </div>
 
             <div class="col-md-4 text-center text-md-end">
-                <h6 class="text-secondary text-uppercase small fw-bold mb-3">🔒 Compra Segura</h6>
+                <h6 class="text-white-50 text-uppercase small fw-bold mb-3">🔒 Compra Segura</h6>
                 <div class="d-flex gap-3 justify-content-center justify-content-md-end align-items-center">
                     <i class="bi bi-shield-lock-fill text-success fs-3" title="Site Seguro"></i>
                     <i class="bi bi-file-lock2 text-success fs-3" title="SSL"></i>
-                    <span class="badge bg-success px-3 py-2">
+                    <span class="badge bg-success px-3 py-2 text-white">
                         <i class="bi bi-truck me-2"></i>FRETE GRÁTIS*
                     </span>
                 </div>

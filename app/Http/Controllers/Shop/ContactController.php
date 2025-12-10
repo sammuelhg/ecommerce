@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
-    public function store(Request $request, SendContactEmailAction $action)
+    public function store(Request $request, SendContactEmailAction $emailAction, \App\Actions\Contacts\CreateContactAction $createAction)
     {
         $validated = $request->validate([
             'name' => 'required|min:3',
@@ -28,8 +28,12 @@ class ContactController extends Controller
             message: $validated['message']
         );
 
+        // 1. Save to Database using Action
+        $createAction->execute($dto);
+
+        // 2. Send Notification
         try {
-            $action->execute($dto);
+            $emailAction->execute($dto);
             return back()->with('contact_success', 'Mensagem enviada com sucesso!');
         } catch (\Exception $e) {
             Log::error('Standard Contact Form Error: ' . $e->getMessage());

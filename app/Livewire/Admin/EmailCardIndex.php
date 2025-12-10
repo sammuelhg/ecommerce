@@ -93,8 +93,8 @@ class EmailCardIndex extends Component
         if ($this->photo) {
             $extension = $this->photo->getClientOriginalExtension() ?: 'jpg';
             $filename = uniqid() . '_' . time() . '.' . $extension;
-            $this->photo->storeAs('email-cards', $filename, 'public_uploads');
-            $data['photo'] = 'email-cards/' . $filename;
+            $this->photo->storeAs('uploads/email-cards', $filename, 'public_uploads');
+            $data['photo'] = 'uploads/email-cards/' . $filename;
         }
 
         if ($this->editMode) {

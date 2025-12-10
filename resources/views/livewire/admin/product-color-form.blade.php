@@ -1,5 +1,5 @@
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white">
+    <div class="card-header">
         <h5 class="mb-0">{{ $colorId ? 'Editar Cor' : 'Nova Cor' }}</h5>
     </div>
     <div class="card-body">

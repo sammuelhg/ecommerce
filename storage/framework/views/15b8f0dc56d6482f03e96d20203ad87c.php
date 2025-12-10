@@ -28,9 +28,9 @@
             <!-- Logo -->
             <a class="navbar-brand me-2" href="<?php echo e(route('shop.index')); ?>" title="Página Inicial">
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($storeSettings['store_logo']) && $storeSettings['store_logo']): ?>
-                    <img src="<?php echo e($storeSettings['store_logo']); ?>" alt="Logo" style="height: 90px; width: auto;">
+                    <img src="<?php echo e($storeSettings['store_logo']); ?>" alt="Logo" style="height: 70px; width: auto;">
                 <?php else: ?>
-                    <img src="<?php echo e(asset('logo.svg')); ?>" alt="Logo" style="height: 90px; width: auto;">
+                    <img src="<?php echo e(asset('logo.svg')); ?>" alt="Logo" style="height: 70px; width: auto;">
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
 
@@ -79,6 +79,7 @@
                             type="button" 
                             @click="handleClick()"
                             title="<?php echo e(Auth::check() ? 'Minha Conta' : 'Entrar'); ?>"
+                            aria-label="<?php echo e(Auth::check() ? 'Minha Conta' : 'Entrar'); ?>"
                             style="width: 40px; height: 40px; z-index: 2; background-color: #1a1a1a;">
                         
                         <!-- 2. O Conteúdo (Avatar ou Ícone) -->
@@ -127,6 +128,7 @@
                         type="button" 
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasCart"
+                        aria-label="Carrinho de Compras"
                         style="width: 40px; height: 40px;">
                     <i class="bi bi-cart4"></i>
                     <span class="notification-badge" 
@@ -141,6 +143,7 @@
                         type="button" 
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasWishlist"
+                        aria-label="Lista de Desejos"
                         style="width: 40px; height: 40px;">
                     <i class="bi" :class="wishlist.length > 0 ? 'bi-heart-fill' : 'bi-heart'"></i>
                     <span class="notification-badge" 
@@ -155,6 +158,7 @@
                         type="button" 
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasNav"
+                        aria-label="Menu Navegação"
                         style="width: 40px; height: 40px;">
                     <i class="bi bi-list"></i>
                 </button>
@@ -162,14 +166,57 @@
 
             <!-- Navegação Desktop -->
             <div class="collapse navbar-collapse order-lg-2">
-                <!-- Busca Desktop -->
-                <!-- Busca Desktop -->
-                <form class="d-flex flex-grow-1 me-lg-4 my-2 my-lg-0 d-none d-lg-flex" @submit.prevent="performSearch()">
-                    <input class="form-control bg-white me-2 rounded-pill" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
-                    <button class="btn btn-outline-warning btn-icon-shape rounded-circle" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
+                
+                <!-- Wrapper para Busca (Fake Layout + Real Absolute) -->
+                <div class="d-none d-lg-block flex-grow-1 me-lg-4 position-relative">
+                    <!-- 1. Fake Bar (Invisível) para determinar altura/largura no fluxo -->
+                    <div style="visibility: hidden; pointer-events: none;" aria-hidden="true">
+                        <?php if (isset($component)) { $__componentOriginal901916e66f76643cea530aa9f8bff40c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal901916e66f76643cea530aa9f8bff40c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.shop.header-search','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('shop.header-search'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $attributes = $__attributesOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__attributesOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $component = $__componentOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__componentOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
+                    </div>
+
+                    <!-- 2. Real Bar (Absoluta) Interativa -->
+                    <div class="position-absolute top-0 start-0 w-100 h-100">
+                        <?php if (isset($component)) { $__componentOriginal901916e66f76643cea530aa9f8bff40c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal901916e66f76643cea530aa9f8bff40c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.shop.header-search','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('shop.header-search'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $attributes = $__attributesOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__attributesOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $component = $__componentOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__componentOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
+                    </div>
+                </div>
 
                 <!-- Links de Navegação -->
                 <ul class="navbar-nav mb-2 mb-lg-0">

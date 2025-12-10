@@ -6,10 +6,12 @@
 
     @if(isset($data['image']) && $data['image'])
         @if($imageStyle === 'background')
-            <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}'); background-size: cover; background-position: center; opacity: 0.3;"></div>
+            <div class="position-absolute top-0 start-0 w-100 h-100 placeholder-glow" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}'); background-size: cover; background-position: center; opacity: 0.3;" onerror="this.style.display='none'"></div>
+            {{-- Fallback for background image using hidden img to detect error --}}
+            <img src="{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}" style="display:none;" onerror="this.previousElementSibling.style.display='none'; this.closest('.card').classList.add('bg-light');">
         @else
             <div class="w-100 flex-shrink-0">
-                <img src="{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}" class="card-img-top object-fit-cover" style="height: 150px;">
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}" class="card-img-top object-fit-cover" style="height: 150px;" onerror="this.style.display='none'; this.closest('.card').classList.add('bg-light');">
             </div>
         @endif
     @endif
@@ -22,7 +24,7 @@
                 @if(isset($data['text']) && !empty($data['text']))
                     {!! $data['text'] !!}
                 @else
-                    Ganhe <strong class="text-danger">15% OFF</strong> na 1ª compra!
+                    Ganhe <strong class="text-danger fw-bold" style="text-shadow: 0 0 1px rgba(0,0,0,0.1);">15% OFF</strong> na 1ª compra!
                 @endif
             </div>
         </div>

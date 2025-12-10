@@ -23,7 +23,19 @@ class StoreSettingController extends Controller
             $tab = 'identity';
         }
 
-        $settings = StoreSetting::all()->pluck('value', 'key');
+        $settings = StoreSetting::all()->mapWithKeys(function ($item) {
+             // Fix for localhost URLs in production dump (Handle standard and port 8000 and double port edge case)
+             $value = str_replace(
+                [
+                    'http://localhost:8000/:8000', 'https://localhost:8000/:8000', // Double port edge case
+                    'http://localhost:8000', 'https://localhost:8000', 
+                    'http://localhost', 'https://localhost'
+                ], 
+                '', 
+                $item->value
+             );
+             return [$item->key => $value];
+        });
         
         return view('admin.settings.index', [
             'settings' => $settings,

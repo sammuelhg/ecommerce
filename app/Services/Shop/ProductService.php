@@ -22,8 +22,8 @@ class ProductService extends BaseService
         // Filter by Search
         if ($filters->search) {
             $query->where(function (Builder $q) use ($filters) {
-                $q->where('name', 'LIKE', "%{$filters->search}%")
-                  ->orWhere('description', 'LIKE', "%{$filters->search}%");
+                $q->where('name', 'LIKE', "%{$filters->search}%");
+                //  ->orWhere('description', 'LIKE', "%{$filters->search}%"); // Disabled for performance
             });
         }
 

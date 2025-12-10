@@ -14,6 +14,7 @@ Route::get('/shop', [App\Http\Controllers\ShopController::class, 'newShop'])->na
 Route::get('/loja', [App\Http\Controllers\ShopController::class, 'newShopSimple'])->name('shop.index'); // Sem regras, 1 col mobile
 Route::get('/loja2', [App\Http\Controllers\ShopController::class, 'newShopB'])->name('shop.index_b'); // Com regras, 2 col mobile
 Route::get('/loja/busca', [App\Http\Controllers\ShopController::class, 'search'])->name('shop.search');
+Route::get('/loja/busca/sugestoes', [App\Http\Controllers\ShopController::class, 'suggestions'])->name('shop.search.suggestions');
 Route::get('/loja/categoria/{category}', [App\Http\Controllers\ShopController::class, 'category'])->name('shop.category');
 Route::get('/loja/categoria/{parent}/{category}', [App\Http\Controllers\ShopController::class, 'subcategory'])->name('shop.subcategory');
 Route::get('/loja/produto/{product}', [App\Http\Controllers\ShopController::class, 'show'])->name('shop.show');
@@ -111,6 +112,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Grid Manager
     Route::get('/grid', \App\Livewire\Admin\Grid\GridManager::class)->name('grid.index');
+    // Route::get('/grid', \App\Livewire\Admin\Grid\GridManager::class)->name('grid.index'); // Replaced by Livewire route below
 
     // Newsletter Campaign Manager
     Route::prefix('newsletter')->name('newsletter.')->group(function () {
@@ -122,8 +124,31 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/templates', \App\Livewire\Admin\Newsletter\TemplateManager::class)->name('templates');
         Route::get('/campaigns', \App\Livewire\Admin\Newsletter\CampaignManager::class)->name('campaigns');
         Route::get('/campaigns/{campaign}/builder', \App\Livewire\Admin\Newsletter\CampaignBuilder::class)->name('campaign.builder');
+        // Contacts
+        Route::get('/contacts', \App\Livewire\Admin\Newsletter\ContactManager::class)->name('contacts');
     });
 
+    // Marketing
+    Route::get('/grid', App\Livewire\Admin\Grid\GridManager::class)->name('grid.index');
+    Route::get('/marketing/search', App\Livewire\Admin\Marketing\SearchHighlights::class)->name('marketing.search');
+
+    // Leads
+    Route::get('/leads', App\Livewire\Admin\Leads\LeadManager::class)->name('leads.index');
+
+    // CRM / Unified Audience
+    Route::prefix('crm')->name('crm.')->group(function() {
+        Route::get('/audience', \App\Livewire\Admin\Crm\AudienceIndex::class)->name('audience');
+        
+        Route::get('/traffic/organic', function() {
+            return view('admin.crm.placeholder', ['title' => 'Tráfego Orgânico', 'feature' => 'Análise de Tráfego Orgânico']);
+        })->name('organic-traffic');
+
+        Route::get('/traffic/paid', \App\Livewire\Admin\Crm\ExpenseManager::class)->name('paid-traffic');
+
+        Route::get('/reports', \App\Livewire\Admin\Crm\FinancialReport::class)->name('reports');
+
+        Route::get('/forms/builder', \App\Livewire\Forms\FormBuilder::class)->name('forms.builder');
+    });
 
     // Stories (History)
     Route::resource('stories', App\Http\Controllers\Admin\StoryController::class)->only(['index', 'store', 'update']);
@@ -197,6 +222,25 @@ Route::get('/test-buttons', function () {
     return view('test-buttons');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Rotas Públicas (High Performance)
+|--------------------------------------------------------------------------
+*/
+// Rota de Rastreamento (Pixel transparente)
+Route::get('/pixel/{id}', \App\Http\Controllers\Web\PixelController::class)->name('pixel.track');
+
+Route::get('/', function () {
+    return redirect()->route('shop.index'); // Redirect to existing shop index
+});
+
+Route::get('/dashboard', function () {
+    return redirect()->route('admin.dashboard'); // Redirect to existing admin dashboard
+})->middleware(['auth', 'verified']);
+
+Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)
+    ->middleware(['auth'])
+    ->name('admin.dashboard');
 
 // Digital Card & Linktree
 Route::get('/card', function () {
@@ -207,8 +251,39 @@ Route::get('/links', function () {
     return view('links');
 })->name('links');
 
+// Landing Pages
+Route::view('/minha-historia', 'landing.history')->name('landing.history');
+
 // Email Tracking Route
 Route::get('/t/{campaign}/{lead}/pixel.gif', App\Http\Controllers\Tracking\TrackOpenController::class)->name('tracking.open');
 
 // API Routes
 Route::post('/api/leads', [App\Http\Controllers\LeadCaptureController::class, 'store'])->name('api.leads.store');
+
+// Debug SMTP Route (Temporary)
+Route::get('/debug-smtp', function () {
+    $key = 'smtp_host';
+    $testValue = 'test.smtp.server.com';
+    
+    // 1. Check current value
+    $current = \App\Models\StoreSetting::where('key', $key)->first();
+    echo "Current Value in DB: " . ($current ? $current->value : 'NOT FOUND') . "<br>";
+    
+    // 2. Try simple update
+    try {
+        \App\Models\StoreSetting::updateOrCreate(
+            ['key' => $key],
+            ['value' => $testValue, 'type' => 'text']
+        );
+        echo "Update executed.<br>";
+    } catch (\Exception $e) {
+        echo "Update FAILED: " . $e->getMessage() . "<br>";
+    }
+    
+    // 3. Check again
+    $after = \App\Models\StoreSetting::where('key', $key)->first();
+    echo "Value After Update: " . ($after ? $after->value : 'NOT FOUND') . "<br>";
+    
+    echo "<br>Dump of all settings:<br>";
+    dump(\App\Models\StoreSetting::all()->toArray());
+});

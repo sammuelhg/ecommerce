@@ -47,9 +47,18 @@ class SubscribeToNewsletterAction
                      $subscriber->campaigns()->attach($campaignId, [
                          'started_at' => now(),
                          'current_email_id' => $firstEmail?->id,
-                         // If immediate, it might be picked up by scheduler. 
-                         // Or we can trigger it here? Let's leave for scheduler.
+                         'last_email_sent_at' => $firstEmail ? now() : null,
                      ]);
+
+                     // Send Immediate First Email (Bypassing Scheduler)
+                     if ($firstEmail) {
+                         try {
+                             Mail::to($email)->send(new \App\Mail\CampaignMail($campaign, $subscriber, $firstEmail));
+                             Log::info("Campaign First Email Sent: {$email} (Campaign: {$campaignId})");
+                         } catch (\Exception $e) {
+                             Log::error("Campaign Email Failed: " . $e->getMessage());
+                         }
+                     }
                 }
             }
         }

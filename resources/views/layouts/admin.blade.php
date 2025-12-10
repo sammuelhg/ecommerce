@@ -16,118 +16,7 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @livewireStyles
     
-   <style>
-        .admin-sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
 
-        @media (min-width: 768px) {
-            .admin-sidebar {
-                position: fixed;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                z-index: 100;
-                height: 100vh;
-                overflow-y: auto;
-            }
-        }
-        
-        .admin-logo {
-            padding: 1.5rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
-        }
-        
-        .admin-logo img {
-            max-width: 150px;
-            height: auto;
-        }
-        
-        .admin-nav .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 0.75rem 1.5rem;
-            border-left: 3px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .admin-nav .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border-left-color: #ffd700;
-        }
-        
-        .admin-nav .nav-link.active {
-            background: rgba(255,255,255,0.15);
-            color: #fff;
-            border-left-color: #ffd700;
-            font-weight: 600;
-        }
-        
-        .admin-nav .nav-link i {
-            margin-right: 0.5rem;
-            width: 20px;
-        }
-        
-        /* Submenu styles */
-        .admin-nav .nav-link[data-bs-toggle="collapse"] {
-            cursor: pointer;
-        }
-        
-        .admin-nav .nav-link .bi-chevron-down {
-            transition: transform 0.3s ease;
-            font-size: 0.8rem;
-        }
-        
-        .admin-nav .nav-link[aria-expanded="true"] .bi-chevron-down {
-            transform: rotate(180deg);
-        }
-        
-        .admin-nav .collapse .nav-link {
-            padding: 0.5rem 1rem 0.5rem 2.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .admin-nav .collapse .nav-link i {
-            width: 16px;
-            font-size: 0.9rem;
-        }
-        
-        .home-link {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            margin-top: auto;
-        }
-        
-        .home-link a {
-            color: rgba(255,255,255,0.9);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s;
-        }
-        
-        .home-link a:hover {
-            color: #ffd700;
-        }
-        
-        .admin-header {
-            background: #fff;
-            padding: 1rem 2rem;
-            border-bottom: 2px solid #f0f0f0;
-            margin-bottom: 2rem;
-        }
-        
-        .logout-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-        }
-    </style>
     @stack('styles')
 </head>
 <body>
@@ -222,66 +111,102 @@
                             </div>
                         </li>
 
-                        <!-- Newsletter (Top Level) -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.newsletter.campaigns', 'admin.newsletter.campaign.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.newsletter.campaigns') }}">
-                                <i class="bi bi-envelope-paper"></i> Newsletter
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.newsletter.templates') ? 'active' : '' }}" 
-                               href="{{ route('admin.newsletter.templates') }}">
-                                <i class="bi bi-file-earmark-text"></i> Modelos
-                            </a>
-                        </li>
-
-                        <!-- Vendas (Antigo Pedidos) -->
+                        <!-- CRM -->
                         <li class="nav-item">
                             <a class="nav-link d-flex justify-content-between align-items-center" 
                                data-bs-toggle="collapse" 
-                               href="#salesMenu" 
+                               href="#crmMenu" 
                                role="button" 
-                               aria-expanded="{{ request()->routeIs('admin.orders.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-cart"></i> Vendas</span>
+                               aria-expanded="{{ request()->routeIs('admin.crm.*', 'admin.users.*', 'admin.leads.*', 'admin.newsletter.*') ? 'true' : 'false' }}">
+                                <span><i class="bi bi-people-fill"></i> CRM</span>
                                 <i class="bi bi-chevron-down"></i>
                             </a>
-                            <div class="collapse {{ request()->routeIs('admin.orders.*') ? 'show' : '' }}" 
-                                 id="salesMenu">
+                            <div class="collapse {{ request()->routeIs('admin.crm.*', 'admin.users.*', 'admin.leads.*', 'admin.newsletter.*') ? 'show' : '' }}" 
+                                 id="crmMenu">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.orders.incoming') ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['type' => 'incoming']) }}">
-                                            <i class="bi bi-box-arrow-in-down"></i> Entrada
+                                        <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.users.index') }}">
+                                            <i class="bi bi-person-badge"></i> Clientes
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.orders.outgoing') ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['type' => 'outgoing']) }}">
-                                            <i class="bi bi-box-arrow-up"></i> Saída
+                                        <a class="nav-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.leads.index') }}">
+                                            <i class="bi bi-funnel"></i> Leads
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.orders.returns') ? 'active' : '' }}" 
-                                           href="{{ route('admin.orders.index', ['type' => 'returns']) }}">
-                                            <i class="bi bi-arrow-counterclockwise"></i> Devoluções
+                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.contacts') ? 'active' : '' }}" 
+                                           href="{{ route('admin.newsletter.contacts') }}">
+                                            <i class="bi bi-chat-left-text"></i> Contatos
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.campaigns', 'admin.newsletter.campaign.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.newsletter.campaigns') }}">
+                                            <i class="bi bi-megaphone"></i> Campanha Newsletter
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.crm.organic-traffic') ? 'active' : '' }}" 
+                                           href="{{ route('admin.crm.organic-traffic') }}">
+                                            <i class="bi bi-graph-up"></i> Tráfego Orgânico
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link d-flex justify-content-between align-items-center collapsed" 
+                                           data-bs-toggle="collapse" 
+                                           href="#paidTrafficSubMenu" 
+                                           role="button" 
+                                           aria-expanded="{{ request()->routeIs('admin.crm.paid-traffic') ? 'true' : 'false' }}">
+                                            <span><i class="bi bi-currency-dollar"></i> Tráfego Pago</span>
+                                            <i class="bi bi-chevron-down"></i>
+                                        </a>
+                                        <div class="collapse {{ request()->routeIs('admin.crm.paid-traffic') ? 'show' : '' }}" id="paidTrafficSubMenu">
+                                            <ul class="nav flex-column ms-3">
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->fullUrlIs(route('admin.crm.paid-traffic', ['source' => 'meta'])) ? 'active' : '' }}" 
+                                                       href="{{ route('admin.crm.paid-traffic', ['source' => 'meta']) }}">
+                                                        <i class="bi bi-facebook"></i> Meta Ads
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->fullUrlIs(route('admin.crm.paid-traffic', ['source' => 'google'])) ? 'active' : '' }}" 
+                                                       href="{{ route('admin.crm.paid-traffic', ['source' => 'google']) }}">
+                                                        <i class="bi bi-google"></i> Google Ads
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->fullUrlIs(route('admin.crm.paid-traffic', ['source' => 'tiktok'])) ? 'active' : '' }}" 
+                                                       href="{{ route('admin.crm.paid-traffic', ['source' => 'tiktok']) }}">
+                                                        <i class="bi bi-tiktok"></i> TikTok Ads
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.crm.reports') ? 'active' : '' }}" 
+                                           href="{{ route('admin.crm.reports') }}">
+                                            <i class="bi bi-bar-chart-fill"></i> Relatórios
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                         </li>
 
-                        <!-- Marketing & Conteúdo -->
+                        <!-- Marketing (Visual & Content) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex justify-content-between align-items-center" 
                                data-bs-toggle="collapse" 
                                href="#marketingMenu" 
                                role="button" 
-                               aria-expanded="{{ request()->routeIs('admin.stories.*', 'admin.newsletter.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-megaphone"></i> Marketing</span>
+                               aria-expanded="{{ request()->routeIs('admin.stories.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'true' : 'false' }}">
+                                <span><i class="bi bi-palette"></i> Visual & Conteúdo</span>
                                 <i class="bi bi-chevron-down"></i>
                             </a>
-                            <div class="collapse {{ request()->routeIs('admin.stories.*', 'admin.newsletter.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'show' : '' }}" 
+                            <div class="collapse {{ request()->routeIs('admin.stories.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'show' : '' }}" 
                                  id="marketingMenu">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
@@ -296,29 +221,26 @@
                                             <i class="bi bi-grid-3x3"></i> Layout do Grid
                                         </a>
                                     </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.email-cards.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.email-cards.index') }}">
-                                            <i class="bi bi-card-image"></i> Cards de Email
-                                        </a>
-                                    </li>
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.links.*') ? 'active' : '' }}" 
                                            href="{{ route('admin.links.index') }}">
                                             <i class="bi bi-link-45deg"></i> Links da Bio
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.email-cards.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.email-cards.index') }}">
+                                            <i class="bi bi-card-image"></i> Cards de Email
+                                        </a>
+                                    </li>
+                                     <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.templates') ? 'active' : '' }}" 
+                                           href="{{ route('admin.newsletter.templates') }}">
+                                            <i class="bi bi-file-earmark-text"></i> Modelos de Email
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
-                        </li>
-
-                        <!-- Clientes -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.users.index') }}">
-                                <i class="bi bi-people"></i> Clientes
-                            </a>
                         </li>
 
                         <!-- Configurações -->
