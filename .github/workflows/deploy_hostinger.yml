@@ -1,0 +1,54 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, bcmath, intl, gd, xml, dom, ctype, fileinfo, pdo, pdo_mysql, zip
+        coverage: none
+
+    - name: Install Composer Dependencies
+      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install NPM Dependencies & Build
+      run: |
+        npm ci
+        npm run build
+
+    - name: Deploy to Hostinger via SSH
+      uses: easingthemes/ssh-deploy@main
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+        ARGS: "-rlgoDzvc -i --delete"
+        SOURCE: "./"
+        REMOTE_HOST: ${{ secrets.HOSTINGER_IP }}
+        REMOTE_USER: ${{ secrets.HOSTINGER_USERNAME }}
+        REMOTE_PORT: 65002
+        TARGET: ${{ secrets.TARGET_DIRECTORY }}
+        EXCLUDE: "/.git/, /.github/, /node_modules/, /tests/, /.env, /storage/logs/, /storage/framework/sessions/"
+        SCRIPT_BEFORE: |
+          echo "Starting deployment..."
+        SCRIPT_AFTER: |
+          cd ${{ secrets.TARGET_DIRECTORY }}
+          php artisan migrate --force
+          php artisan optimize:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          echo "Deployment complete!"
