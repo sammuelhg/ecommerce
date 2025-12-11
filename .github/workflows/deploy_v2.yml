@@ -1,4 +1,4 @@
-name: Deploy to Hostinger
+name: Deploy to Hostinger V2
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: 🚀 Build & Deploy
+  deploy_v2:
+    name: 🚀 Deploy V2 (Safe Mode)
     runs-on: ubuntu-latest
 
     steps:
@@ -24,9 +24,10 @@ jobs:
         npm ci
         npm run build
 
-    - name: 📦 Create Deployment Artifact (VERSION 2 - FIXED)
+    - name: 📦 Create Deployment Artifact (Safe Mode)
       run: |
         # Create archive in a temporary location to avoid "file changed" errors
+        # Using /tmp ensures we don't try to tar the tarball itself
         tar -czf /tmp/deploy_release.tar.gz \
           --exclude=.git \
           --exclude=.github \
@@ -38,7 +39,7 @@ jobs:
           --exclude=storage/framework/sessions \
           .
         
-        # Move it back to the workspace
+        # Move it back to the workspace to send it
         mv /tmp/deploy_release.tar.gz ./deploy_release.tar.gz
 
     - name: 📤 Transfer Files to Server
@@ -50,8 +51,6 @@ jobs:
         port: ${{ secrets.HOSTINGER_PORT }}
         source: "deploy_release.tar.gz,hostinger.env,hostinger.htaccess,version.php"
         target: "public_html" 
-        # Note: scp-action uploads to user home relative path usually. 
-        # If 'target' is public_html, it goes to ~/public_html which is correct.
 
     - name: 🚀 Execute Remote Deployment
       uses: appleboy/ssh-action@master
@@ -66,11 +65,10 @@ jobs:
           COMPOSER_BIN="/usr/local/bin/composer"
           TARGET_DIR="public_html"
 
-          echo "--- Starting Deployment on Hostinger ---"
+          echo "--- Starting Deployment V2 on Hostinger ---"
           cd $TARGET_DIR
 
           echo "1. Cleaning old files (preserving storage & .env)..."
-          # Find and delete everything except specific files/folders
           find . -maxdepth 1 ! -name '.env' ! -name '.htaccess' ! -name 'storage' ! -name 'deploy_release.tar.gz' ! -name 'hostinger.env' ! -name 'hostinger.htaccess' ! -name '.' ! -name '..' -exec rm -rf {} +
 
           echo "2. Extracting new release..."
@@ -78,7 +76,6 @@ jobs:
           rm deploy_release.tar.gz
 
           echo "3. Updating Configuration..."
-          # Move environment specific files to their real names
           mv -f hostinger.env .env
           mv -f hostinger.htaccess .htaccess
 
@@ -92,8 +89,7 @@ jobs:
           echo "6. Running Migrations & Optimizations..."
           $PHP_BIN artisan migrate --force
           $PHP_BIN artisan config:clear
-          $PHP_BIN artisan cache:clear
           $PHP_BIN artisan route:cache
           $PHP_BIN artisan view:cache
 
-          echo "--- Deployment Successfully Completed! 🚀 ---"
+          echo "--- Deployment V2 Successfully Completed! 🚀 ---"
