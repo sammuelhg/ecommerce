@@ -26,20 +26,25 @@ else {
 }
 
 Write-Host "=== 1. Preparando Build para Produção ===" -ForegroundColor Cyan
-Write-Host "Executando composer install (Otimizado)..."
-cmd /c composer install --no-dev --optimize-autoloader --no-interaction
+# Composer install will be done remotely on Hostinger
+# cmd /c composer install --no-dev --optimize-autoloader --no-interaction
 
 Write-Host "Compilando assets (NPM)..."
 cmd /c npm install
 cmd /c npm run build
 
 Write-Host "=== 2. Empacotando Arquivos ===" -ForegroundColor Cyan
-$PackageName = "deploy_package.tar.gz"
-if (Test-Path $PackageName) { Remove-Item $PackageName }
+$PackageName = "deploy_release.tar.gz"
+if (Test-Path $PackageName) { Remove-Item $PackageName -Force -ErrorAction SilentlyContinue }
 
 Write-Host "Criando $PackageName..."
 # Exclui arquivos desnecessários para produção
-tar -czf $PackageName --exclude=.git --exclude=.github --exclude=node_modules --exclude=tests --exclude=.env --exclude=storage/logs --exclude=storage/framework/sessions --exclude=deploy_manual.ps1 .
+tar -czf $PackageName --exclude=.git --exclude=.github --exclude=node_modules --exclude=vendor --exclude=tests --exclude=.env --exclude=storage/logs --exclude=storage/framework/sessions --exclude=deploy_manual.ps1 .
+
+if (-not (Test-Path $PackageName)) {
+    Write-Host "ERRO CRÍTICO: Falha ao criar $PackageName" -ForegroundColor Red
+    Exit
+}
 
 Write-Host "=== 3. Enviando para o Servidor ===" -ForegroundColor Cyan
 $Destination = "${HOSTINGER_USER}@${HOSTINGER_IP}:${REMOTE_DIR}/$PackageName"
@@ -63,7 +68,7 @@ Invoke-Expression "scp $SCP_OPT version.php ${HOSTINGER_USER}@${HOSTINGER_IP}:${
 
 Write-Host "=== 4. Executando Comandos no Servidor ===" -ForegroundColor Cyan
 # Comandos para rodar lá no servidor: Limpar (preservando .env/storage), extrair, migrar
-$RemoteCommands = "cd $REMOTE_DIR && echo 'Limpando arquivos antigos...' && find . -maxdepth 1 ! -name '.env' ! -name 'storage' ! -name '$PackageName' ! -name '.' ! -name '..' -exec rm -rf {} + && tar -xzf $PackageName && rm $PackageName && php artisan migrate --force && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && echo '--- Deploy Completo (Clean) Finalizado ---'"
+$RemoteCommands = "cd $REMOTE_DIR && echo '1. Limpando public_html...' && find . -maxdepth 1 ! -name '.env' ! -name '.htaccess' ! -name 'storage' ! -name '$PackageName' ! -name '.' ! -name '..' -exec rm -rf {} + && echo '2. Extraindo arquivos...' && tar -xzf $PackageName && rm $PackageName && echo '3. Instalando dependências (PHP 8.4)...' && /opt/alt/php84/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader --no-scripts && echo '4. Configurando Laravel...' && /opt/alt/php84/usr/bin/php artisan package:discover --ansi && /opt/alt/php84/usr/bin/php artisan config:clear && echo '5. Corrigindo Storage...' && rm -rf public/storage && ln -sfn ../storage/app/public public/storage && echo '6. Database: Reset & Seed...' && /opt/alt/php84/usr/bin/php artisan migrate:fresh --seed --force && /opt/alt/php84/usr/bin/php artisan optimize:clear && echo '--- Deploy Completo (Clean + Seed) Finalizado ---'"
 
 Write-Host "Conectando via SSH para finalizar o deploy..."
 Invoke-Expression "ssh $SSH_OPT ${HOSTINGER_USER}@${HOSTINGER_IP} `"$RemoteCommands`""

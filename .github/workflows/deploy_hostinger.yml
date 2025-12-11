@@ -3,52 +3,94 @@ name: Deploy to Hostinger
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   deploy:
+    name: 🚀 Build & Deploy
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: mbstring, bcmath, intl, gd, xml, dom, ctype, fileinfo, pdo, pdo_mysql, zip
-        coverage: none
-
-    - name: Install Composer Dependencies
-      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
 
-    - name: Install NPM Dependencies & Build
+    - name: 🔨 Build Assets
       run: |
         npm ci
         npm run build
 
-    - name: Deploy to Hostinger via SSH
-      uses: easingthemes/ssh-deploy@main
+    - name: 📦 Create Deployment Artifact
+      run: |
+        # Create a clean archive excluding dev files
+        tar -czf deploy_release.tar.gz \
+          --exclude=.git \
+          --exclude=.github \
+          --exclude=node_modules \
+          --exclude=tests \
+          --exclude=.env \
+          --exclude=deploy_manual.ps1 \
+          --exclude=storage/logs \
+          --exclude=storage/framework/sessions \
+          .
+
+    - name: 📤 Transfer Files to Server
+      uses: appleboy/scp-action@master
       with:
-        SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
-        ARGS: "-rlgoDzvc -i --delete"
-        SOURCE: "./"
-        REMOTE_HOST: ${{ secrets.HOSTINGER_IP }}
-        REMOTE_USER: ${{ secrets.HOSTINGER_USERNAME }}
-        REMOTE_PORT: 65002
-        TARGET: ${{ secrets.TARGET_DIRECTORY }}
-        EXCLUDE: "/.git/, /.github/, /node_modules/, /tests/, /.env, /storage/logs/, /storage/framework/sessions/"
-        SCRIPT_BEFORE: |
-          echo "Starting deployment..."
-        SCRIPT_AFTER: |
-          cd ${{ secrets.TARGET_DIRECTORY }}
-          php artisan migrate --force
-          php artisan optimize:clear
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          echo "Deployment complete!"
+        host: ${{ secrets.HOSTINGER_IP }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        key: ${{ secrets.HOSTINGER_SSH_KEY }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        source: "deploy_release.tar.gz,hostinger.env,hostinger.htaccess,version.php"
+        target: "public_html" 
+        # Note: scp-action uploads to user home relative path usually. 
+        # If 'target' is public_html, it goes to ~/public_html which is correct.
+
+    - name: 🚀 Execute Remote Deployment
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOSTINGER_IP }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        key: ${{ secrets.HOSTINGER_SSH_KEY }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        script: |
+          # Variables
+          PHP_BIN="/opt/alt/php84/usr/bin/php"
+          COMPOSER_BIN="/usr/local/bin/composer"
+          TARGET_DIR="public_html"
+
+          echo "--- Starting Deployment on Hostinger ---"
+          cd $TARGET_DIR
+
+          echo "1. Cleaning old files (preserving storage & .env)..."
+          # Find and delete everything except specific files/folders
+          find . -maxdepth 1 ! -name '.env' ! -name '.htaccess' ! -name 'storage' ! -name 'deploy_release.tar.gz' ! -name 'hostinger.env' ! -name 'hostinger.htaccess' ! -name '.' ! -name '..' -exec rm -rf {} +
+
+          echo "2. Extracting new release..."
+          tar -xzf deploy_release.tar.gz
+          rm deploy_release.tar.gz
+
+          echo "3. Updating Configuration..."
+          # Move environment specific files to their real names
+          mv -f hostinger.env .env
+          mv -f hostinger.htaccess .htaccess
+
+          echo "4. Installing Dependencies (PHP 8.4)..."
+          $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+          echo "5. Linking Storage..."
+          rm -rf public/storage
+          $PHP_BIN artisan storage:link
+
+          echo "6. Running Migrations & Optimizations..."
+          $PHP_BIN artisan migrate --force
+          $PHP_BIN artisan config:clear
+          $PHP_BIN artisan cache:clear
+          $PHP_BIN artisan route:cache
+          $PHP_BIN artisan view:cache
+
+          echo "--- Deployment Successfully Completed! 🚀 ---"

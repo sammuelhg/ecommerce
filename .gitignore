@@ -31,3 +31,8 @@ id_rsa_hostinger
 id_rsa_hostinger.pub
 hostinger.env
 hostinger.htaccess
+deploy_hostinger.ps1
+prepare_manual_deploy.ps1
+*.tar.gz
+*.zip
+*.rar
