@@ -4,9 +4,9 @@ $ErrorActionPreference = "Stop"
 # Preencha estas variáveis com os dados do seu Hostinger
 # Você pode encontrar esses dados no painel do Hostinger em "Acesso SSH"
 $HOSTINGER_USER = "u488238372"      # Usuário extraído do DB_NAME
-$HOSTINGER_IP = "91.108.127.41"     # IP do domínio losfit.com.br
+$HOSTINGER_IP = "185.245.180.69"      # IP SSH correto fornecido pelo usuário
 $HOSTINGER_PORT = "65002"           # Porta padrão do Hostinger é 65002
-$REMOTE_DIR = "domains/losfit.com.br/public_html" # O caminho onde o site está
+$REMOTE_DIR = "public_html" # Tentativa na raiz, conforme screenshot e erro 404
 $SSH_KEY_PATH = ""                  # Opcional: Caminho para sua chave privada (ex: "C:\Users\User\.ssh\id_rsa"). Deixe vazio para usar senha.
 
 # Verifica se o usuário configurou o script
@@ -56,6 +56,10 @@ Invoke-Expression "scp $SCP_OPT hostinger.env ${HOSTINGER_USER}@${HOSTINGER_IP}:
 # Executa SCP do arquivo .htaccess (root)
 Write-Host "Enviando arquivo .htaccess (hostinger.htaccess) atualizado..."
 Invoke-Expression "scp $SCP_OPT hostinger.htaccess ${HOSTINGER_USER}@${HOSTINGER_IP}:${REMOTE_DIR}/.htaccess"
+
+# Executa SCP do arquivo version.php (para teste)
+Write-Host "Enviando arquivo de verificação (version.php)..."
+Invoke-Expression "scp $SCP_OPT version.php ${HOSTINGER_USER}@${HOSTINGER_IP}:${REMOTE_DIR}/public/version.php"
 
 Write-Host "=== 4. Executando Comandos no Servidor ===" -ForegroundColor Cyan
 # Comandos para rodar lá no servidor: Limpar (preservando .env/storage), extrair, migrar
