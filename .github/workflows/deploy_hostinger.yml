@@ -24,11 +24,10 @@ jobs:
         npm ci
         npm run build
 
-    - name: 📦 Create Deployment Artifact
+    - name: 📦 Create Deployment Artifact (Safe Mode)
       run: |
-        # Create a clean archive excluding dev files
-        tar -czf deploy_release.tar.gz \
-          --exclude=deploy_release.tar.gz \
+        # Create archive in a temporary location to avoid "file changed" errors
+        tar -czf /tmp/deploy_release.tar.gz \
           --exclude=.git \
           --exclude=.github \
           --exclude=node_modules \
@@ -38,6 +37,9 @@ jobs:
           --exclude=storage/logs \
           --exclude=storage/framework/sessions \
           .
+        
+        # Move it back to the workspace
+        mv /tmp/deploy_release.tar.gz ./deploy_release.tar.gz
 
     - name: 📤 Transfer Files to Server
       uses: appleboy/scp-action@master
