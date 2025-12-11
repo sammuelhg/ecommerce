@@ -28,6 +28,7 @@ jobs:
       run: |
         # Create a clean archive excluding dev files
         tar -czf deploy_release.tar.gz \
+          --exclude=deploy_release.tar.gz \
           --exclude=.git \
           --exclude=.github \
           --exclude=node_modules \
