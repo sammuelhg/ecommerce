@@ -24,7 +24,7 @@ jobs:
         npm ci
         npm run build
 
-    - name: 📦 Create Deployment Artifact (Safe Mode)
+    - name: 📦 Create Deployment Artifact (VERSION 2 - FIXED)
       run: |
         # Create archive in a temporary location to avoid "file changed" errors
         tar -czf /tmp/deploy_release.tar.gz \
