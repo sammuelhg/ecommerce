@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Actions;
+namespace App\Actions\Newsletter;
 
 use App\Models\NewsletterSubscriber;
 use App\Mail\WelcomeNewsletter;
@@ -38,7 +38,7 @@ class SubscribeToNewsletterAction
         // 1a. Enroll in Campaign if provided
         if ($campaignId) {
             $campaign = \App\Models\NewsletterCampaign::find($campaignId);
-            if ($campaign) {
+            if ($campaign && $campaign->is_active) {
                 // Check if already enrolled to avoid duplicates (though constraint handles it, better safe)
                 if (!$subscriber->campaigns()->where('newsletter_campaign_id', $campaignId)->exists()) {
                      // Get first email

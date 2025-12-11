@@ -33,14 +33,13 @@ class ProductGrid extends Component
     public $newsletterSuccess = false;
     public $source = 'grid';
 
-    public function newsletterSubscribe($campaignId = null)
+    public function newsletterSubscribe($campaignId = null, $customMessage = null)
     {
         $action = app(\App\Actions\SubscribeToNewsletterAction::class);
 
         $this->validate([
-            'newsletterEmail' => 'required|email|unique:newsletter_subscribers,email'
+            'newsletterEmail' => 'required|email'
         ], [
-            'newsletterEmail.unique' => 'Este email já está inscrito!',
             'newsletterEmail.required' => 'Por favor, informe um email.',
             'newsletterEmail.email' => 'Email inválido.'
         ]);
@@ -52,7 +51,8 @@ class ProductGrid extends Component
         $this->newsletterSuccess = true;
         $this->newsletterEmail = '';
         
-        session()->flash('newsletter_message', 'Inscrição realizada com sucesso! Ganhe 15% OFF com o cupom: WELCOME15');
+        $message = $customMessage ?: 'Inscrição realizada com sucesso! Ganhe 15% OFF com o cupom: WELCOME15';
+        session()->flash('newsletter_message', $message);
     }
 
     public function render(GridComposer $composer)

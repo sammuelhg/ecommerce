@@ -19,99 +19,14 @@ class ShopController extends Controller
     /**
      * Search suggestions API
      */
-    public function suggestions(Request $request): \Illuminate\Http\JsonResponse
+    public function suggestions(Request $request, \App\Actions\Shop\GetSearchSuggestionsAction $action): \Illuminate\Http\JsonResponse
     {
         $query = $request->input('q');
         $categorySlug = $request->input('category');
         
-        // CASE: Default Suggestions (Search Highlights)
-        // Triggered when query is empty but we want to show suggestions for the selected category (or global)
-        if (empty($query)) {
-             $categoryId = null;
-             
-             if ($categorySlug && $categorySlug !== 'Todos') {
-                 $category = Category::where('slug', $categorySlug)->first();
-                 $categoryId = $category?->id;
-             }
+        $data = $action->execute($query, $categorySlug);
 
-             // 1. Try to get configured highlights
-             $highlights = \App\Models\SearchHighlight::with('product')
-                ->where('category_id', $categoryId)
-                ->limit(3)
-                ->get()
-                ->pluck('product');
-
-             // 2. If not enough, fill with products from the category (if selected) or top selling/random
-             if ($highlights->count() < 3) {
-                 $needed = 3 - $highlights->count();
-                 $excludeIds = $highlights->pluck('id')->toArray();
-                 
-                 $fillerQuery = Product::where('is_active', true)->whereNotIn('id', $excludeIds);
-                 
-                 if ($categoryId) {
-                     $fillerQuery->where(function($q) use ($categoryId) {
-                         $q->where('category_id', $categoryId)
-                           ->orWhereHas('categories', function($sq) use ($categoryId) {
-                               $sq->where('categories.id', $categoryId);
-                           });
-                     });
-                 }
-                 
-                 // Fallback: If category has no products, remove category constraint to ensure we show *something*
-                 // (User said: "se a catogoria não tiver 3 produtos acrescentar de outras de cada categoria")
-                 // We'll check count first? Or just chain order.
-                 // Let's standardise: randomized for now or latest
-                 $fillers = $fillerQuery->inRandomOrder()->limit($needed)->get();
-                 
-                 // If still not enough (e.g. strict category filter returned 0), loosen filter
-                 if ($highlights->count() + $fillers->count() < 3) {
-                     $stillNeeded = 3 - ($highlights->count() + $fillers->count());
-                     $globalFillers = Product::where('is_active', true)
-                        ->whereNotIn('id', array_merge($excludeIds, $fillers->pluck('id')->toArray()))
-                        ->inRandomOrder()
-                        ->limit($stillNeeded)
-                        ->get();
-                     $fillers = $fillers->merge($globalFillers);
-                 }
-                 
-                 $highlights = $highlights->merge($fillers);
-             }
-
-             // Sort for JSON
-             $products = $highlights->take(3)->map(function($p) {
-                 return [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'slug' => $p->slug,
-                    'image' => $p->image
-                 ];
-             });
-
-             return response()->json([
-                 'products' => $products,
-                 'categories' => [] // No categories suggestion for empty search
-             ]);
-        }
-
-        // CASE: Active Typing Search
-        if (strlen($query) < 2) {
-            return response()->json(['products' => [], 'categories' => []]);
-        }
-
-        $products = Product::where('name', 'like', "%{$query}%")
-            ->where('is_active', true)
-            ->limit(5)
-            ->get(['id', 'name', 'slug', 'image']);
-
-        $categories = Category::where('name', 'like', "%{$query}%")
-            ->where('is_active', true)
-            ->limit(3)
-            ->get(['id', 'name', 'slug']);
-
-        return response()->json([
-            'products' => $products,
-            'categories' => $categories
-        ]);
+        return response()->json($data);
     }
 
     /**

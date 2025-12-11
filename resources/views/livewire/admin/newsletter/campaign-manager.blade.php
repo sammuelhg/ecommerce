@@ -90,6 +90,21 @@
                                     @endif
                                 </td>
                                 <td class="text-end pe-4">
+                                    <!-- Active Toggle -->
+                                    <button wire:click="toggleStatus({{ $campaign->id }})" 
+                                            class="btn btn-sm btn-{{ $campaign->is_active ? 'success' : 'light' }} border me-1" 
+                                            title="{{ $campaign->is_active ? 'Desativar' : 'Ativar' }}">
+                                        <i class="bi bi-toggle-{{ $campaign->is_active ? 'on' : 'off' }}"></i>
+                                        {{ $campaign->is_active ? 'Ativo' : 'Inativo' }}
+                                    </button>
+
+                                    <!-- Subscribers Button -->
+                                    <a href="{{ route('admin.newsletter.campaign.subscribers', $campaign->id) }}" 
+                                       class="btn btn-sm btn-light border me-1" 
+                                       title="Ver Inscritos">
+                                        <i class="bi bi-people"></i>
+                                    </a>
+
                                     <!-- Builder Button -->
                                     <a href="{{ route('admin.newsletter.campaign.builder', $campaign->slug ?? $campaign->id) }}" 
                                        class="btn btn-sm btn-outline-primary me-1" 

@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class NewsletterCampaign extends Model
 {
-    protected $fillable = ['subject', 'sent_at', 'status', 'email_card_id', 'slug', 'promo_image_url', 'show_promo_image_in_email'];
+    protected $fillable = ['name', 'subject', 'sent_at', 'status', 'email_card_id', 'slug', 'promo_image_url', 'show_promo_image_in_email', 'is_active'];
     
     protected $casts = [
         'sent_at' => 'datetime',
         'status' => \App\Enums\CampaignStatus::class,
+        'is_active' => 'boolean', // Ensure casts to bool
     ];
 
     public function resolveRouteBinding($value, $field = null)

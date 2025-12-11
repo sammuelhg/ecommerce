@@ -95,8 +95,16 @@ class GridComposer
         $productQueue = $products->items(); // Convert to array for easier shifting
         $index = 0;
         
+        $maxLoops = 1000;
+        $loops = 0;
+        
         while (!empty($productQueue) || isset($rules[$index])) {
-            
+            $loops++;
+            if ($loops > $maxLoops) {
+                \Illuminate\Support\Facades\Log::error("GridComposer infinite loop detected at index {$index}.");
+                break;
+            }
+
             // 1. Check if there is a RULE for this specific index
             if (isset($rules[$index])) {
                 $rule = $rules[$index];

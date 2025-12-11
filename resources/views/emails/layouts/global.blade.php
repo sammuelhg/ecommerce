@@ -37,8 +37,12 @@
 
 @inject('emailConfig', 'App\Settings\EmailConfigSettings')
 @php
-    // fetch Card
-    $emailCard = $emailConfig->getDefaultEmailCard();
+    // fetch Card (Prioritize override from Preview/Builder)
+    if (isset($overrideCard) && $overrideCard) {
+        $emailCard = $overrideCard;
+    } else {
+        $emailCard = $emailConfig->getDefaultEmailCard();
+    }
     
     // Fallback data
     if ($emailCard) {
@@ -47,10 +51,24 @@
         $instagram = $emailCard->instagram;
         $website = $emailCard->website;
         $slogan = $emailCard->slogan;
-        $photoUrl = $emailCard->photo ? url('uploads/'.$emailCard->photo) : null; 
-        // NOTE: photo path depends on how it was stored (Livewire usually stores in storage/app/public, linked to public/storage or public/uploads)
-        // StoreSettingController uses 'public_uploads' disk? "uploads" folder? 
-        // Let's assume standard Asset URL for now. logic below handles it.
+        
+        // Handle Photo URL (Support both Storage and legacy Uploads)
+        $photo = $emailCard->photo;
+        if (!$photo) {
+            $photoUrl = null;
+        } elseif (preg_match('/^http/', $photo)) {
+            $photoUrl = $photo;
+        } elseif (str_starts_with($photo, 'uploads/')) {
+             $photoUrl = url($photo);
+        } else {
+             // Check if file exists in public/uploads (legacy direct upload)
+             if (file_exists(public_path('uploads/' . $photo))) {
+                 $photoUrl = url('uploads/' . $photo);
+             } else {
+                 // Default to Storage
+                 $photoUrl = asset('storage/' . $photo);
+             }
+        }
     } else {
         $senderName = 'LosFit Team';
         $senderRole = 'Suporte';

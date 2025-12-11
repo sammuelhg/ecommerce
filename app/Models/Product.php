@@ -136,4 +136,21 @@ class Product extends Model
 
         return $image ? $image->path : null;
     }
+    /**
+     * Get the full product image URL.
+     */
+    public function getImageUrlAttribute()
+    {
+        $image = $this->image;
+        
+        if (!$image) {
+            return 'https://placehold.co/400x400/f3f4f6/6c757d?text=' . urlencode('Sem Imagem');
+        }
+
+        if (str_starts_with($image, 'http')) {
+            return $image;
+        }
+
+        return asset('storage/' . $image);
+    }
 }

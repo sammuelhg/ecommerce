@@ -42,14 +42,19 @@ class CampaignMail extends Mailable
      */
     public function content(): Content
     {
-        $trackingUrl = route('newsletter.track', [
+        $trackingUrl = route('tracking.open', [
             'campaign' => $this->campaign->id, 
             'lead' => $this->subscriber->id,
-            'email_id' => $this->emailStep->id
+            'email_id' => $this->emailStep->id ?? null // Handle potential null emailStep id if strictly required by route
         ]);
 
-        // Process placeholder replacements if needed (e.g. {{ name }})
-        $body = str_replace('{{ name }}', $this->subscriber->name ?? 'Cliente', $this->emailStep->body);
+        // Process placeholder replacements
+        // Support {{ name }} and {{ $user->name }} commonly used by users
+        $body = str_replace(
+            ['{{ name }}', '{{ $user->name }}', '{{$user->name}}'], 
+            $this->subscriber->name ?? 'Cliente', 
+            $this->emailStep->body
+        );
 
         return new Content(
             markdown: 'emails.newsletter.campaign',

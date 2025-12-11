@@ -70,6 +70,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::get('/forms/new', \App\Livewire\Forms\FormBuilder::class)->name('forms.create');
     Route::view('/products', 'admin.products.index')->name('products.index');
     Route::view('/products/create', 'admin.products.create')->name('products.create');
     Route::get('/products/{product}', function ($product) {
@@ -128,6 +129,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/templates', \App\Livewire\Admin\Newsletter\TemplateManager::class)->name('templates');
         Route::get('/campaigns', \App\Livewire\Admin\Newsletter\CampaignManager::class)->name('campaigns');
         Route::get('/campaigns/{campaign}/builder', \App\Livewire\Admin\Newsletter\CampaignBuilder::class)->name('campaign.builder');
+        Route::get('/campaigns/{campaign}/subscribers', \App\Livewire\Admin\Newsletter\CampaignSubscribers::class)->name('campaign.subscribers');
         // Contacts
         Route::get('/contacts', \App\Livewire\Admin\Newsletter\ContactManager::class)->name('contacts');
     });
@@ -264,8 +266,11 @@ Route::get('/t/{campaign}/{lead}/pixel.gif', App\Http\Controllers\Tracking\Track
 // API Routes
 Route::post('/api/leads', [App\Http\Controllers\LeadCaptureController::class, 'store'])->name('api.leads.store');
 
-// Debug SMTP Route (Temporary)
-Route::get('/debug-smtp', function () {
+    // Debug SMTP Route (Robust)
+    Route::get('/debug/smtp', [App\Http\Controllers\SmtpDebugController::class, 'index']);
+
+    // Debug SMTP Route (Temporary - Deprecated)
+    Route::get('/debug-smtp-legacy', function () {
     $key = 'smtp_host';
     $testValue = 'test.smtp.server.com';
     

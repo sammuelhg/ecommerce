@@ -76,13 +76,16 @@ class CampaignManager extends Component
             $campaign = NewsletterCampaign::findOrFail($this->editingId);
             $campaign->update([
                 'subject' => $this->subject,
+                'name' => $this->subject, // Auto-sync name with subject for now
             ]);
             session()->flash('success', 'Campanha atualizada com sucesso.');
         } else {
             NewsletterCampaign::create([
                 'subject' => $this->subject,
+                'name' => $this->subject, // Auto-sync name with subject for now
                 'body' => '', // Empty body initially
-                'status' => \App\Enums\CampaignStatus::DRAFT
+                'status' => \App\Enums\CampaignStatus::DRAFT,
+                'is_active' => false // Default to inactive
             ]);
             session()->flash('success', 'Campanha criada! Agora você pode editar o conteúdo.');
         }
@@ -108,6 +111,21 @@ class CampaignManager extends Component
     public function cancelDeletion(): void
     {
         $this->confirmingDeletionId = null;
+    }
+
+    public function toggleStatus(int $id): void
+    {
+        $campaign = NewsletterCampaign::findOrFail($id);
+        $campaign->is_active = !$campaign->is_active;
+        
+        // Auto-fix name if missing (for legacy campaigns)
+        if (empty($campaign->name)) {
+            $campaign->name = $campaign->subject;
+        }
+
+        $campaign->save();
+        
+        session()->flash('success', 'Status da campanha atualizado.');
     }
 
     public function closeModal(): void

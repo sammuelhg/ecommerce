@@ -9,7 +9,7 @@ class GridManager extends Component
 {
     use \Livewire\WithFileUploads;
 
-    public $rules;
+    public $rules = [];
     public $showModal = false;
     public $editingRuleId = null;
 
@@ -23,7 +23,8 @@ class GridManager extends Component
     public $config_text;
     public $config_link;
     public $config_bg_class = 'bg-primary text-white'; // Legacy/Custom fallback
-    
+    public $config_success_message; // Added
+
     // Visual Config
     public $config_text_color = 'text-dark';
     public $config_bg_color = 'bg-light';
@@ -33,15 +34,7 @@ class GridManager extends Component
     public $config_image; // Shared file upload (Newsletter & Banner)
     public $config_image_style = 'background'; // 'background' or 'top'
     public $config_campaign_id; 
-    public $config_button_text; 
-    
-    public $activeTab = 'content';
-
-    // Product Search
-    public $productSearch = '';
-    public $foundProducts = [];
-    public $selectedProduct = null;
-    public $formatted_config_product_id; 
+    public $config_button_text;
 
     protected $rules_validation = [
         'position' => 'required|integer|min:1', 
@@ -57,9 +50,16 @@ class GridManager extends Component
 
     public function loadRules()
     {
-        $this->rules = GridRule::orderBy('position')->get();
+        $this->rules = \App\Models\GridRule::orderBy('position')->get();
     }
-    
+
+    // Product Search logic also likely went missing if it was in that block, checking...
+    public $productSearch = '';
+    public $foundProducts = [];
+    public $selectedProduct = null;
+    public $formatted_config_product_id; 
+    public $activeTab = 'content';
+
     public function setTab($tab)
     {
         $this->activeTab = $tab;
@@ -115,6 +115,7 @@ class GridManager extends Component
         $this->config_bg_class = $config['bg_class'] ?? 'bg-primary text-white'; // Keep for legacy
         $this->config_campaign_id = $config['campaign_id'] ?? null;
         $this->config_button_text = $config['button_text'] ?? '';
+        $this->config_success_message = $config['success_message'] ?? ''; // Added
         
         // Load Visual Config
         $this->config_text_color = $config['text_color'] ?? 'text-dark';
@@ -135,7 +136,7 @@ class GridManager extends Component
         $this->reset([
             'editingRuleId', 'position', 'type', 'col_span', 
             'config_title', 'config_text', 'config_link', 
-            'config_bg_class', 'config_image', 'config_campaign_id', 'config_button_text',
+            'config_bg_class', 'config_image', 'config_campaign_id', 'config_button_text', 'config_success_message',
             'config_text_color', 'config_bg_color', 'config_btn_color', 'config_badge_type',
             'productSearch', 'selectedProduct', 'formatted_config_product_id', 'config_image_style'
         ]);
@@ -209,6 +210,7 @@ class GridManager extends Component
                 'text' => $this->config_text,
                 'button_text' => $this->config_button_text,
                 'btn_color' => $this->config_btn_color,
+                'success_message' => $this->config_success_message, // Added
             ]);
         }
 

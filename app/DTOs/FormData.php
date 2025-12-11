@@ -8,6 +8,6 @@ readonly class FormData
 {
     public function __construct(
         public string $title,
-        public array $structure // The Builder JSON
+        public array $structure
     ) {}
 }

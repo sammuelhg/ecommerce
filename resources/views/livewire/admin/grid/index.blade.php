@@ -228,14 +228,92 @@
                                             <input type="text" wire:model="config_title" x-model="title" class="form-control" placeholder="Ex: Super Oferta">
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Texto / Subtítulo (HTML Permitido)</label>
-                                            <textarea wire:model="config_text" x-model="text" class="form-control" rows="3" placeholder="Use <strong>bold</strong> ou <br>"></textarea>
+                                            <label class="form-label">Texto / Subtítulo</label>
+                                            <div class="border rounded bg-white" 
+                                                 x-data="{
+                                                     exec(command, value = null) {
+                                                         document.execCommand(command, false, value);
+                                                         this.$refs.editor.focus();
+                                                         text = this.$refs.editor.innerHTML;
+                                                     },
+                                                     insertBadge() {
+                                                         const selection = window.getSelection();
+                                                         if (!selection.rangeCount) return;
+                                                         const range = selection.getRangeAt(0);
+                                                         const span = document.createElement('span');
+                                                         span.style.cssText = 'background-color: #FFD700; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;';
+                                                         span.textContent = selection.toString() || 'NOVO';
+                                                         range.deleteContents();
+                                                         range.insertNode(span);
+                                                         text = this.$refs.editor.innerHTML;
+                                                     },
+                                                     init() {
+                                                         this.$refs.editor.innerHTML = text || '';
+                                                         this.$watch('text', value => {
+                                                             if (document.activeElement !== this.$refs.editor) {
+                                                                 this.$refs.editor.innerHTML = value || '';
+                                                             }
+                                                         });
+                                                     }
+                                                 }"
+                                                 wire:ignore>
+                                                
+                                                <!-- Toolbar -->
+                                                <div class="d-flex gap-1 p-2 border-bottom bg-light rounded-top">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="exec('bold')" title="Negrito">
+                                                        <i class="bi bi-type-bold"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="exec('removeFormat')" title="Limpar Formatação">
+                                                        <i class="bi bi-eraser"></i>
+                                                    </button>
+                                                    
+                                                    <div class="vr mx-1"></div>
+                                                    
+                                                    <!-- Color Picker -->
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                            <i class="bi bi-palette"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu p-2" style="min-width: 150px;">
+                                                            <li><h6 class="dropdown-header">Cor do Texto</h6></li>
+                                                            <li><div class="d-flex gap-1 flex-wrap">
+                                                                <button type="button" class="btn btn-sm rounded-circle border" style="width:24px;height:24px;bg:#D42426;" @click="exec('foreColor', '#D42426')"></button>
+                                                                <button type="button" class="btn btn-sm rounded-circle border bg-primary" style="width:24px;height:24px;" @click="exec('foreColor', '#0d6efd')"></button>
+                                                                <button type="button" class="btn btn-sm rounded-circle border bg-success" style="width:24px;height:24px;" @click="exec('foreColor', '#198754')"></button>
+                                                                <button type="button" class="btn btn-sm rounded-circle border bg-dark" style="width:24px;height:24px;" @click="exec('foreColor', '#000000')"></button>
+                                                            </div></li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <!-- Badge Button -->
+                                                    <button type="button" class="btn btn-sm btn-warning d-flex align-items-center gap-1" @click="insertBadge()" title="Inserir Destaque (Badge)">
+                                                        <i class="bi bi-patch-check-fill"></i> <span class="small d-none d-md-inline">Badge</span>
+                                                    </button>
+                                                </div>
+
+                                                <!-- Editor Area -->
+                                                <div x-ref="editor"
+                                                     class="form-control border-0 shadow-none"
+                                                     contenteditable="true"
+                                                     style="min-height: 100px; max-height: 200px; overflow-y: auto;"
+                                                     @input="text = $el.innerHTML"
+                                                     @blur="@this.set('config_text', text)">
+                                                </div>
+                                            </div>
                                         </div>
         
                                         <div class="mb-3">
                                             <label class="form-label">Texto do Botão</label>
                                             <input type="text" wire:model="config_button_text" x-model="btn_text" class="form-control" placeholder="Ex: Ver Oferta">
                                         </div>
+
+                                        @if($type === 'card.newsletter_form')
+                                            <div class="mb-3">
+                                                <label class="form-label">Mensagem de Sucesso (Opcional)</label>
+                                                <input type="text" wire:model="config_success_message" class="form-control" placeholder="Ex: Inscrição realizada! Ganhe 50% OFF...">
+                                                <div class="form-text">Deixe em branco para usar o padrão (15% OFF).</div>
+                                            </div>
+                                        @endif
                                     @endif
                                 </div>
                             @endif

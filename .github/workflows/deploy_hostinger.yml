@@ -33,7 +33,7 @@ jobs:
 
     - name: Deploy to Hostinger via SSH
       uses: easingthemes/ssh-deploy@main
-      env:
+      with:
         SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
         ARGS: "-rlgoDzvc -i --delete"
         SOURCE: "./"

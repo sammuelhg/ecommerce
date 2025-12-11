@@ -34,10 +34,15 @@
                 {{ session('newsletter_message') }}
             </div>
         @else
-            <form wire:submit.prevent="newsletterSubscribe({{ $data['campaign_id'] ?? 'null' }})" class="d-flex flex-column gap-2">
+            <form wire:submit.prevent="newsletterSubscribe({{ $data['campaign_id'] ?? 'null' }}, '{{ addslashes($data['success_message'] ?? '') }}')" class="d-flex flex-column gap-2">
                 <input type="email" wire:model="newsletterEmail" class="form-control form-control-sm bg-white border border-secondary text-center" placeholder="seu@email.com" required>
-                <button class="btn {{ $data['btn_color'] ?? 'btn-danger' }} btn-sm fw-bold w-100 text-uppercase" type="submit">
-                    {{ $data['button_text'] ?? 'QUERO DESCONTO' }}
+                <button class="btn {{ $data['btn_color'] ?? 'btn-danger' }} btn-sm fw-bold w-100 text-uppercase d-flex align-items-center justify-content-center gap-2" 
+                        type="submit" 
+                        wire:loading.attr="disabled"
+                        wire:target="newsletterSubscribe">
+                    <span wire:loading.remove wire:target="newsletterSubscribe">{{ $data['button_text'] ?? 'QUERO DESCONTO' }}</span>
+                    <span wire:loading wire:target="newsletterSubscribe" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span wire:loading wire:target="newsletterSubscribe">Enviando...</span>
                 </button>
             </form>
             @error('newsletterEmail') <div class="text-danger small mt-1 text-center">{{ $message }}</div> @enderror

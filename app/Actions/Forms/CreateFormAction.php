@@ -16,10 +16,10 @@ final class CreateFormAction
         $slug = Str::slug($data->title) . '-' . Str::random(4);
 
         return Form::create([
-            'user_id' => Auth::id() ?? 1, // Fallback for dev/test if no auth
+            'user_id' => Auth::id(),
             'title'   => $data->title,
             'slug'    => $slug,
-            'config'  => $data->structure,
+            'config'  => $data->structure, 
             'is_active' => true,
         ]);
     }
