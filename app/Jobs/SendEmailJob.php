@@ -15,8 +15,11 @@ class SendEmailJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
+    /**
+     * Create a new job instance.
+     */
     public function __construct(
-        public \App\Models\NewsletterCampaign $campaign,
+        public \App\Models\NewsletterEmail $email,
         public \App\Models\NewsletterSubscriber $subscriber
     ) {}
 
@@ -30,7 +33,7 @@ class SendEmailJob implements ShouldQueue
             // For now, simpler: pass campaign to Mailable
             
             \Illuminate\Support\Facades\Mail::to($this->subscriber->email)
-                ->send(new \App\Mail\CampaignEmail($this->campaign, $this->subscriber));
+                ->send(new \App\Mail\CampaignEmail($this->email, $this->subscriber));
             
             // Optional: Log success or update counters
             // \App\Models\CampaignOpen::create([...]) ? No, that's for opens.

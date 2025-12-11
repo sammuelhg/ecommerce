@@ -10,6 +10,7 @@ enum CampaignStatus: string
     case SCHEDULED = 'scheduled';
     case SENT = 'sent';
     case FAILED = 'failed';
+    case SENDING = 'sending';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum CampaignStatus: string
             self::SCHEDULED => 'Agendado',
             self::SENT => 'Enviado',
             self::FAILED => 'Falhou',
+            self::SENDING => 'Enviando',
         };
     }
 
@@ -28,6 +30,7 @@ enum CampaignStatus: string
             self::SCHEDULED => 'warning',
             self::SENT => 'success',
             self::FAILED => 'danger',
+            self::SENDING => 'info',
         };
     }
 }

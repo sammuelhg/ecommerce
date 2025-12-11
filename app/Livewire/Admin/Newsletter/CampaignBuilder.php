@@ -11,13 +11,24 @@ use App\Models\NewsletterEmail;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
-
+use App\Enums\CampaignStatus;
 use Livewire\WithFileUploads;
 
 #[Layout('layouts.admin')]
 class CampaignBuilder extends Component
 {
     use WithFileUploads;
+
+    public function toggleStatus(): void
+    {
+        if ($this->campaign->status === CampaignStatus::DRAFT) {
+            $this->campaign->update(['status' => CampaignStatus::SENT]);
+            $this->dispatch('alert', type: 'success', message: 'Campanha marcada como Enviada/Ativa.');
+        } else {
+            $this->campaign->update(['status' => CampaignStatus::DRAFT]);
+            $this->dispatch('alert', type: 'info', message: 'Campanha marcada como Rascunho.');
+        }
+    }
 
     public NewsletterCampaign $campaign;
 

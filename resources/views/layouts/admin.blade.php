@@ -102,6 +102,12 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.flavors.*') ? 'active' : '' }}" 
+                                           href="{{ route('admin.flavors.index') }}">
+                                            <i class="bi bi-droplet"></i> Sabores
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.sizes.*') ? 'active' : '' }}" 
                                            href="{{ route('admin.sizes.index') }}">
                                             <i class="bi bi-rulers"></i> Tamanhos
@@ -249,6 +255,43 @@
                                href="{{ route('admin.settings.index') }}">
                                 <i class="bi bi-gear"></i> Configurações
                             </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link d-flex justify-content-between align-items-center collapsed" 
+                               data-bs-toggle="collapse" 
+                               href="#integrationsMenu" 
+                               role="button" 
+                               aria-expanded="{{ request()->routeIs('admin.integrations.*') ? 'true' : 'false' }}">
+                                <span><i class="bi bi-hdd-network"></i> Integrações</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </a>
+                            <div class="collapse {{ request()->routeIs('admin.integrations.*') ? 'show' : '' }}" 
+                                 id="integrationsMenu">
+                                <ul class="nav flex-column ms-3">
+                                    {{-- Meta Ads --}}
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ (request()->routeIs('admin.integrations.index') && (!request()->has('tab') || request()->input('tab') == 'meta')) ? 'active' : '' }}" 
+                                           href="{{ route('admin.integrations.index', ['tab' => 'meta']) }}">
+                                            <i class="bi bi-facebook"></i> Meta Ads
+                                        </a>
+                                    </li>
+                                    {{-- Google Ads --}}
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ (request()->input('tab') == 'google') ? 'active' : '' }}" 
+                                           href="{{ route('admin.integrations.index', ['tab' => 'google']) }}">
+                                            <i class="bi bi-google"></i> Google Ads
+                                        </a>
+                                    </li>
+                                    {{-- TikTok Ads --}}
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ (request()->input('tab') == 'tiktok') ? 'active' : '' }}" 
+                                           href="{{ route('admin.integrations.index', ['tab' => 'tiktok']) }}">
+                                            <i class="bi bi-tiktok"></i> TikTok Ads
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
 

@@ -31,10 +31,19 @@ class CategoryIndex extends Component
         session()->flash('message', 'Categoria excluída com sucesso.');
     }
     
+    public function create()
+    {
+        $this->editingCategoryId = null;
+        $this->showCreateForm = true;
+        // $this->dispatch('open-modal', 'categoryModal');
+        $this->dispatch('open-category-modal');
+    }
+    
     public function edit($id)
     {
         $this->editingCategoryId = $id;
         $this->showCreateForm = true;
+        $this->dispatch('open-category-modal');
     }
     
     #[On('categorySaved')]
@@ -43,6 +52,7 @@ class CategoryIndex extends Component
         $this->showCreateForm = false;
         $this->editingCategoryId = null;
         $this->resetPage();
+        $this->dispatch('close-category-modal');
     }
     
     #[On('closeForm')]
@@ -50,6 +60,7 @@ class CategoryIndex extends Component
     {
         $this->showCreateForm = false;
         $this->editingCategoryId = null;
+        $this->dispatch('close-category-modal');
     }
 
     public function render()

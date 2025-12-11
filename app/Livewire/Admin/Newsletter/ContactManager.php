@@ -9,6 +9,23 @@ class ContactManager extends Component
     use \Livewire\WithPagination;
 
     public $search = '';
+    public $autoResponseCampaignId;
+
+    public function mount()
+    {
+        $this->autoResponseCampaignId = \App\Models\StoreSetting::get('contact_auto_response_campaign_id');
+    }
+
+    public function updatedAutoResponseCampaignId($value)
+    {
+        \App\Models\StoreSetting::set('contact_auto_response_campaign_id', $value);
+        $this->dispatch('alert', type: 'success', message: 'Campanha de resposta automática atualizada.');
+    }
+
+    public function getCampaignsProperty()
+    {
+        return \App\Models\NewsletterCampaign::orderBy('created_at', 'desc')->get();
+    }
 
     public function render()
     {
@@ -22,7 +39,8 @@ class ContactManager extends Component
             ->paginate(15);
 
         return view('livewire.admin.newsletter.contact-manager', [
-            'contacts' => $contacts
+            'contacts' => $contacts,
+            'campaigns' => $this->campaigns
         ])
         ->layout('layouts.admin')
         ->title('Gerenciar Contatos do Site');

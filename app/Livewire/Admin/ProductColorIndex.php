@@ -25,12 +25,15 @@ class ProductColorIndex extends Component
     {
         $this->editingId = null;
         $this->showForm = true;
+        // Dispatch open-modal event
+        $this->dispatch('open-color-modal');
     }
 
     public function edit($id)
     {
         $this->editingId = $id;
         $this->showForm = true;
+        $this->dispatch('open-color-modal');
     }
 
     public function delete($id)
@@ -39,10 +42,21 @@ class ProductColorIndex extends Component
         session()->flash('message', 'Cor deletada com sucesso!');
     }
 
+    #[\Livewire\Attributes\On('colorSaved')]
+    public function refreshList()
+    {
+        $this->showForm = false;
+        $this->editingId = null;
+        $this->resetPage();
+        $this->dispatch('close-color-modal');
+    }
+
+    #[\Livewire\Attributes\On('closeForm')]
     public function closeForm()
     {
         $this->showForm = false;
         $this->editingId = null;
+        $this->dispatch('close-color-modal');
     }
 
     public function render()

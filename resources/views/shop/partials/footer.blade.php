@@ -69,7 +69,7 @@
                 <h6 class="text-warning text-uppercase fw-bold mb-3">🔗 Links Rápidos</h6>
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <a href="#" class="text-light text-decoration-none d-flex align-items-center" onclick="openModal('about'); return false;">
+                        <a href="{{ route('landing.history') }}" class="text-light text-decoration-none d-flex align-items-center">
                             <i class="bi bi-chevron-right text-warning me-2 small"></i>Sobre Nós
                         </a>
                     </li>

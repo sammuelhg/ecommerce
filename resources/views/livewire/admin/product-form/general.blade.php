@@ -32,32 +32,34 @@
                         </select>
                     </div>
 
+                    <!-- Variant Group -->
+                    <div class="col-md-3 mb-3" x-data="{ variantType: @entangle('variant_type') }">
+                        <div class="d-flex gap-3 mb-2">
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="radio" value="color" x-model="variantType" wire:model.live="variant_type" id="variantColor">
+                                <label class="form-check-label" for="variantColor">Cor</label>
+                            </div>
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="radio" value="flavor" x-model="variantType" wire:model.live="variant_type" id="variantFlavor">
+                                <label class="form-check-label" for="variantFlavor">Sabor</label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex flex-column">
+                            <div x-show="variantType == 'color'" x-transition>
+                                <x-admin.color-select :colors="$colors" label="" wireModel="product_color_id" :dropup="true" />
+                            </div>
+                            <div x-show="variantType == 'flavor'" x-transition style="display: none;">
+                                <x-admin.color-select :colors="$flavors" label="" wireModel="product_flavor_id" :dropup="true" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Material</label>
                         <select wire:model.lazy="product_material_id" class="form-select bg-white">
                             <option value="">Selecione...</option>
                             @foreach($materials as $mat) <option value="{{ $mat->id }}">{{ $mat->name }}</option> @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">
-                            @if($category_id && isset($categories) && str_contains(strtolower($categories->firstWhere('id', $category_id)->name ?? ''), 'suplemento'))
-                                Sabor
-                            @else
-                                Cor
-                            @endif
-                        </label>
-                        <select wire:model.lazy="product_color_id" class="form-select bg-white">
-                            <option value="">Selecione...</option>
-                            @foreach($colors as $color)
-                                <option value="{{ $color->id }}">
-                                    {{ $color->name }} 
-                                    @if($color->hex_code)
-                                        <span style="color: {{ $color->hex_code }}">●</span>
-                                    @endif
-                                </option>
-                            @endforeach
                         </select>
                     </div>
 
@@ -72,7 +74,7 @@
                     </div>
                     
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Atributo Genérico</label>
+                        <label class="form-label">Atributo</label>
                         <input type="text" wire:model.lazy="attribute" class="form-control bg-white" placeholder="Ex: Manga Longa">
                     </div>
                 </div>

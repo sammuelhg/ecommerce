@@ -25,12 +25,15 @@ class ProductTypeIndex extends Component
     {
         $this->editingId = null;
         $this->showForm = true;
+        // Dispatch event to open modal
+        $this->dispatch('open-type-modal');
     }
 
     public function edit($id)
     {
         $this->editingId = $id;
         $this->showForm = true;
+        $this->dispatch('open-type-modal');
     }
 
     public function delete($id)
@@ -39,10 +42,21 @@ class ProductTypeIndex extends Component
         session()->flash('message', 'Tipo deletado com sucesso!');
     }
 
+    #[\Livewire\Attributes\On('typeSaved')]
+    public function refreshList()
+    {
+        $this->showForm = false;
+        $this->editingId = null;
+        $this->resetPage();
+        $this->dispatch('close-type-modal');
+    }
+
+    #[\Livewire\Attributes\On('closeForm')]
     public function closeForm()
     {
         $this->showForm = false;
         $this->editingId = null;
+        $this->dispatch('close-type-modal');
     }
 
     public function render()

@@ -25,12 +25,14 @@ class ProductSizeIndex extends Component
     {
         $this->editingId = null;
         $this->showForm = true;
+        $this->dispatch('open-size-modal');
     }
 
     public function edit($id)
     {
         $this->editingId = $id;
         $this->showForm = true;
+        $this->dispatch('open-size-modal');
     }
 
     public function delete($id)
@@ -39,10 +41,21 @@ class ProductSizeIndex extends Component
         session()->flash('message', 'Tamanho deletado com sucesso!');
     }
 
+    #[\Livewire\Attributes\On('sizeSaved')]
+    public function refreshList()
+    {
+        $this->showForm = false;
+        $this->editingId = null;
+        $this->resetPage();
+        $this->dispatch('close-size-modal');
+    }
+
+    #[\Livewire\Attributes\On('closeForm')]
     public function closeForm()
     {
         $this->showForm = false;
         $this->editingId = null;
+        $this->dispatch('close-size-modal');
     }
 
     public function render()

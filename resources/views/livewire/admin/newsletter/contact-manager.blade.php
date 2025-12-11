@@ -7,6 +7,25 @@
             </div>
         </div>
 
+        <div class="card shadow mb-4 border-0">
+            <div class="card-body d-flex align-items-center justify-content-between p-4 bg-white rounded">
+                <div>
+                    <h5 class="fw-bold mb-1 text-primary">Automação de Resposta</h5>
+                    <p class="text-muted small mb-0">Selecione uma campanha para ser enviada automaticamente quando alguém preencher o formulário de contato.</p>
+                </div>
+                <div style="min-width: 300px;">
+                    <select wire:model.live="autoResponseCampaignId" class="form-select border-primary shadow-sm" style="background-color: #f8f9fc;">
+                        <option value="">-- Nenhuma Resposta Automática --</option>
+                        @foreach($campaigns as $campaign)
+                            <option value="{{ $campaign->id }}">
+                                [{{ $campaign->status->label() }}] {{ $campaign->name ?? $campaign->subject }} (ID: {{ $campaign->id }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="card shadow mb-4">
             <div class="card-body p-0">
                 <div class="table-responsive">

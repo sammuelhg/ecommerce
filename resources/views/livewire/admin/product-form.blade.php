@@ -13,7 +13,7 @@
                     </h4>
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="submit" id="saveProductBtn" wire:loading.attr="disabled" class="btn btn-primary px-4 fw-bold">
+                    <button type="submit" id="saveProductBtn" wire:loading.attr="disabled" wire:target="save" class="btn btn-primary px-4 fw-bold">
                         <span wire:loading.remove wire:target="save"><i class="bi bi-check-lg me-1"></i> Salvar Produto</span>
                         <span wire:loading wire:target="save"><i class="spinner-border spinner-border-sm me-1"></i> Salvando...</span>
                     </button>
@@ -25,6 +25,27 @@
     <div class="container-fluid px-4 pb-5">
         
         <!-- Product Identity Section (Always Visible) -->
+        
+        @if(session('error'))
+        <div class="alert alert-danger mb-4 shadow-sm border-danger">
+            <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Erro do Sistema</h4>
+            <p class="mb-0">{{ session('error') }}</p>
+        </div>
+        @endif
+        
+        @if($errors->any())
+        <div class="alert alert-danger mb-4">
+            <h4><i class="bi bi-bug"></i> Debug: Erros de Validação Encontrados</h4>
+            <p>O formulário não pôde ser salvo devido aos seguintes erros:</p>
+            <div class="bg-dark text-white p-3 rounded font-monospace" style="max-height: 300px; overflow: auto;">
+                <pre class="m-0">{{ json_encode($errors->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+            </div>
+            <div class="mt-2">
+                <small>Verifique os campos correspondentes nas abas indicadas.</small>
+            </div>
+        </div>
+        @endif
+
         <div class="card border-0 shadow-sm mb-4" 
              x-data="{
                  types: @js($types->pluck('name', 'id')->toArray()),
@@ -97,64 +118,78 @@
             </div>
         </div>
 
-        <!-- AlpineJS Tabs        <div class="card border-0 shadow-sm" x-data="{ activeTab: 'general' }" x-init="$watch('activeTab', value => $wire.set('activeTab', value))">
-            <!-- Removed bg-white, kept border-bottom-0 to merge with body -->
-            <div class="card-header border-bottom-0 pt-3 px-3">
-                <ul class="nav nav-tabs nav-fill card-header-tabs nav-tabs-dark-mode" id="productTabs" role="tablist">
-                    <li class="nav-item">
-                        <button class="nav-link fw-bold py-3" 
-                                :class="{ 'active': activeTab === 'general' }"
-                                @click.prevent="activeTab = 'general'"
-                                type="button">
-                            <i class="bi bi-box-seam me-2"></i> Geral
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link fw-bold py-3" 
-                                :class="{ 'active': activeTab === 'pricing' }"
-                                @click.prevent="activeTab = 'pricing'"
-                                type="button">
-                            <i class="bi bi-currency-dollar me-2"></i> Preço & Estoque
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link fw-bold py-3" 
-                                :class="{ 'active': activeTab === 'images' }"
-                                @click.prevent="activeTab = 'images'"
-                                type="button">
-                            <i class="bi bi-images me-2"></i> Imagens
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link fw-bold py-3" 
-                                :class="{ 'active': activeTab === 'seo' }"
-                                @click.prevent="activeTab = 'seo'"
-                                type="button">
-                            <i class="bi bi-google me-2"></i> SEO & Detalhes
-                        </button>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body p-4">
-                <div class="tab-content">
-                    <!-- General Tab -->
-                    <div class="tab-pane fade" :class="{ 'active show': activeTab === 'general' }">
-                        @include('livewire.admin.product-form.general')
-                    </div>
+        <!-- AlpineJS Tabs -->
+        <!-- Standard Bootstrap Tabs -->
+        <ul class="nav nav-tabs mb-4 px-4 border-bottom-0" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {{ $activeTab === 'general' ? 'active' : '' }}" 
+                        id="general-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#general" 
+                        type="button" 
+                        role="tab" 
+                        wire:click="$set('activeTab', 'general')">
+                    <i class="bi bi-box-seam me-2"></i> Geral
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {{ $activeTab === 'pricing' ? 'active' : '' }}" 
+                        id="pricing-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#pricing" 
+                        type="button" 
+                        role="tab" 
+                        wire:click="$set('activeTab', 'pricing')">
+                    <i class="bi bi-currency-dollar me-2"></i> Preço & Estoque
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {{ $activeTab === 'images' ? 'active' : '' }}" 
+                        id="images-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#images" 
+                        type="button" 
+                        role="tab" 
+                        wire:click="$set('activeTab', 'images')">
+                    <i class="bi bi-images me-2"></i> Imagens
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {{ $activeTab === 'seo' ? 'active' : '' }}" 
+                        id="seo-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#seo" 
+                        type="button" 
+                        role="tab" 
+                        wire:click="$set('activeTab', 'seo')">
+                    <i class="bi bi-google me-2"></i> SEO & Detalhes
+                </button>
+            </li>
+        </ul>
 
-                    <!-- Pricing Tab -->
-                    <div class="tab-pane fade" :class="{ 'active show': activeTab === 'pricing' }">
-                        @include('livewire.admin.product-form.pricing')
-                    </div>
+        <div class="container-fluid px-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="tab-content" id="productTabsContent">
+                        <!-- General Tab -->
+                        <div class="tab-pane fade {{ $activeTab === 'general' ? 'show active' : '' }}" id="general" role="tabpanel" aria-labelledby="general-tab">
+                            @include('livewire.admin.product-form.general')
+                        </div>
 
-                    <!-- Images Tab -->
-                    <div class="tab-pane fade" :class="{ 'active show': activeTab === 'images' }">
-                        @include('livewire.admin.product-form.images')
-                    </div>
+                        <!-- Pricing Tab -->
+                        <div class="tab-pane fade {{ $activeTab === 'pricing' ? 'show active' : '' }}" id="pricing" role="tabpanel" aria-labelledby="pricing-tab">
+                            @include('livewire.admin.product-form.pricing')
+                        </div>
 
-                    <!-- SEO Tab -->
-                    <div class="tab-pane fade" :class="{ 'active show': activeTab === 'seo' }">
-                        @include('livewire.admin.product-form.seo')
+                        <!-- Images Tab -->
+                        <div class="tab-pane fade {{ $activeTab === 'images' ? 'show active' : '' }}" id="images" role="tabpanel" aria-labelledby="images-tab">
+                            @include('livewire.admin.product-form.images')
+                        </div>
+
+                        <!-- SEO Tab -->
+                        <div class="tab-pane fade {{ $activeTab === 'seo' ? 'show active' : '' }}" id="seo" role="tabpanel" aria-labelledby="seo-tab">
+                            @include('livewire.admin.product-form.seo')
+                        </div>
                     </div>
                 </div>
             </div>
@@ -237,6 +272,13 @@
                 tab.show();
             }
         }
+    });
+
+
+
+    window.addEventListener('show-validation-toast', event => {
+        // Implement global toaster here if needed
+        // console.error('Validation Errors:', event.detail[0].errors);
     });
 
     // Livewire hook to handle successful commits if needed

@@ -89,6 +89,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::view('/models', 'admin.models.index')->name('models.index');
     Route::view('/colors', 'admin.colors.index')->name('colors.index');
     Route::view('/sizes', 'admin.sizes.index')->name('sizes.index');
+    Route::view('/flavors', 'admin.flavors.index')->name('flavors.index');
 
     // Users
     Route::view('/users', 'admin.users.index')->name('users.index');
@@ -109,6 +110,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Links Bio
     Route::view('/links', 'admin.links.index')->name('links.index');
+    
+    // Integrações
+    Route::view('/integrations', 'admin.integrations.index')->name('integrations.index');
     
     // Grid Manager
     Route::get('/grid', \App\Livewire\Admin\Grid\GridManager::class)->name('grid.index');

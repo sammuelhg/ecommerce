@@ -40,6 +40,8 @@ class ProductForm extends Component
     public $product_model_id = '';
     public $product_material_id = '';
     public $product_color_id = '';
+    public $product_flavor_id = ''; // New flavor property
+    public $variant_type = 'color'; // Default variant type
     public $product_size_id = '';
     public $color = ''; // Deprecated, mantido para compatibilidade temporária
     public $attribute = '';
@@ -71,7 +73,7 @@ class ProductForm extends Component
             'marketing_description' => 'nullable|string|max:500',
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
-            'compare_at_price' => 'nullable|numeric|min:0',
+            'compare_at_price' => 'nullable|numeric|min:0|gt:price',
             'stock' => 'nullable|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'is_active' => 'boolean',
@@ -82,7 +84,9 @@ class ProductForm extends Component
             'product_model_id' => 'nullable|exists:product_models,id',
             'product_material_id' => 'nullable|exists:product_materials,id',
             'product_color_id' => 'nullable|exists:product_colors,id',
+            'product_flavor_id' => 'nullable|exists:flavors,id',
             'product_size_id' => 'nullable|exists:product_sizes,id',
+            'variant_type' => 'required|in:color,flavor',
         ];
     }
 
@@ -136,7 +140,10 @@ class ProductForm extends Component
         $this->product_type_id = $product->product_type_id;
         $this->product_model_id = $product->product_model_id;
         $this->product_material_id = $product->product_material_id;
+        $this->product_material_id = $product->product_material_id;
         $this->product_color_id = $product->product_color_id;
+        $this->product_flavor_id = $product->product_flavor_id;
+        $this->variant_type = $product->variant_type ?: 'color';
         $this->product_size_id = $product->product_size_id;
         $this->color = $product->color; // Legacy field
         $this->size = $product->size; // Legacy field
@@ -187,7 +194,10 @@ class ProductForm extends Component
             'product_type_id',
             'product_model_id',
             'product_material_id',
+            'product_material_id',
             'product_color_id',
+            'product_flavor_id',
+            'variant_type',
             'product_size_id',
             'color',
             'size',
@@ -219,12 +229,20 @@ class ProductForm extends Component
         $colorName = '';
         $sizeName = '';
         
-        if ($this->product_color_id) {
-            $color = \App\Models\ProductColor::find($this->product_color_id);
-            $colorName = $color ? $color->name : '';
-        } elseif ($this->color) {
-            // Fallback to legacy text field
-            $colorName = $this->color;
+        if ($this->variant_type === 'color') {
+            if ($this->product_color_id) {
+                $color = \App\Models\ProductColor::find($this->product_color_id);
+                $colorName = $color ? $color->name : '';
+            } elseif ($this->color) {
+                $colorName = $this->color;
+            }
+        } elseif ($this->variant_type === 'flavor') {
+            if ($this->product_flavor_id) {
+                $flavor = \App\Models\Flavor::find($this->product_flavor_id);
+                // We use colorName variable but fill it with flavor name for title generation
+                // ProductTitleService might interpret it as color/variant
+                $colorName = $flavor ? $flavor->name : '';
+            }
         }
         
         if ($this->product_size_id) {
@@ -280,13 +298,21 @@ class ProductForm extends Component
             return;
         }
         
-        // Get color code
+        // Get variant code (color or flavor)
         $colorCode = 'STD';
-        if ($this->product_color_id) {
-            $color = \App\Models\ProductColor::find($this->product_color_id);
-            $colorCode = $color && $color->code ? $color->code : 'STD';
-        } elseif ($this->color) {
-            $colorCode = $this->color;
+        if ($this->variant_type === 'color') {
+            if ($this->product_color_id) {
+                $color = \App\Models\ProductColor::find($this->product_color_id);
+                $colorCode = $color && $color->code ? $color->code : 'STD';
+            } elseif ($this->color) {
+                $colorCode = $this->color;
+            }
+        } elseif ($this->variant_type === 'flavor') {
+            if ($this->product_flavor_id) {
+                $flavor = \App\Models\Flavor::find($this->product_flavor_id);
+                // Use slug or name as code for flavor, maybe slug is safer
+                $colorCode = $flavor ? strtoupper(substr($flavor->slug, 0, 3)) : 'SAB';
+            }
         }
         
         // Get size code
@@ -317,6 +343,9 @@ class ProductForm extends Component
         $this->product_material_id = $this->product_material_id ?: null;
         $this->product_model_id = $this->product_model_id ?: null;
         $this->product_type_id = $this->product_type_id ?: null;
+        $this->product_color_id = $this->product_color_id ?: null;
+        $this->product_flavor_id = $this->product_flavor_id ?: null;
+        $this->product_size_id = $this->product_size_id ?: null;
         // Default stock to 1 if not provided
         $this->stock = ($this->stock === '' || $this->stock === null) ? 1 : $this->stock;
 
@@ -335,21 +364,33 @@ class ProductForm extends Component
             $errors = $e->validator->errors();
             $targetTab = 'general'; // Default
 
-            if ($errors->has('name') || $errors->has('category_id') || $errors->has('product_type_id')) {
+            if ($errors->has('name') || $errors->has('category_id') || $errors->has('product_type_id') || $errors->has('product_model_id') || $errors->has('product_material_id') || $errors->has('product_color_id') || $errors->has('product_size_id')) {
                 $targetTab = 'general';
-            } elseif ($errors->has('price') || $errors->has('stock')) {
+            } elseif ($errors->has('price') || $errors->has('stock') || $errors->has('sku') || $errors->has('cost_price') || $errors->has('compare_at_price')) {
                 $targetTab = 'pricing';
             } elseif ($errors->has('images') || $errors->has('images.*')) {
                 $targetTab = 'images';
+            } elseif ($errors->has('slug') || $errors->has('description') || $errors->has('marketing_description')) {
+                $targetTab = 'seo';
             }
             
             $this->activeTab = $targetTab;
             
+            // Dispatch event for frontend to switch tabs
+            $this->dispatch('validation-errors', ['tab' => $targetTab]);
+
             // Dispatch event for toast notification
             $this->dispatch('show-validation-toast', ['errors' => $e->validator->errors()->toArray()]);
             
             // Re-throw to let Livewire handle the error bag
             throw $e;
+        }
+
+        // Sanitize variant type data
+        if ($this->variant_type === 'color') {
+            $this->product_flavor_id = null;
+        } else {
+            $this->product_color_id = null;
         }
 
         try {
@@ -370,6 +411,8 @@ class ProductForm extends Component
                 'product_model_id' => $this->product_model_id,
                 'product_material_id' => $this->product_material_id,
                 'product_color_id' => $this->product_color_id,
+                'product_flavor_id' => $this->product_flavor_id,
+                'variant_type' => $this->variant_type,
                 'product_size_id' => $this->product_size_id,
                 'color' => $this->color,
                 'size' => $this->size,
@@ -683,6 +726,7 @@ class ProductForm extends Component
         $models = ProductModel::where('is_active', true)->get();
         $materials = ProductMaterial::where('is_active', true)->get();
         $colors = \App\Models\ProductColor::where('is_active', true)->get();
+        $flavors = \App\Models\Flavor::where('is_active', true)->get();
         $sizes = \App\Models\ProductSize::where('is_active', true)->get();
 
         // Carregar categorias para o select (hierarquia simples para visualização)
@@ -713,6 +757,7 @@ class ProductForm extends Component
             'models' => $models,
             'materials' => $materials,
             'colors' => $colors,
+            'flavors' => $flavors,
             'sizes' => $sizes,
             'kitProducts' => $kitProducts,
         ])->layout('layouts.admin');

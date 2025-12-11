@@ -25,6 +25,11 @@
                 <i class="bi bi-download me-2"></i> Modelos
             </button>
 
+            <button wire:click="toggleStatus" class="btn btn-sm d-flex align-items-center rounded-3 shadow-sm hover-shadow fw-bold me-2 {{ $campaign->status === \App\Enums\CampaignStatus::DRAFT ? 'btn-light text-muted border' : 'btn-success text-white' }}">
+                <i class="bi {{ $campaign->status === \App\Enums\CampaignStatus::DRAFT ? 'bi-toggle-off' : 'bi-toggle-on' }} me-2"></i>
+                {{ $campaign->status === \App\Enums\CampaignStatus::DRAFT ? 'Rascunho' : 'Ativo' }}
+            </button>
+
             <button wire:click="openSettingsModal" class="btn btn-white border btn-sm d-flex align-items-center rounded-3 shadow-sm hover-shadow text-dark fw-medium">
                 <i class="bi bi-sliders me-2"></i> Configurações
             </button>

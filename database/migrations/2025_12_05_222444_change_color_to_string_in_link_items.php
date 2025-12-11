@@ -10,7 +10,10 @@ return new class extends Migration
     public function up(): void
     {
         // Change ENUM to VARCHAR
-        DB::statement("ALTER TABLE link_items MODIFY color VARCHAR(50) DEFAULT 'white'");
+        // Skip for SQLite (testing) as it doesn't support MODIFY and treats ENUM as TEXT anyway
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE link_items MODIFY color VARCHAR(50) DEFAULT 'white'");
+        }
     }
 
     public function down(): void

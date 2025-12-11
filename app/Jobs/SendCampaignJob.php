@@ -27,11 +27,22 @@ class SendCampaignJob implements ShouldQueue
         }
 
         // 2. Fetch Active Subscribers
+        // PREPARE: Find the first email to send (for now assuming 1 email per campaign for bulk send)
+        // Or should we send ALL emails? Usually drip is scheduled.
+        // Let's assume we send the FIRST email of the sequence now.
+        $email = $this->campaign->emails()->orderBy('sort_order')->first();
+        
+        if (!$email) {
+            \Illuminate\Support\Facades\Log::warning("Campaign {$this->campaign->id} has no emails to send.");
+            $this->campaign->update(['status' => 'draft']); // Revert
+            return;
+        }
+
         \App\Models\NewsletterSubscriber::where('is_active', true)
-            ->chunk(100, function ($subscribers) {
+            ->chunk(100, function ($subscribers) use ($email) {
                 foreach ($subscribers as $subscriber) {
                     // Dispatch individual email job
-                    \App\Jobs\SendEmailJob::dispatch($this->campaign, $subscriber);
+                    \App\Jobs\SendEmailJob::dispatch($email, $subscriber);
                 }
             });
 

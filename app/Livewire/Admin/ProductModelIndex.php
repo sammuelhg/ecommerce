@@ -25,12 +25,14 @@ class ProductModelIndex extends Component
     {
         $this->editingId = null;
         $this->showForm = true;
+        $this->dispatch('open-model-modal');
     }
 
     public function edit($id)
     {
         $this->editingId = $id;
         $this->showForm = true;
+        $this->dispatch('open-model-modal');
     }
 
     public function delete($id)
@@ -39,10 +41,21 @@ class ProductModelIndex extends Component
         session()->flash('message', 'Modelo deletado com sucesso!');
     }
 
+    #[\Livewire\Attributes\On('modelSaved')]
+    public function refreshList()
+    {
+        $this->showForm = false;
+        $this->editingId = null;
+        $this->resetPage();
+        $this->dispatch('close-model-modal');
+    }
+
+    #[\Livewire\Attributes\On('closeForm')]
     public function closeForm()
     {
         $this->showForm = false;
         $this->editingId = null;
+        $this->dispatch('close-model-modal');
     }
 
     public function render()

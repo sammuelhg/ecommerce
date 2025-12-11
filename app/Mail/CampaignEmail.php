@@ -17,7 +17,7 @@ class CampaignEmail extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        public \App\Models\NewsletterCampaign $campaign,
+        public \App\Models\NewsletterEmail $email,
         public \App\Models\NewsletterSubscriber $subscriber
     ) {}
 
@@ -27,8 +27,11 @@ class CampaignEmail extends Mailable
     public function envelope(): Envelope
     {
         $prefix = \App\Models\StoreSetting::get('email_subject_prefix', '[LosFit]');
+        // Use Email subject, fallback to Campaign subject
+        $subject = $this->email->subject ?? $this->email->campaign->subject ?? 'Novidades LosFit';
+        
         return new Envelope(
-            subject: $prefix . ' ' . $this->campaign->subject,
+            subject: $prefix . ' ' . $subject,
         );
     }
 
@@ -37,11 +40,35 @@ class CampaignEmail extends Mailable
      */
     public function content(): Content
     {
+        // 1. Process Body Images (Relative -> Absolute)
+        $body = $this->email->body ?? '';
+        $appUrl = config('app.url');
+        
+        // Regex to find src="/storage..." and prepend App URL
+        // Doesn't touch http/https urls
+        $body = preg_replace('/src="\/storage/i', 'src="' . $appUrl . '/storage', $body);
+        
+        // 2. Parse Variables (Manual Blade-like interpolation)
+        // Replaces {{ $user->name }} or {{$user->name}} with subscriber name
+        $name = $this->subscriber->name ?? 'Cliente';
+        $body = preg_replace('/\{\{\s*\$user->name\s*\}\}/', $name, $body);
+        $body = preg_replace('/\{\{\s*\$user->email\s*\}\}/', $this->subscriber->email, $body);
+        
+        // 3. Fetch Products
+        $products = $this->email->products; // Relationship
+        
+        // 3. Fetch Card (Email Override -> Campaign -> Default)
+        $card = $this->email->campaign->emailCard; // Relationship
+
         return new Content(
             view: 'emails.newsletter.campaign',
             with: [
-                'content' => $this->campaign->body,
-                'trackingUrl' => route('tracking.open', ['campaign' => $this->campaign->id, 'lead' => $this->subscriber->id], true)
+                'content' => $body,
+                'trackingUrl' => route('tracking.open', ['campaign' => $this->email->campaign->id, 'lead' => $this->subscriber->id], true),
+                'overrideProducts' => $products->count() > 0 ? $products : null,
+                'overrideCard' => $card,
+                // Pass subscriber for unsubscribe link
+                'subscriber' => $this->subscriber,
             ]
         );
     }

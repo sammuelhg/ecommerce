@@ -22,9 +22,13 @@ class Product extends Model
         'product_material_id',
         'product_color_id',
         'product_size_id',
+        'product_flavor_id',
+        'variant_type',
         'color',
         'attribute',
         'size',
+        'compare_at_price',
+        'cost_price',
         'card_type',
     ];
 
@@ -53,6 +57,11 @@ class Product extends Model
     public function productColor()
     {
         return $this->belongsTo(ProductColor::class);
+    }
+
+    public function flavor()
+    {
+        return $this->belongsTo(Flavor::class, 'product_flavor_id');
     }
 
     public function productSize()
