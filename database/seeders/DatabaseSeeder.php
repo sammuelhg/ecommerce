@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             SampleProductsSeeder::class,
             LinkItemSeeder::class,
             EmailCardSeeder::class,
+            NewsletterCampaignSeeder::class,
         ]);
 
         $this->command->info('');
