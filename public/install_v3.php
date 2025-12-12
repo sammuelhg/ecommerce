@@ -55,8 +55,27 @@ if (file_put_contents($envPath, $envContent)) {
     echo "❌ Failed to create .env file (Permissions?)\n";
 }
 
-// 2. Fix Permissions
-echo "\n--- [Step 2] Fixing Permissions ---\n";
+// 2. Fix Permissions & Create Directories
+echo "\n--- [Step 2] Creating Directories & Fixing Permissions ---\n";
+
+$requiredDirs = [
+    $rootDir . '/storage/framework/sessions',
+    $rootDir . '/storage/framework/views',
+    $rootDir . '/storage/framework/cache',
+    $rootDir . '/storage/logs',
+    $rootDir . '/bootstrap/cache',
+];
+
+foreach ($requiredDirs as $dir) {
+    if (!file_exists($dir)) {
+        if (mkdir($dir, 0777, true)) {
+            echo "✅ Created missing directory: $dir\n";
+        } else {
+            echo "❌ Failed to create directory: $dir\n";
+        }
+    }
+}
+
 function recursiveChmod($path, $filePerm, $dirPerm) {
     if (!file_exists($path)) return;
     $iterator = new RecursiveIteratorIterator(
