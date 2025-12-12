@@ -50,7 +50,7 @@ jobs:
         key: ${{ secrets.HOSTINGER_SSH_KEY }}
         port: ${{ secrets.HOSTINGER_PORT }}
         source: "deploy_release.tar.gz,hostinger.env,hostinger.htaccess,version.php"
-        target: "public_html" 
+        target: ${{ secrets.TARGET_DIRECTORY }}
 
     - name: 🚀 Execute Remote Deployment
       uses: appleboy/ssh-action@master
@@ -63,7 +63,7 @@ jobs:
           # Variables
           PHP_BIN="/opt/alt/php84/usr/bin/php"
           COMPOSER_BIN="/usr/local/bin/composer"
-          TARGET_DIR="public_html"
+          TARGET_DIR="${{ secrets.TARGET_DIRECTORY }}"
 
           echo "--- Starting Deployment V2 on Hostinger ---"
           cd $TARGET_DIR
@@ -91,5 +91,10 @@ jobs:
           $PHP_BIN artisan config:clear
           $PHP_BIN artisan route:cache
           $PHP_BIN artisan view:cache
+
+          echo "7. Fixing Permissions (Critical for Hostinger)..."
+          find . -type d -exec chmod 755 {} \;
+          find . -type f -exec chmod 644 {} \;
+          chmod -R 777 storage bootstrap/cache
 
           echo "--- Deployment V2 Successfully Completed! 🚀 ---"

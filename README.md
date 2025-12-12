@@ -1,4 +1,5 @@
 # LosFit E-commerce High-Performance
+[![Deploy to Hostinger V2](https://github.com/sammuelhg/ecommerce/actions/workflows/deploy_v2.yml/badge.svg)](https://github.com/sammuelhg/ecommerce/actions/workflows/deploy_v2.yml)
 
 Plataforma de comércio eletrônico moderna e de alta performance, desenvolvida para a marca LosFit. Focada em modularidade, SEO e experiência do usuário.
 
