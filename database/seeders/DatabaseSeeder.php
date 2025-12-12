@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             CategoriesSeeder::class,
             ProductAttributesSeeder::class,
             SampleProductsSeeder::class,
+            LinkItemSeeder::class,
         ]);
 
         $this->command->info('');

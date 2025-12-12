@@ -24,7 +24,7 @@ class SampleProductsSeeder extends Seeder
         $modaFit = Category::where('slug', 'fit')->first();
         $modaPraia = Category::where('slug', 'praia')->first();
         $modaCroche = Category::where('slug', 'croche')->first();
-        $losfitNutri = Category::where('slug', 'losfitnutri')->first();
+        $losfitNutri = Category::where('slug', 'suplementos')->first();
 
         // Get attributes
         $types = ProductType::all()->keyBy('code');
