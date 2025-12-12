@@ -188,6 +188,7 @@ class SampleProductsSeeder extends Seeder
                 'price' => $productData['price'],
                 'stock' => $productData['stock'],
                 'is_active' => $productData['is_active'],
+                'image' => 'https://placehold.co/600x600?text=' . urlencode($name),
             ]);
         }
 
