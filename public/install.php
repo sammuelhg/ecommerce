@@ -57,8 +57,25 @@ try {
     echo "❌ Error fixing permissions: " . $e->getMessage() . "\n";
 }
 
+// 2.5 Setup Environment
+echo "\n--- [Step 1.5] Configuring Environment (.env) ---\n";
+$envPath = $rootDir . '/.env';
+$hostingerEnvPath = $rootDir . '/hostinger.env';
+
+if (file_exists($hostingerEnvPath)) {
+    if (copy($hostingerEnvPath, $envPath)) {
+        echo "✅ Copied hostinger.env to .env successfully.\n";
+        // Force reload config? Artisan should pick it up on next call.
+    } else {
+        echo "❌ Failed to copy hostinger.env to .env\n";
+    }
+} else {
+    echo "⚠️ hostinger.env not found in root ($hostingerEnvPath). Using existing .env if present.\n";
+}
+
 // 3. Run Migrations via Process/Shell
 echo "\n--- [Step 2] Running Database Migrations ---\n";
+echo "Current DB Connection (from env): " . getenv('DB_CONNECTION') . "\n";
 
 if (!file_exists("$rootDir/artisan")) {
     echo "❌ CRITICAL: 'artisan' file not found in root. Deployment might be incomplete.\n";
