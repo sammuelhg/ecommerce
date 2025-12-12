@@ -1,0 +1,36 @@
+name: ♻️ Reset Database (Fresh + Seed)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reset_db:
+    name: 🧨 Wipe & Seed DB
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🚀 Execute Remote Reset
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOSTINGER_IP }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        key: ${{ secrets.HOSTINGER_SSH_KEY }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        script: |
+          # Variables
+          PHP_BIN="/opt/alt/php84/usr/bin/php"
+          TARGET_DIR="${{ secrets.TARGET_DIRECTORY }}"
+
+          echo "--- 🧨 STARTING DATABASE RESET 🧨 ---"
+          cd $TARGET_DIR
+          
+          # Check location
+          echo "Working Directory: $(pwd)"
+
+          echo "1. Wiping Database and Seeding..."
+          $PHP_BIN artisan migrate:fresh --seed --force
+          
+          echo "2. Clearing Caches..."
+          $PHP_BIN artisan optimize:clear
+
+          echo "--- ✅ DATABASE RESET COMPLETE ---"
