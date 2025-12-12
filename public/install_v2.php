@@ -17,24 +17,43 @@ echo "Root: $rootDir\n";
 // 1. Setup Environment force
 echo "\n--- [Step 1] Setting up MySQL Connection (.env) ---\n";
 $envPath = $rootDir . '/.env';
-$hostingerEnvPath = $rootDir . '/hostinger.env';
 
-if (file_exists($hostingerEnvPath)) {
-    if (copy($hostingerEnvPath, $envPath)) {
-        echo "✅ Copied hostinger.env to .env\n";
-    } else {
-        echo "❌ Failed to copy hostinger.env\n";
-    }
+// FORCE WRITE .ENV CONTENT
+$envContent = <<<'EOD'
+APP_NAME=LosFit
+APP_ENV=production
+APP_KEY=base64:Z4v05feP+qEppVkYLC9CNnqAlpcq489h9KQtdn2icIM=
+APP_DEBUG=true
+APP_URL=https://losfit.com.br
+
+LOG_CHANNEL=stack
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=u488238372_losfit
+DB_USERNAME=u488238372_losfit
+DB_PASSWORD=!Sa002125
+
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.hostinger.com
+MAIL_PORT=465
+MAIL_USERNAME=contato@losfit.com.br
+MAIL_PASSWORD=!Sa002125
+MAIL_ENCRYPTION=ssl
+EOD;
+
+if (file_put_contents($envPath, $envContent)) {
+    echo "✅ FORCED creation of .env file.\n";
 } else {
-    echo "⚠️ hostinger.env missing!\n";
+    echo "❌ Failed to create .env file (Permissions?)\n";
 }
 
 // Verify DB Connection String
-$envContent = file_get_contents($envPath);
-if (strpos($envContent, 'DB_CONNECTION=mysql') !== false) {
-    echo "✅ Verified .env is using MySQL.\n";
-} else {
-    echo "❌ WARNING: .env might not be using mysql!\n";
+if (file_exists($envPath)) {
+    echo "✅ .env exists now.\n";
 }
 
 // 2. Fix Permissions
