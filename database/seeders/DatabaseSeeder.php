@@ -16,10 +16,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create admin user
-        User::factory()->create([
+        // Create admin user
+        User::create([
             'name' => 'Admin LosFit',
             'email' => 'admin@losfit.com',
             'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         // Seed categories and attributes
