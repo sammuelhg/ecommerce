@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@losfit.com',
             'password' => bcrypt('password'),
             'email_verified_at' => now(),
-            'is_active' => true,
+            'is_admin' => true,
         ]);
 
         // Seed categories and attributes
