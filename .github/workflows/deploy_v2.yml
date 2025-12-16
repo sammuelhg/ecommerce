@@ -90,7 +90,11 @@ jobs:
           $PHP_BIN artisan migrate --force
           echo "6.1. Running One-Time Seeder (Recovery)..."
           $PHP_BIN artisan db:seed --class=DeployRecoverySeeder --force
-          $PHP_BIN artisan config:clear
+          
+          echo "6.2. Clearing All Caches (Deep Clean)..."
+          $PHP_BIN artisan optimize:clear
+          
+          $PHP_BIN artisan config:cache
           $PHP_BIN artisan route:cache
           $PHP_BIN artisan view:cache
 
