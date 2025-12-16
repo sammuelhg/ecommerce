@@ -1,40 +1,45 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Shop;
 
 use Livewire\Component;
 use App\Models\Product;
-use App\Services\WishlistService;
 use App\Services\CartService;
-
 use App\DTOs\Cart\CartItemDTO;
+use Illuminate\Contracts\View\View;
 
 class ProductCard extends Component
 {
-    // ... existed code ...
+    // 1. Definição Obrigatória: A propriedade deve ser pública e tipada
+    public Product $product;
 
-    public function addToCart(CartService $cart)
+    // 2. Estado local para interações
+    public bool $isAddingToCart = false;
+
+    // 3. Mount Opcional (O Livewire 3 faz o binding automático, mas isso valida)
+    public function mount(Product $product): void
     {
-        $dto = new CartItemDTO($this->product->id, 1);
-        $cart->add($dto);
-        $this->dispatch('cartUpdated');
-        $this->dispatch('toast-success', message: 'Produto adicionado ao carrinho!');
+        $this->product = $product;
     }
 
-    public function toggleWishlist(WishlistService $wishlist)
-    {
-        $this->inWishlist = $wishlist->toggle($this->product);
-        $this->dispatch('wishlistUpdated');
-        
-        if ($this->inWishlist) {
-            $this->dispatch('toast-success', message: 'Produto adicionado à lista de desejos!');
-        } else {
-            $this->dispatch('toast-info', message: 'Produto removido da lista de desejos.');
-        }
-    }
-
-    public function render()
+    public function render(): View
     {
         return view('livewire.shop.product-card');
+    }
+
+    public function addToCart(CartService $cart): void
+    {
+        $this->isAddingToCart = true;
+
+        // Use the Service to add to cart
+        $dto = new CartItemDTO($this->product->id, 1);
+        $cart->add($dto);
+        
+        $this->dispatch('cartUpdated');
+        $this->dispatch('toast-success', message: 'Produto adicionado ao carrinho!');
+
+        $this->isAddingToCart = false;
     }
 }

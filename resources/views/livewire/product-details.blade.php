@@ -82,7 +82,7 @@
     @if($relatedProducts->count() > 0)
         <div class="row mt-5">
             <div class="col-12 mb-4">
-                <h3 class="fw-bold">Produtos Relacionados</h3>
+                <h2 class="fw-bold fs-4 mb-4">Produtos Relacionados</h2>
                 <hr>
             </div>
             

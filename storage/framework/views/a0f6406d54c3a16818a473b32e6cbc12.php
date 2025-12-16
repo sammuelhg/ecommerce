@@ -44,34 +44,51 @@
         <!-- Lista de Favoritos -->
         <div class="list-group list-group-flush" x-show="wishlist.length > 0">
             <template x-for="item in wishlist" :key="item.id">
-                <div class="list-group-item d-flex align-items-center p-3">
-                    <img :src="item.image 
-                            ? (item.image.startsWith('http') ? item.image : `/storage/${item.image}`) 
-                            : `https://placehold.co/80x80/CCCCCC/333333?text=${encodeURIComponent(item.name?.substring(0,10) || 'Produto')}`" 
-                         class="rounded me-3 flex-shrink-0" 
-                         style="width: 80px; height: 80px; object-fit: cover;"
-                         :alt="item.name"
-                         x-on:error="$el.src = 'https://placehold.co/80x80/CCCCCC/333333?text=Imagem'">
-                    
-                    <div class="flex-grow-1 me-2 overflow-hidden"> 
-                        <p class="mb-1 fw-bold text-dark line-clamp-2" x-text="item.name" :title="item.name"></p>
-                        <p class="mb-0 text-primary fw-semibold" x-text="formatCurrency(item.price)"></p>
-                    </div>
-                    
-                    <div class="ms-auto d-flex flex-column align-items-end flex-shrink-0">
-                        <button class="btn btn-sm btn-outline-danger mb-1" @click="toggleWishlist(item)" title="Remover">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                        <button class="btn btn-sm btn-primary" @click="addToCart(item)" title="Adicionar ao Carrinho">
-                            <i class="bi bi-bag-plus"></i>
-                        </button>
+                <div class="list-group-item p-3 border-bottom">
+                    <div class="d-flex gap-3">
+                        <!-- Imagem -->
+                        <div class="flex-shrink-0">
+                            <img :src="item.image 
+                                    ? (item.image.startsWith('http') ? item.image : `/storage/${item.image}`) 
+                                    : `https://placehold.co/80x80/CCCCCC/333333?text=${encodeURIComponent(item.name?.substring(0,10) || 'Produto')}`" 
+                                 class="rounded object-fit-cover" 
+                                 style="width: 80px; height: 80px;"
+                                 :alt="item.name"
+                                 x-on:error="$el.src = 'https://placehold.co/80x80/CCCCCC/333333?text=Imagem'">
+                        </div>
+
+                        <!-- Conteúdo -->
+                        <div class="flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                <p class="mb-1 fw-bold text-dark line-clamp-2" x-text="item.name" :title="item.name"></p>
+                                <p class="mb-0 text-muted small" x-text="formatCurrency(item.price)"></p>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mt-2 align-items-center">
+                                <!-- Botão Adicionar -->
+                                <button class="btn btn-warning flex-grow-1 d-flex align-items-center justify-content-center gap-2 text-dark fw-bold" 
+                                        @click="addToCart(item)"
+                                        title="Adicionar ao Carrinho">
+                                    <i class="bi bi-cart-plus-fill"></i>
+                                    <span>Adicionar</span>
+                                </button>
+                                
+                                <!-- Botão Remover -->
+                                <button class="btn btn-outline-danger d-flex align-items-center justify-content-center px-0" 
+                                        style="width: 38px; height: 38px;"
+                                        @click="toggleWishlist(item)" 
+                                        title="Remover">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </template>
         </div>
     </div>
     <div class="offcanvas-footer border-top p-3 text-center" x-show="wishlist.length > 0">
-        <a href="#" class="btn btn-primary w-100 fw-semibold">Ver Todos os Itens</a>
+        <!-- Button removed as requested -->
     </div>
 </div>
 <?php /**PATH C:\xampp\htdocs\ecommerce\ecommerce-hp\resources\views/shop/partials/wishlist-offcanvas.blade.php ENDPATH**/ ?>

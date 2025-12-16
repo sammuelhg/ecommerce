@@ -56,113 +56,8 @@
         position: relative;
         z-index: 2;
     }
-
-    /* DIGITAL CARD STYLES (Copied from /card) */
-    :root {
-      --brand-primary: #000000; 
-      --text-color-dark: #1a1a1a;
-      --text-color-light: #555555;
-    }
-    .custom-card {
-      background-color: #ffffff;
-      width: 340px;
-      height: 200px;
-      border-radius: 16px;
-      border-top: 5px solid var(--brand-primary);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      margin: 0 auto; /* Center it */
-    }
-    .custom-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
-    .card-main-content {
-      display: flex;
-      flex-direction: row;
-      flex: 1;
-      position: relative;
-    }
-    .card-image-section {
-      width: 120px;
-      background-color: #f9f9f9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    .card-image-section img.photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .card-image-section img.logo {
-      max-width: 100px;
-      height: auto;
-    }
-    .card-logo-corner {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      width: 52px;
-      opacity: 0.9;
-    }
-    .card-text-section {
-      flex: 1;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 800;
-      text-transform: uppercase;
-      margin: 0 0 2px 0;
-      color: var(--brand-primary);
-      line-height: 1.2;
-    }
-    .card-subtitle {
-      font-size: 9px;
-      color: var(--text-color-light);
-      text-transform: uppercase;
-      margin: 0 0 10px 0;
-    }
-    .contact-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .contact-item img {
-      width: 16px;
-      height: 16px;
-    }
-    .contact-link {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-color-dark);
-      text-decoration: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .card-footer {
-      background-color: var(--brand-primary);
-      color: #ffffff;
-      padding: 6px;
-      text-align: center;
-      font-size: 10px;
-      font-style: italic;
-    }
 </style>
+<link rel="stylesheet" href="{{ asset('css/card-styles.css') }}">
 
 <!-- 1. HERO SECTION -->
 <section class="position-relative py-5 bg-dark d-flex align-items-center" style="min-height: 80vh;">
@@ -357,7 +252,7 @@
             <!-- Right: CEO Card -->
             <div class="col-lg-5">
                 @php
-                    $ceoCard = \App\Models\EmailCard::active()->first();
+                    $ceoCard = \App\Models\SignCard::first();
                 @endphp
                 
                 @if($ceoCard)
@@ -375,8 +270,11 @@
     </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="py-5 text-center bg-black border-top border-secondary border-opacity-10">
+    <!-- 6. LEAD CAPTURE (VIP CLUB) -->
+    <livewire:landing.lead-capture />
+
+    <!-- FOOTER -->
+    <footer class="py-5 text-center bg-black border-top border-secondary border-opacity-10">
     <div class="container">
         <h2 class="h4 fw-bold text-white mb-3">Seja sua melhor versão.</h2>
         <div class="d-flex justify-content-center gap-3 mt-4">

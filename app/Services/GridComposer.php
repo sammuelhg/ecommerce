@@ -23,6 +23,12 @@ class GridComposer
      */
     public function merge($products, array $rules = [], bool $useDbRules = true): Collection
     {
+        \Illuminate\Support\Facades\Log::info('GridComposer::merge started', [
+            'product_count' => $products->count(),
+            'rules_count' => count($rules),
+            'useDbRules' => $useDbRules
+        ]);
+
         // 1. Fetch Rules from Database (Active ones)
         // If useDbRules is true, we fetch DB rules and MERGE them with passed rules.
         // Passed rules ($rules) take precedence if keys collide? Or DB?
@@ -66,6 +72,7 @@ class GridComposer
     
                 if ($r->type === 'card.newsletter_form') {
                     $content = $r->configuration;
+                    $content['form_id'] = $r->form_id; // Inject form_id from column
                 }
     
                 $finalRules[$r->position] = [

@@ -11,6 +11,7 @@ class ExpenseManager extends Component
     use WithPagination;
 
     public $sourceFilter = '';
+    public $fixedSource = null;
     
     // Form Inputs
     public $date;
@@ -20,9 +21,17 @@ class ExpenseManager extends Component
     
     public bool $isModalOpen = false;
 
-    public function mount()
+    public function mount($fixedSource = null)
     {
-        $this->sourceFilter = request()->query('source', '');
+        $this->fixedSource = $fixedSource;
+
+        if ($this->fixedSource) {
+            $this->sourceFilter = $this->fixedSource;
+            $this->source = $this->fixedSource;
+        } else {
+            $this->sourceFilter = request()->query('source', '');
+        }
+
         $this->date = now()->format('Y-m-d');
     }
 
@@ -36,6 +45,13 @@ class ExpenseManager extends Component
     public function create()
     {
         $this->reset(['amount', 'description']);
+        
+        if ($this->fixedSource) {
+            $this->source = $this->fixedSource;
+        } elseif ($this->sourceFilter && $this->sourceFilter !== 'all') {
+            $this->source = $this->sourceFilter;
+        }
+        
         $this->date = now()->format('Y-m-d');
         $this->isModalOpen = true;
     }
@@ -64,7 +80,9 @@ class ExpenseManager extends Component
     {
         $query = MarketingExpense::query()->orderBy('date', 'desc');
 
-        if ($this->sourceFilter && $this->sourceFilter !== 'all') {
+        if ($this->fixedSource) {
+            $query->where('source', $this->fixedSource);
+        } elseif ($this->sourceFilter && $this->sourceFilter !== 'all') {
             $query->where('source', $this->sourceFilter);
         }
 

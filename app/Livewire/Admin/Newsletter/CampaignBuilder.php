@@ -127,7 +127,7 @@ class CampaignBuilder extends Component
                 'subject' => $campaign->subject,
                 'body' => '',
                 'delay_in_hours' => 0,
-                'sort_order' => 0,
+                'step_order' => 0,
             ]);
         }
         
@@ -195,7 +195,7 @@ class CampaignBuilder extends Component
             'subject' => $this->campaign->subject . ' - Passo ' . ($count + 1),
             'body' => '',
             'delay_in_hours' => 24, // Default delay
-            'sort_order' => $count,
+            'step_order' => $count,
         ]);
         
         $this->setActiveEmail($newEmail->id);
@@ -307,7 +307,7 @@ class CampaignBuilder extends Component
     public function render()
     {
         return view('livewire.admin.newsletter.campaign-builder', [
-            'steps' => $this->campaign->emails()->orderBy('sort_order')->get()
+            'steps' => $this->campaign->emails()->orderBy('step_order')->get()
         ]);
     }
 }

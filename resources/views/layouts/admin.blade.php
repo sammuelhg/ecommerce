@@ -14,303 +14,77 @@
     <link href="{{ asset('css/card-styles.css') }}" rel="stylesheet">
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @livewireStyles
     
+    <!-- Quill WYSIWYG -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     @stack('styles')
+    
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block admin-sidebar p-0">
-                <div class="d-flex flex-column h-100">
-                    <!-- Logo -->
-                    <div class="admin-logo">
-                        <a href="{{ route('shop.index') }}" target="_blank" title="Ir para a Loja">
-                            <img src="{{ asset('logo.svg') }}" alt="LosFit" style="height: 90px; width: auto;" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 60%22%3E%3Ctext x=%2210%22 y=%2240%22 font-family=%22Arial,sans-serif%22 font-size=%2230%22 font-weight=%22bold%22 fill=%22%23ffd700%22%3ELosFit%3C/text%3E%3C/svg%3E';">
+    <!-- Navbar (Fixed Top) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow px-3 mb-4">
+        <div class="container-fluid">
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('admin.dashboard') }}">
+                <img src="{{ asset('logo.svg') }}" alt="LosFit" height="30" class="d-inline-block align-text-top me-2" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 60%22%3E%3Ctext x=%2210%22 y=%2240%22 font-family=%22Arial,sans-serif%22 font-size=%2230%22 font-weight=%22bold%22 fill=%22%23ffd700%22%3ELosFit%3C/text%3E%3C/svg%3E';">
+                <span class="fs-6 fw-bold text-uppercase text-warning">Admin</span>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar" aria-controls="topNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Links -->
+            <div class="collapse navbar-collapse" id="topNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active text-warning' : '' }}" href="{{ route('admin.dashboard') }}">
+                            <i class="bi bi-grid-fill me-1"></i> Dashboard
                         </a>
-                    </div>
-
-                    <!-- Logout Button -->
-                    <div class="logout-btn">
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-outline-light" title="Sair">
-                                <i class="bi bi-box-arrow-right"></i>
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Navigation -->
-                    <ul class="nav flex-column admin-nav pt-3">
-                        <!-- Dashboard -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
-                               href="{{ route('admin.dashboard') }}">
-                                <i class="bi bi-speedometer2"></i> Dashboard
-                            </a>
-                        </li>
-
-                        <!-- Catálogo (Antigo Dados de Itens) -->
-                        <li class="nav-item">
-                            <a class="nav-link d-flex justify-content-between align-items-center" 
-                               data-bs-toggle="collapse" 
-                               href="#catalogMenu" 
-                               role="button" 
-                               aria-expanded="{{ request()->routeIs('admin.products.*', 'admin.categories.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-tag"></i> Catálogo</span>
-                                <i class="bi bi-chevron-down"></i>
-                            </a>
-                            <div class="collapse {{ request()->routeIs('admin.products.*', 'admin.categories.*', 'admin.types.*', 'admin.models.*', 'admin.materials.*', 'admin.colors.*', 'admin.sizes.*') ? 'show' : '' }}" 
-                                 id="catalogMenu">
-                                <ul class="nav flex-column ms-3">
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.products.index') }}">
-                                            <i class="bi bi-box"></i> Produtos
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.categories.index') }}">
-                                            <i class="bi bi-folder"></i> Categorias
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.types.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.types.index') }}">
-                                            <i class="bi bi-tags"></i> Tipos
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.models.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.models.index') }}">
-                                            <i class="bi bi-diagram-3"></i> Modelos
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.materials.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.materials.index') }}">
-                                            <i class="bi bi-palette"></i> Materiais
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.colors.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.colors.index') }}">
-                                            <i class="bi bi-paint-bucket"></i> Cores
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.flavors.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.flavors.index') }}">
-                                            <i class="bi bi-droplet"></i> Sabores
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.sizes.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.sizes.index') }}">
-                                            <i class="bi bi-rulers"></i> Tamanhos
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-                        <!-- CRM -->
-                        <li class="nav-item">
-                            <a class="nav-link d-flex justify-content-between align-items-center" 
-                               data-bs-toggle="collapse" 
-                               href="#crmMenu" 
-                               role="button" 
-                               aria-expanded="{{ request()->routeIs('admin.crm.*', 'admin.users.*', 'admin.leads.*', 'admin.newsletter.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-people-fill"></i> CRM</span>
-                                <i class="bi bi-chevron-down"></i>
-                            </a>
-                            <div class="collapse {{ request()->routeIs('admin.crm.*', 'admin.users.*', 'admin.leads.*', 'admin.newsletter.*') ? 'show' : '' }}" 
-                                 id="crmMenu">
-                                <ul class="nav flex-column ms-3">
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.users.index') }}">
-                                            <i class="bi bi-person-badge"></i> Clientes
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.leads.index') }}">
-                                            <i class="bi bi-funnel"></i> Leads
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.contacts') ? 'active' : '' }}" 
-                                           href="{{ route('admin.newsletter.contacts') }}">
-                                            <i class="bi bi-chat-left-text"></i> Contatos
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.campaigns', 'admin.newsletter.campaign.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.newsletter.campaigns') }}">
-                                            <i class="bi bi-megaphone"></i> Campanha Newsletter
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.crm.organic-traffic') ? 'active' : '' }}" 
-                                           href="{{ route('admin.crm.organic-traffic') }}">
-                                            <i class="bi bi-graph-up"></i> Tráfego Orgânico
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link d-flex justify-content-between align-items-center collapsed" 
-                                           data-bs-toggle="collapse" 
-                                           href="#paidTrafficSubMenu" 
-                                           role="button" 
-                                           aria-expanded="{{ request()->routeIs('admin.crm.paid-traffic') ? 'true' : 'false' }}">
-                                            <span><i class="bi bi-currency-dollar"></i> Tráfego Pago</span>
-                                            <i class="bi bi-chevron-down"></i>
-                                        </a>
-                                        <div class="collapse {{ request()->routeIs('admin.crm.paid-traffic') ? 'show' : '' }}" id="paidTrafficSubMenu">
-                                            <ul class="nav flex-column ms-3">
-                                                <li class="nav-item">
-                                                    <a class="nav-link {{ request()->fullUrlIs(route('admin.crm.paid-traffic', ['source' => 'meta'])) ? 'active' : '' }}" 
-                                                       href="{{ route('admin.crm.paid-traffic', ['source' => 'meta']) }}">
-                                                        <i class="bi bi-facebook"></i> Meta Ads
-                                                    </a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link {{ request()->fullUrlIs(route('admin.crm.paid-traffic', ['source' => 'google'])) ? 'active' : '' }}" 
-                                                       href="{{ route('admin.crm.paid-traffic', ['source' => 'google']) }}">
-                                                        <i class="bi bi-google"></i> Google Ads
-                                                    </a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link {{ request()->fullUrlIs(route('admin.crm.paid-traffic', ['source' => 'tiktok'])) ? 'active' : '' }}" 
-                                                       href="{{ route('admin.crm.paid-traffic', ['source' => 'tiktok']) }}">
-                                                        <i class="bi bi-tiktok"></i> TikTok Ads
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.crm.reports') ? 'active' : '' }}" 
-                                           href="{{ route('admin.crm.reports') }}">
-                                            <i class="bi bi-bar-chart-fill"></i> Relatórios
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-                        <!-- Marketing (Visual & Content) -->
-                        <li class="nav-item">
-                            <a class="nav-link d-flex justify-content-between align-items-center" 
-                               data-bs-toggle="collapse" 
-                               href="#marketingMenu" 
-                               role="button" 
-                               aria-expanded="{{ request()->routeIs('admin.stories.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-palette"></i> Visual & Conteúdo</span>
-                                <i class="bi bi-chevron-down"></i>
-                            </a>
-                            <div class="collapse {{ request()->routeIs('admin.stories.*', 'admin.grid.*', 'admin.links.*', 'admin.email-cards.*') ? 'show' : '' }}" 
-                                 id="marketingMenu">
-                                <ul class="nav flex-column ms-3">
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.stories.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.stories.index') }}">
-                                            <i class="bi bi-instagram"></i> Stories
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.grid.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.grid.index') }}">
-                                            <i class="bi bi-grid-3x3"></i> Layout do Grid
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.links.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.links.index') }}">
-                                            <i class="bi bi-link-45deg"></i> Links da Bio
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.email-cards.*') ? 'active' : '' }}" 
-                                           href="{{ route('admin.email-cards.index') }}">
-                                            <i class="bi bi-card-image"></i> Cards de Email
-                                        </a>
-                                    </li>
-                                     <li class="nav-item">
-                                        <a class="nav-link {{ request()->routeIs('admin.newsletter.templates') ? 'active' : '' }}" 
-                                           href="{{ route('admin.newsletter.templates') }}">
-                                            <i class="bi bi-file-earmark-text"></i> Modelos de Email
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-                        <!-- Configurações -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" 
-                               href="{{ route('admin.settings.index') }}">
-                                <i class="bi bi-gear"></i> Configurações
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link d-flex justify-content-between align-items-center collapsed" 
-                               data-bs-toggle="collapse" 
-                               href="#integrationsMenu" 
-                               role="button" 
-                               aria-expanded="{{ request()->routeIs('admin.integrations.*') ? 'true' : 'false' }}">
-                                <span><i class="bi bi-hdd-network"></i> Integrações</span>
-                                <i class="bi bi-chevron-down"></i>
-                            </a>
-                            <div class="collapse {{ request()->routeIs('admin.integrations.*') ? 'show' : '' }}" 
-                                 id="integrationsMenu">
-                                <ul class="nav flex-column ms-3">
-                                    {{-- Meta Ads --}}
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ (request()->routeIs('admin.integrations.index') && (!request()->has('tab') || request()->input('tab') == 'meta')) ? 'active' : '' }}" 
-                                           href="{{ route('admin.integrations.index', ['tab' => 'meta']) }}">
-                                            <i class="bi bi-facebook"></i> Meta Ads
-                                        </a>
-                                    </li>
-                                    {{-- Google Ads --}}
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ (request()->input('tab') == 'google') ? 'active' : '' }}" 
-                                           href="{{ route('admin.integrations.index', ['tab' => 'google']) }}">
-                                            <i class="bi bi-google"></i> Google Ads
-                                        </a>
-                                    </li>
-                                    {{-- TikTok Ads --}}
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ (request()->input('tab') == 'tiktok') ? 'active' : '' }}" 
-                                           href="{{ route('admin.integrations.index', ['tab' => 'tiktok']) }}">
-                                            <i class="bi bi-tiktok"></i> TikTok Ads
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-
-                    <!-- Home Link -->
-                    <div class="home-link mt-auto">
-                        <a href="{{ route('shop.index') }}" target="_blank">
-                            <i class="bi bi-house-door"></i>
-                            <span>Ir para Loja</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.cms.*') ? 'active text-warning' : '' }}" href="{{ route('admin.cms.pages.index') }}">
+                            <i class="bi bi-file-text me-1"></i> Páginas
                         </a>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Main Content -->
-            <main class="col-md-9 offset-md-3 col-lg-10 offset-lg-2 px-md-4">
-                <div class="admin-header">
-                    <h1 class="h2 mb-0">@yield('title', 'Dashboard')</h1>
-                </div>
+                    </li>
+                </ul>
                 
+                <div class="d-flex align-items-center">
+                    <a href="{{ route('shop.index') }}" target="_blank" class="btn btn-outline-light btn-sm me-3">
+                        <i class="bi bi-shop me-1"></i> Ver Loja
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-link text-white text-decoration-none opacity-75 hover-opacity-100">
+                             <i class="bi bi-box-arrow-right me-1"></i> Sair
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <main class="col-12">
+                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">@yield('title', 'Dashboard')</h1>
+                    
+                    @if(!request()->routeIs('admin.dashboard'))
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Voltar ao Início
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
                 @if(session('success') || session('message'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') ?? session('message') }}

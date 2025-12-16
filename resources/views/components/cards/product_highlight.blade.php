@@ -24,58 +24,58 @@
         <div class="col-12">
             <div class="card-body p-3 pt-0">
         <!-- Brand Name -->
-        <div class="text-uppercase fw-bold text-dark mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">
-            {{ $product->brand ?? 'MAX TITANIUM' }} {{-- Placeholder/Mock --}}
+        <div class="text-uppercase fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+            {{ $product->brand ?? 'MAX TITANIUM' }}
         </div>
         
         <!-- Product Title -->
-        <h6 class="card-title text-dark mb-2" style="font-size: 1rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8rem;">
+        <h6 class="card-title text-dark mb-1" style="font-size: 0.95rem; line-height: 1.3;">
             {{ $product->name }}
         </h6>
         
         <!-- Seller Info -->
-        <div class="text-secondary small mb-2" style="font-size: 0.85rem;">
-            Por {{ $product->seller_name ?? 'Max Titanium' }} <i class="bi bi-patch-check-fill text-primary"></i>
+        <div class="text-secondary mb-2" style="font-size: 0.75rem;">
+            Por <span class="text-dark">{{ $product->seller_name ?? 'Max Titanium' }}</span>
         </div>
         
         <!-- Rating -->
-        <div class="d-flex align-items-center mb-3">
-            <span class="text-secondary me-2" style="font-size: 0.9rem;">4.8</span>
-            <div class="text-primary me-2">
+        <div class="d-flex align-items-center mb-2">
+            <span class="text-secondary me-1" style="font-size: 0.8rem;">4.8</span>
+            <div class="text-primary me-1" style="font-size: 0.8rem;">
                 <i class="bi bi-star-fill"></i>
                 <i class="bi bi-star-fill"></i>
                 <i class="bi bi-star-fill"></i>
                 <i class="bi bi-star-fill"></i>
                 <i class="bi bi-star-fill"></i>
             </div>
-            <span class="text-secondary" style="font-size: 0.9rem;">(59836)</span>
+            <span class="text-secondary" style="font-size: 0.75rem;">(59836)</span>
         </div>
         
         <!-- Price Section -->
         <div class="mb-1">
             @if($product->old_price)
-                <div class="text-decoration-line-through text-secondary" style="font-size: 0.9rem;">R$ {{ number_format($product->old_price, 2, ',', '.') }}</div>
+                <div class="text-decoration-line-through text-muted" style="font-size: 0.75rem;">R$ {{ number_format($product->old_price, 2, ',', '.') }}</div>
             @endif
             
             <div class="d-flex align-items-center">
-                <span class="fs-2 fw-normal text-dark">R$ {{ number_format($product->price, 0, ',', '.') }}</span>
-                <span class="fs-5 fw-normal text-dark ms-1">{{ number_format(($product->price - floor($product->price)) * 100, 0) }}</span>
+                <span class="fw-normal text-dark" style="font-size: 1.2rem;">R$ {{ number_format($product->price, 0, ',', '.') }}</span>
+                <span class="fw-normal text-dark ms-0" style="font-size: 0.8rem; margin-top: -5px;">{{ substr(number_format($product->price, 2, '', ''), -2) }}</span>
                 @if($product->old_price)
                     @php
                         $discount = round((($product->old_price - $product->price) / $product->old_price) * 100);
                     @endphp
-                    <span class="ms-2 text-success fw-bold" style="font-size: 0.9rem;">{{ $discount }}% OFF</span>
+                    <span class="ms-2 text-success fw-bold" style="font-size: 0.8rem;">{{ $discount }}% OFF</span>
                 @endif
             </div>
         </div>
         
         <!-- Installments -->
-        <div class="mb-3">
-            <span class="text-dark" style="font-size: 0.95rem;">12x R$ {{ number_format($product->price / 12, 2, ',', '.') }}</span>
+        <div class="mb-2">
+            <span class="text-success" style="font-size: 0.8rem;">12x R$ {{ number_format($product->price / 12, 2, ',', '.') }} sem juros</span>
         </div>
         
         <!-- Shipping Badge -->
-        <div class="text-success fw-bold mb-3" style="font-size: 0.95rem;">
+        <div class="text-success fw-bold mb-2" style="font-size: 0.85rem;">
             Frete grátis <span class="fst-italic fw-bolder" style="font-family: sans-serif;"><i class="bi bi-lightning-fill"></i>FULL</span>
         </div>
         

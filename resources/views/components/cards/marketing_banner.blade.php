@@ -1,5 +1,6 @@
 @props(['data'])
-<div {{ $attributes->merge(['class' => 'card h-100 border-0 overflow-hidden position-relative shadow-sm ' . ($data['bg_color'] ?? 'bg-primary') . ' ' . ($data['text_color'] ?? 'text-white')]) }}>
+<div {{ $attributes->merge(['class' => 'card h-100 border-0 overflow-hidden position-relative shadow-sm ' . ($data['bg_color'] ?? 'bg-primary') . ' ' . ($data['text_color'] ?? '')]) }}
+     style="color: {{ isset($data['text_color']) &&Str::contains($data['text_color'], 'text-') ? '' : '#1a1a1a' }};">
     @php
         $imageStyle = $data['image_style'] ?? 'background';
     @endphp
@@ -17,19 +18,22 @@
         @endif
     @endif
     
-    <div class="card-body d-flex flex-column justify-content-center align-items-start p-4 position-relative" style="z-index: 2;">
+    <div class="card-body d-flex flex-column p-4 position-relative h-100" style="z-index: 2;">
         @if(!empty($data['title']))
             <h3 class="card-title fw-bold mb-2">{{ $data['title'] }}</h3>
         @endif
         
         @if(!empty($data['text']))
-            <p class="card-text mb-4 fs-5">{!! $data['text'] !!}</p>
+            <p class="card-text mb-4" style="font-size: 0.8rem; opacity: 0.9;">{!! $data['text'] !!}</p>
         @endif
         
         @if(!empty($data['link']))
-            <a href="{{ $data['link'] }}" class="btn {{ $data['btn_color'] ?? 'btn-light' }} fw-bold px-4 rounded-pill">
-                {{ $data['button_text'] ?? 'Ver Oferta' }}
-            </a>
+            <div class="mt-auto w-100">
+                <a href="{{ $data['link'] }}" class="btn {{ $data['btn_color'] ?? 'btn-light' }} fw-bold btn-sm w-100 text-uppercase"
+                   style="padding-top: 0.4rem; padding-bottom: 0.4rem;">
+                    {{ $data['button_text'] ?? 'Ver Oferta' }}
+                </a>
+            </div>
         @endif
     </div>
 </div>

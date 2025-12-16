@@ -57,7 +57,7 @@
             <div class="text-danger mb-3">
                 <i class="bi bi-x-circle display-1"></i>
             </div>
-            <h3 class="fw-bold mb-3">Inscrição Cancelada</h3>
+            <h2 class="fw-bold mb-3">Inscrição Cancelada</h2>
             @foreach($unsubScenarios as $scenario)
                 <div class="alert alert-light border">
                     <p class="mb-1 text-muted small">Campanha</p>

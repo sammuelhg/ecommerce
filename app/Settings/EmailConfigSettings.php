@@ -33,8 +33,8 @@ class EmailConfigSettings
         return StoreSetting::get('email_subject_prefix', '[LosFit]');
     }
 
-    public function getDefaultEmailCard(): ?\App\Models\EmailCard
+    public function getDefaultEmailCard(): ?\App\Models\SignCard
     {
-        return \App\Models\EmailCard::getDefault();
+        return \App\Models\SignCard::first();
     }
 }

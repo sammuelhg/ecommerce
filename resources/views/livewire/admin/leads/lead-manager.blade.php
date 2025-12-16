@@ -1,12 +1,21 @@
+@section('title')
+    <i class="bi bi-funnel text-warning me-2"></i>Leads
+@endsection
+
 <div class="card shadow-sm">
     <div class="card-header py-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">
                 <i class="bi bi-funnel me-2"></i>Leads Capturados
             </h5>
-            <span class="badge bg-light text-dark border">
-                Total: {{ $leads->total() }}
-            </span>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('admin.leads.kanban') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-kanban me-1"></i> Modo Kanban
+                </a>
+                <span class="badge bg-light text-dark border p-2">
+                    Total: {{ $leads->total() }}
+                </span>
+            </div>
         </div>
 
         <div class="row g-2">
@@ -26,6 +35,13 @@
                     <option value="all">Todos os Status</option>
                     <option value="active">Ativos</option>
                     <option value="banned">Banidos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select wire:model.live="trafficType" class="form-select" data-bs-toggle="tooltip" title="Filtrar por Tipo de Tráfego">
+                    <option value="">Todos Tipos</option>
+                    <option value="organic">Orgânico</option>
+                    <option value="paid">Pago (Ads)</option>
                 </select>
             </div>
             <div class="col-md-3">
@@ -71,10 +87,17 @@
                         </td>
                         <td>
                             @php
-                                $meta = is_string($lead->meta) ? json_decode($lead->meta, true) : $lead->meta;
-                                $source = $meta['utm_source'] ?? '-';
-                                $medium = $meta['utm_medium'] ?? '-';
-                                $camp = $meta['utm_campaign'] ?? '-';
+                                $source = $lead->utm_source ?? '-';
+                                $medium = $lead->utm_medium ?? '-';
+                                $camp = $lead->utm_campaign ?? '-';
+                                
+                                // Fallback for old data in 'data' column
+                                if ($source === '-') {
+                                    $data = $lead->data ?? [];
+                                    $source = $data['utm_source'] ?? '-';
+                                    $medium = $data['utm_medium'] ?? '-';
+                                    $camp = $data['utm_campaign'] ?? '-';
+                                }
                             @endphp
                             <div style="font-size: 0.85rem;">
                                 @if($source !== '-')

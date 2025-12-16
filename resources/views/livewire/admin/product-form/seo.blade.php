@@ -36,16 +36,176 @@
                 <h6 class="card-title mb-3 text-muted"><i class="bi bi-megaphone"></i> Conteúdo de Marketing & SEO</h6>
                 
                 <div class="mb-3">
-                    <label class="form-label">Descrição Curta (Marketing)</label>
-                    <textarea wire:model.blur="marketing_description" class="form-control bg-white" rows="2" placeholder="Breve descrição para listagens e SEO..."></textarea>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label mb-0">Descrição Curta (Marketing)</label>
+                        <button type="button" wire:click="previewAiGeneration('seo')" wire:loading.attr="disabled" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-stars me-1"></i> 
+                            <span wire:loading.remove wire:target="previewAiGeneration('seo')">Gerar SEO com IA</span>
+                            <span wire:loading wire:target="previewAiGeneration('seo')">Preparando...</span>
+                        </button>
+                    </div>
+                    <textarea wire:model.blur="marketing_description" 
+                              class="form-control bg-white" 
+                              rows="3" 
+                              style="min-height: 80px; max-height: 200px; overflow-y: auto;"
+                              placeholder="Breve descrição para listagens e SEO..."></textarea>
                     <small class="text-muted">Usado em listagens de produtos e resultados de busca</small>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Descrição Detalhada (Completa)</label>
-                    <textarea wire:model.blur="description" class="form-control bg-white" rows="10" placeholder="Descreva o produto em detalhes, incluindo especificações técnicas, benefícios, etc..."></textarea>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label mb-0">Descrição Detalhada (Completa)</label>
+                        <button type="button" wire:click="previewAiGeneration('description')" wire:loading.attr="disabled" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-stars me-1"></i> 
+                            <span wire:loading.remove wire:target="previewAiGeneration('description')">Gerar Descrição com IA</span>
+                            <span wire:loading wire:target="previewAiGeneration('description')">Preparando...</span>
+                        </button>
+                    </div>
+                    <div wire:ignore
+                         class="border rounded"
+                         x-data="productDescriptionEditor($wire.entangle('description'))">
+                        
+                        <!-- Fallback if Quill fails -->
+                        <textarea id="quill-fallback" style="display:none;" class="form-control" rows="5" wire:model.defer="description"></textarea>
+                        
+                        <!-- Editor Container -->
+                        <div x-ref="quillEditor" style="min-height: 300px; background: white;"></div>
+                    </div>
+
+                    @push('scripts')
+                    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+                    <script>
+                        // Prevent double loading check
+                        if (!document.querySelector('link[href*="quill.snow.css"]')) {
+                            var link = document.createElement('link');
+                            link.rel = 'stylesheet';
+                            link.href = 'https://cdn.quilljs.com/1.3.6/quill.snow.css';
+                            document.head.appendChild(link);
+                        }
+
+                        document.addEventListener('alpine:init', () => {
+                            Alpine.data('productDescriptionEditor', (entangled) => ({
+                                quill: null,
+                                content: entangled,
+                                init() {
+                                    if (typeof Quill === 'undefined') {
+                                        console.error('Quill not loaded');
+                                        document.getElementById('quill-fallback').style.display = 'block';
+                                        return;
+                                    }
+                                    
+                                    this.quill = new Quill(this.$refs.quillEditor, {
+                                        theme: 'snow',
+                                        placeholder: 'Descreva o produto...',
+                                        modules: {
+                                            toolbar: [
+                                                ['bold', 'italic', 'underline'],
+                                                [{ 'header': 1 }, { 'header': 2 }],
+                                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                ['clean']
+                                            ]
+                                        }
+                                    });
+
+                                    // Sync content from Quill to Livewire
+                                    this.quill.on('text-change', () => {
+                                        this.content = this.quill.root.innerHTML;
+                                    });
+
+                                    // Initial load
+                                    if (this.content) {
+                                        let cleanContent = this.content;
+                                        // Simple check for quoted JSON string
+                                        if (typeof cleanContent === 'string' && cleanContent.startsWith('"') && cleanContent.endsWith('"')) {
+                                            try {
+                                                cleanContent = JSON.parse(cleanContent);
+                                            } catch(e) {}
+                                        }
+                                        this.quill.root.innerHTML = cleanContent;
+                                    }
+
+                                    // Listen for AI Updates
+                                    Livewire.on('description-updated', (newContent) => {
+                                        // Handle potential double-encoding or array wrapping
+                                        if (Array.isArray(newContent)) newContent = newContent[0];
+                                        
+                                        if (typeof newContent === 'string' && newContent.startsWith('"') && newContent.endsWith('"')) {
+                                           try {
+                                               newContent = JSON.parse(newContent);
+                                           } catch(e) {}
+                                        }
+
+                                        if(this.quill) {
+                                            this.quill.root.innerHTML = newContent;
+                                            this.content = newContent;
+                                        }
+                                    });
+                                }
+                            }));
+                        });
+                    </script>
+                    @endpush
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- AI Prompt Preview Modal -->
+<div class="modal fade" id="aiPromptModal" tabindex="-1" aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-robot me-2"></i>Revisar Prompt de IA
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-2">Verifique o prompt que será enviado para a IA. Você pode editá-lo se necessário (edição direta aqui não altera o template salvo).</p>
+                <div class="form-group">
+                    <label class="form-label fw-bold">Prompt Gerado:</label>
+                    <textarea wire:model="promptPreview" class="form-control font-monospace bg-light" rows="10" style="font-size: 0.85rem;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" wire:click="confirmAiGeneration" wire:loading.attr="disabled" class="btn btn-primary">
+                    <span wire:loading.remove wire:target="confirmAiGeneration">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Confirmar e Gerar
+                    </span>
+                    <span wire:loading wire:target="confirmAiGeneration">
+                        <span class="spinner-border spinner-border-sm me-1"></span> Gerando...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('livewire:initialized', () => {
+        let aiModalInstance = null;
+
+        function getModal() {
+            const el = document.getElementById('aiPromptModal');
+            if (el) {
+                if (!aiModalInstance) {
+                    aiModalInstance = new bootstrap.Modal(el);
+                }
+                return aiModalInstance;
+            }
+            return null;
+        }
+        
+        Livewire.on('open-prompt-modal', () => {
+            const modal = getModal();
+            if (modal) modal.show();
+        });
+
+        Livewire.on('close-prompt-modal', () => {
+            const modal = getModal();
+            if (modal) modal.hide();
+        });
+    });
+</script>

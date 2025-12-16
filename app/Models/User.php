@@ -94,4 +94,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Order::class);
     }
+
+    public function campaigns(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Campaign::class);
+    }
 }

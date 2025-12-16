@@ -12,12 +12,14 @@ class Form extends Model
         'user_id',
         'title',
         'slug',
-        'config',
+        'description',
+        'settings',
         'is_active',
+        'campaign_id',
     ];
 
     protected $casts = [
-        'config' => 'array',
+        'settings' => 'array',
         'is_active' => 'boolean',
     ];
 
@@ -29,5 +31,10 @@ class Form extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(Campaign::class);
     }
 }

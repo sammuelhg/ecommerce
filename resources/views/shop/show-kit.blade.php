@@ -287,7 +287,9 @@
                     <div class="tab-pane fade show active" id="description-pane" role="tabpanel" aria-labelledby="description-tab">
                         <h4 class="h5 mb-3">Sobre o Produto</h4>
                         @if($product->description)
-                            <p>{{ $product->description }}</p>
+                            <div class="product-description">
+                                {!! $product->description !!}
+                            </div>
                         @else
                             <p class="text-muted">Descrição detalhada não disponível.</p>
                         @endif
@@ -356,7 +358,7 @@
     <!-- Produtos Relacionados -->
     @if($relatedProducts->count() > 0)
         <div class="mt-5 pt-4 border-top">
-            <h3 class="h4 mb-4">Produtos Relacionados</h3>
+            <h2 class="h4 mb-4">Produtos Relacionados</h2>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 @foreach($relatedProducts as $related)
                     <div class="col">

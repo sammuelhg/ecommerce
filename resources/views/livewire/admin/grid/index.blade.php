@@ -36,8 +36,12 @@
                                     </td>
                                     <td>{{ $rule->col_span }} col(s)</td>
                                     <td>
-                                        <small class="d-block text-muted">Título: {{ $rule->configuration['title'] ?? '-' }}</small>
-                                        <small class="d-block text-muted">Texto: {{ Str::limit($rule->configuration['text'] ?? '-', 30) }}</small>
+                                        @if($rule->type === 'card.newsletter_form')
+                                            <small class="d-block text-success fw-bold">Formulário: {{ $rule->form->title ?? 'N/A' }}</small>
+                                        @else
+                                            <small class="d-block text-muted">Título: {{ $rule->configuration['title'] ?? '-' }}</small>
+                                            <small class="d-block text-muted">Texto: {{ Str::limit($rule->configuration['text'] ?? '-', 30) }}</small>
+                                        @endif
                                     </td>
                                     <td class="text-end">
                                         <button wire:click="edit({{ $rule->id }})" class="btn btn-sm btn-outline-primary me-1">
@@ -74,10 +78,16 @@
              bg_color: @entangle('config_bg_color'),
              text_color: @entangle('config_text_color'),
              btn_color: @entangle('config_btn_color'),
-             btn_color: @entangle('config_btn_color'),
              badge_type: @entangle('config_badge_type'),
              image_style: @entangle('config_image_style'),
              
+             // Form Selection Logic
+             form_id: @entangle('config_form_id'),
+             forms: {{ json_encode($availableForms) }},
+
+             // Tab Logic (Client-side)
+             activeTab: 'content',
+
              // Badge Logic Helpers
              getBadgeLabel() {
                 const labels = {
@@ -105,6 +115,32 @@
                     'limited': 'bg-dark text-white'
                  };
                  return colors[this.badge_type] || 'bg-secondary text-white';
+             },
+             
+             loadFormData(id) {
+                if (!id) return;
+                const form = this.forms.find(f => f.id == id);
+                if (form) {
+                    this.title = form.title;
+                    this.text = form.description;
+                    if (form.settings) {
+                        let settings = form.settings;
+                        if (typeof settings === 'string') {
+                            try { settings = JSON.parse(settings); } catch(e) {}
+                        }
+                        this.btn_text = settings.button_text || 'Enviar';
+                    }
+                }
+             },
+
+             init() {
+                if (this.form_id) {
+                    this.loadFormData(this.form_id);
+                }
+
+                this.$watch('form_id', (value) => {
+                    this.loadFormData(value);
+                });
              }
          }"
     >
@@ -121,17 +157,17 @@
                             {{-- Tabs --}}
                             <ul class="nav nav-tabs mb-4">
                                 <li class="nav-item">
-                                    <button class="nav-link {{ $activeTab === 'content' ? 'active' : '' }}" 
-                                            wire:click="setTab('content')">Conteúdo</button>
+                                    <button class="nav-link" :class="{ 'active': activeTab === 'content' }" 
+                                            @click.prevent="activeTab = 'content'">Conteúdo</button>
                                 </li>
                                 <li class="nav-item">
-                                    <button class="nav-link {{ $activeTab === 'design' ? 'active' : '' }}" 
-                                            wire:click="setTab('design')">Design & Estilo</button>
+                                    <button class="nav-link" :class="{ 'active': activeTab === 'design' }" 
+                                            @click.prevent="activeTab = 'design'">Design & Estilo</button>
                                 </li>
                             </ul>
         
                             {{-- Tab Content (Inputs) --}}
-                            @if($activeTab === 'content')
+                            <div x-show="activeTab === 'content'">
                                 <div class="animate__animated animate__fadeIn">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
@@ -141,7 +177,8 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Tipo de Card</label>
-                                            <select wire:model.live="type" x-model="type" class="form-select"> {{-- Sync Type --}}
+                                            {{-- Removed wire:model.live to prevent server requests --}}
+                                            <select x-model="type" class="form-select">
                                                 <option value="marketing_banner">Banner de Marketing</option>
                                                 <option value="card.product_highlight">Produto Destaque (Card Padrão)</option>
                                                 <option value="card.product_special">Produto Especial (Badge/Oferta)</option>
@@ -151,7 +188,7 @@
                                     </div>
         
                                     {{-- Product Selection --}}
-                                    @if(Str::contains($type, 'product'))
+                                    <div x-show="type.includes('product')">
                                         <div class="mb-3 border p-3 rounded bg-light">
                                             <label class="form-label fw-bold">Selecionar Produto</label>
                                             @if($selectedProduct)
@@ -163,8 +200,9 @@
                                                     <button type="button" class="btn btn-sm btn-outline-danger" wire:click="$set('selectedProduct', null)">Alterar</button>
                                                 </div>
                                             @else
-                                                <div class="position-relative">
-                                                    <input type="text" wire:model.live.debounce.300ms="productSearch" class="form-control" placeholder="Buscar produto...">
+                                                <div class="position-relative" x-data="{ search: @entangle('productSearch').live.debounce.300ms }">
+                                                    {{-- Search still needs livewire to find products --}}
+                                                    <input type="text" x-model="search" class="form-control" placeholder="Buscar produto...">
                                                     @if(count($foundProducts) > 0)
                                                         <div class="list-group position-absolute w-100 shadow-sm" style="z-index: 1000; top: 100%;">
                                                             @foreach($foundProducts as $prod)
@@ -178,27 +216,24 @@
                                             @endif
                                         </div>
         
-                                        @if($type === 'card.product_special')
-                                            <div class="mb-3">
-                                                <label class="form-label">Badge / Tipo de Oferta</label>
-                                                <select wire:model="config_badge_type" x-model="badge_type" class="form-select">
-                                                    <option value="best_buy">Melhor Compra (Ícone ✨)</option>
-                                                    <option value="editor_choice">Escolha do Editor (Ícone ⭐)</option>
-                                                    <option value="big_discount">Super Desconto (Ícone %)</option>
-                                                    <option value="limited">Tempo Limitado (Ícone ⏰)</option>
-                                                </select>
-                                            </div>
-                                        @endif
-                                    @endif
+                                        <div x-show="type === 'card.product_special'" class="mb-3">
+                                            <label class="form-label">Badge / Tipo de Oferta</label>
+                                            <select x-model="badge_type" class="form-select">
+                                                <option value="best_buy">Melhor Compra (Ícone ✨)</option>
+                                                <option value="editor_choice">Escolha do Editor (Ícone ⭐)</option>
+                                                <option value="big_discount">Super Desconto (Ícone %)</option>
+                                                <option value="limited">Tempo Limitado (Ícone ⏰)</option>
+                                            </select>
+                                        </div>
+                                    </div>
         
                                     {{-- Text Content Inputs --}}
-                                    @if($type === 'marketing_banner' || $type === 'card.newsletter_form')
-                                        @if($type === 'marketing_banner')
-                                            <div class="mb-3">
-                                                <label class="form-label">Link de Destino</label>
-                                                <input type="text" wire:model="config_link" x-model="link" class="form-control" placeholder="https://...">
-                                            </div>
-                                        @endif
+                                    <div x-show="['marketing_banner', 'card.newsletter_form'].includes(type)">
+                                        
+                                        <div x-show="type === 'marketing_banner'" class="mb-3">
+                                            <label class="form-label">Link de Destino</label>
+                                            <input type="text" x-model="link" class="form-control" placeholder="https://...">
+                                        </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Largura (Colunas)</label>
@@ -211,51 +246,51 @@
                                             </select>
                                         </div>
         
-                                        @if($type === 'card.newsletter_form')
-                                            <div class="mb-3">
-                                                <label class="form-label">Campanha Vinculada</label>
-                                                <select wire:model="config_campaign_id" class="form-select">
-                                                    <option value="">Selecione...</option>
-                                                    @foreach($this->campaigns as $campaign)
-                                                        <option value="{{ $campaign->id }}">{{ $campaign->subject }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        @endif
-        
-                                        <div class="mb-3">
-                                            <label class="form-label">Título</label>
-                                            <input type="text" wire:model="config_title" x-model="title" class="form-control" placeholder="Ex: Super Oferta">
+                                        <div x-show="type === 'card.newsletter_form'" class="mb-3">
+                                            <label class="form-label">Formulário de Captura</label>
+                                            <select x-model="form_id" class="form-select">
+                                                <option value="">Selecione...</option>
+                                                @foreach($availableForms as $form)
+                                                    <option value="{{ $form->id }}">{{ $form->title }} ({{ $form->campaign->name ?? 'Sem Campanha' }})</option>
+                                                @endforeach
+                                            </select>
+                                            @error('config_form_id') <span class="text-danger small">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="mb-3">
+                                        
+                                        <div x-show="type !== 'card.newsletter_form'" class="mb-3">
+                                            <label class="form-label">Título</label>
+                                            <input type="text" x-model="title" class="form-control" placeholder="Ex: Super Oferta">
+                                        </div>
+
+                                        <div x-show="type === 'marketing_banner'" class="mb-3">
                                             <label class="form-label">Texto / Subtítulo</label>
                                             <div class="border rounded bg-white" 
                                                  x-data="{
-                                                     exec(command, value = null) {
-                                                         document.execCommand(command, false, value);
-                                                         this.$refs.editor.focus();
-                                                         text = this.$refs.editor.innerHTML;
-                                                     },
-                                                     insertBadge() {
-                                                         const selection = window.getSelection();
-                                                         if (!selection.rangeCount) return;
-                                                         const range = selection.getRangeAt(0);
-                                                         const span = document.createElement('span');
-                                                         span.style.cssText = 'background-color: #FFD700; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;';
-                                                         span.textContent = selection.toString() || 'NOVO';
-                                                         range.deleteContents();
-                                                         range.insertNode(span);
-                                                         text = this.$refs.editor.innerHTML;
-                                                     },
-                                                     init() {
-                                                         this.$refs.editor.innerHTML = text || '';
-                                                         this.$watch('text', value => {
-                                                             if (document.activeElement !== this.$refs.editor) {
-                                                                 this.$refs.editor.innerHTML = value || '';
-                                                             }
-                                                         });
-                                                     }
-                                                 }"
+                                                      exec(command, value = null) {
+                                                          document.execCommand(command, false, value);
+                                                          this.$refs.editor.focus();
+                                                          text = this.$refs.editor.innerHTML;
+                                                      },
+                                                      insertBadge() {
+                                                          const selection = window.getSelection();
+                                                          if (!selection.rangeCount) return;
+                                                          const range = selection.getRangeAt(0);
+                                                          const span = document.createElement('span');
+                                                          span.style.cssText = 'background-color: #FFD700; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold;';
+                                                          span.textContent = selection.toString() || 'NOVO';
+                                                          range.deleteContents();
+                                                          range.insertNode(span);
+                                                          text = this.$refs.editor.innerHTML;
+                                                      },
+                                                      init() {
+                                                          this.$refs.editor.innerHTML = text || '';
+                                                          this.$watch('text', value => {
+                                                              if (document.activeElement !== this.$refs.editor) {
+                                                                  this.$refs.editor.innerHTML = value || '';
+                                                              }
+                                                          });
+                                                      }
+                                                  }"
                                                  wire:ignore>
                                                 
                                                 <!-- Toolbar -->
@@ -302,26 +337,19 @@
                                             </div>
                                         </div>
         
-                                        <div class="mb-3">
+                                        <div x-show="type === 'marketing_banner'" class="mb-3">
                                             <label class="form-label">Texto do Botão</label>
-                                            <input type="text" wire:model="config_button_text" x-model="btn_text" class="form-control" placeholder="Ex: Ver Oferta">
+                                            <input type="text" x-model="btn_text" class="form-control" placeholder="Ex: Ver Oferta">
                                         </div>
 
-                                        @if($type === 'card.newsletter_form')
-                                            <div class="mb-3">
-                                                <label class="form-label">Mensagem de Sucesso (Opcional)</label>
-                                                <input type="text" wire:model="config_success_message" class="form-control" placeholder="Ex: Inscrição realizada! Ganhe 50% OFF...">
-                                                <div class="form-text">Deixe em branco para usar o padrão (15% OFF).</div>
-                                            </div>
-                                        @endif
-                                    @endif
+                                    </div>
                                 </div>
-                            @endif
+                            </div>
         
                             {{-- Design Tab Content --}}
-                            @if($activeTab === 'design')
+                            <div x-show="activeTab === 'design'">
                                 <div class="animate__animated animate__fadeIn">
-                                    @if($type === 'marketing_banner' || $type === 'card.newsletter_form')
+                                    <div x-show="['marketing_banner', 'card.newsletter_form'].includes(type)">
                                         <div class="mb-4">
                                             <label class="form-label fw-bold">Imagem de Fundo / Principal</label>
                                             <input type="file" wire:model="config_image" class="form-control mb-2">
@@ -333,14 +361,14 @@
                                             
                                             <label class="form-label fw-bold d-block mt-3">Estilo da Imagem</label>
                                             <div class="btn-group w-100" role="group">
-                                                <input type="radio" class="btn-check" name="img_style" id="style_bg" value="background" wire:model="config_image_style" x-model="image_style">
+                                                <input type="radio" class="btn-check" name="img_style" id="style_bg" value="background" x-model="image_style">
                                                 <label class="btn btn-outline-secondary" for="style_bg">Fundo Cheio (Cover)</label>
                                         
-                                                <input type="radio" class="btn-check" name="img_style" id="style_top" value="top" wire:model="config_image_style" x-model="image_style">
+                                                <input type="radio" class="btn-check" name="img_style" id="style_top" value="top" x-model="image_style">
                                                 <label class="btn btn-outline-secondary" for="style_top">Topo do Card</label>
                                             </div>
                                         </div>
-                                    @endif
+                                    </div>
         
                                     {{-- Colors (Synced with Alpine) --}}
                                     <div class="mb-4">
@@ -348,12 +376,12 @@
                                         <div class="d-flex gap-2 flex-wrap">
                                             @foreach(['text-dark', 'text-white', 'text-primary', 'text-danger', 'text-success', 'text-warning'] as $color)
                                                 <button type="button" 
-                                                    class="btn btn-sm rounded-circle border shadow-sm {{ $config_text_color === $color ? 'ring-2 ring-primary' : '' }}" 
+                                                    class="btn btn-sm rounded-circle border shadow-sm" 
+                                                    :class="{ 'ring-2 ring-primary': text_color === '{{ $color }}' }"
                                                     style="width: 30px; height: 30px; background-color: var(--bs-{{ str_replace('text-', '', $color) }});"
-                                                    wire:click="$set('config_text_color', '{{ $color }}')"
-                                                    @click="text_color = '{{ $color }}'" {{-- Update Alpine --}}
+                                                    @click="text_color = '{{ $color }}'" 
                                                     title="{{ $color }}">
-                                                    @if($config_text_color === $color) <i class="bi bi-check text-white mix-blend-difference"></i> @endif
+                                                    <i x-show="text_color === '{{ $color }}'" class="bi bi-check text-white mix-blend-difference"></i>
                                                 </button>
                                             @endforeach
                                         </div>
@@ -364,12 +392,12 @@
                                         <div class="d-flex gap-2 flex-wrap">
                                             @foreach(['bg-white', 'bg-light', 'bg-dark', 'bg-primary', 'bg-danger', 'bg-success', 'bg-warning'] as $color)
                                                 <button type="button" 
-                                                    class="btn btn-sm rounded-circle border shadow-sm {{ $config_bg_color === $color ? 'ring-2 ring-primary' : '' }}" 
+                                                    class="btn btn-sm rounded-circle border shadow-sm" 
+                                                    :class="{ 'ring-2 ring-primary': bg_color === '{{ $color }}' }"
                                                     style="width: 30px; height: 30px; background-color: var(--bs-{{ str_replace('bg-', '', $color) }});"
-                                                    wire:click="$set('config_bg_color', '{{ $color }}')"
-                                                    @click="bg_color = '{{ $color }}'" {{-- Update Alpine --}}
+                                                    @click="bg_color = '{{ $color }}'"
                                                     title="{{ $color }}">
-                                                    @if($config_bg_color === $color) <i class="bi bi-check {{ str_contains($color, 'dark') || str_contains($color, 'primary') || str_contains($color, 'danger') ? 'text-white' : 'text-dark' }}"></i> @endif
+                                                    <i x-show="bg_color === '{{ $color }}'" class="bi bi-check {{ str_contains($color, 'dark') || str_contains($color, 'primary') || str_contains($color, 'danger') ? 'text-white' : 'text-dark' }}"></i>
                                                 </button>
                                             @endforeach
                                         </div>
@@ -380,22 +408,22 @@
                                         <div class="d-flex gap-2 flex-wrap">
                                             @foreach(['btn-primary', 'btn-dark', 'btn-danger', 'btn-success', 'btn-warning', 'btn-outline-dark', 'btn-outline-light'] as $color)
                                                 <button type="button" 
-                                                    class="btn btn-sm {{ $color }} {{ $config_btn_color === $color ? 'border-2 border-dark' : '' }}" 
-                                                    wire:click="$set('config_btn_color', '{{ $color }}')"
+                                                    class="btn btn-sm {{ $color }}" 
+                                                    :class="{ 'border-2 border-dark': btn_color === '{{ $color }}' }"
                                                     @click="btn_color = '{{ $color }}'">
                                                     Botão
-                                                    @if($config_btn_color === $color) <i class="bi bi-check ms-1"></i> @endif
+                                                    <i x-show="btn_color === '{{ $color }}'" class="bi bi-check ms-1"></i>
                                                 </button>
                                             @endforeach
                                         </div>
                                     </div>
                                 </div>
-                            @endif
+                            </div>
                         </div>
         
                         {{-- Right Column: Preview --}}
-                        <div class="col-lg-5 bg-light border-start p-4 d-flex flex-column align-items-center justify-content-center position-relative">
-                            <div class="sticky-top w-100" style="top: 2rem;">
+                        <div class="col-lg-5 bg-light border-start p-4 d-flex flex-column align-items-center justify-content-start position-relative" style="overflow-y: auto;">
+                            <div class="sticky-top w-100" style="top: 0; max-width: 300px;"> {{-- Simulate Column Width --}}
                                 <h6 class="text-uppercase fw-bold text-muted mb-4 small text-center">Pré-visualização (Tempo Real)</h6>
                                 
                                 {{-- Marketing Banner Preview --}}
@@ -429,30 +457,42 @@
         
                                 {{-- Newsletter Preview --}}
                                 <template x-if="type == 'card.newsletter_form'">
-                                    <div class="card h-100 border-0 d-flex align-items-center justify-content-center p-4 position-relative overflow-hidden shadow-sm"
-                                         :class="[bg_color, text_color]" style="min-height: 250px;">
+                                    <div class="card h-100 border-0 shadow-sm overflow-hidden position-relative d-flex flex-column"
+                                         :class="[bg_color, text_color]"
+                                         style="min-height: 400px; border: 1px solid #e0e0e0;">
                                         
-                                        @if($config_image)
-                                            <div x-show="image_style == 'background'" class="position-absolute top-0 start-0 w-100 h-100" style="background-image: url('{{ $config_image->temporaryUrl() }}'); background-size: cover; background-position: center; opacity: 0.3;"></div>
-                                            
+                                        @if($config_image || $existingImage)
+                                            <!-- Background Style -->
+                                            <div x-show="image_style == 'background'" 
+                                                 class="position-absolute top-0 start-0 w-100 h-100" 
+                                                 :style="`background-image: url('${ '{{ $config_image ? $config_image->temporaryUrl() : ($existingImage ? asset('storage/' . $existingImage) : '') }}' }'); background-size: cover; background-position: center;`">
+                                                 <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark" style="opacity: 0.3;"></div> 
+                                            </div>
+
+                                            <!-- Top Style -->
                                             <div x-show="image_style == 'top'" class="w-100 flex-shrink-0">
-                                                <img src="{{ $config_image->temporaryUrl() }}" class="card-img-top object-fit-cover" style="height: 150px;">
+                                                <img src="{{ $config_image ? $config_image->temporaryUrl() : ($existingImage ? asset('storage/' . $existingImage) : '') }}" class="w-100 object-fit-cover" style="aspect-ratio: 1/1; width: 100%; height: auto; display: block;">
                                             </div>
                                         @endif
         
-                                        <div class="w-100 p-3 position-relative" style="z-index: 2;">
-                                            <div class="text-center mb-3">
-                                                <h5 class="fw-bold mb-2" x-text="title || '📧 Newsletter'"></h5>
-                                                <div class="small lh-sm">
-                                                    <span x-show="text" x-html="text"></span>
-                                                    <span x-show="!text">Ganhe <strong class="text-danger">15% OFF</strong> na 1ª compra!</span>
+                                        <div class="card-body d-flex flex-column p-3 text-start h-100 position-relative" style="z-index: 2;">
+                                            <h3 class="fw-bold mb-1" :style="text_color ? '' : 'color: #1a1a1a;'" x-text="title || 'Título do Formulário'"></h3>
+                                            <p class="small mb-3" :style="text_color ? '' : 'color: #1a1a1a; opacity: 0.8;'" style="line-height: 1.4;" x-text="text || 'Descrição do formulário...'"></p>
+                                            
+                                            <div class="d-flex flex-column gap-2 mb-3">
+                                                <div>
+                                                    <input type="email" class="form-control form-control-sm bg-white border-secondary-subtle" placeholder="seu@email.com" disabled>
+                                                </div>
+                                                <div>
+                                                    <input type="text" class="form-control form-control-sm bg-white border-secondary-subtle" placeholder="Seu Nome" disabled>
                                                 </div>
                                             </div>
-                                            <div class="d-flex flex-column gap-2">
-                                                <input type="email" class="form-control form-control-sm bg-white border border-secondary text-center" placeholder="seu@email.com" disabled>
-                                                <button class="btn btn-sm fw-bold w-100 text-uppercase" 
+
+                                            <div class="mt-auto w-100">
+                                                <button class="btn btn-sm w-100 fw-bold text-uppercase" 
                                                         :class="btn_color" 
-                                                        x-text="btn_text || 'QUERO DESCONTO'"></button>
+                                                        style="border-radius: 4px; padding-top: 0.4rem; padding-bottom: 0.4rem;" 
+                                                        x-text="btn_text || 'ENVIAR'"></button>
                                             </div>
                                         </div>
                                     </div>
@@ -460,23 +500,35 @@
         
                                 {{-- Product Special Preview (Simplified) --}}
                                 <template x-if="type == 'card.product_special'">
-                                    <div class="card h-100 border-0 shadow-sm overflow-hidden position-relative bg-white text-center" style="min-height: 350px;">
-                                         <div class="position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between align-items-start z-2">
-                                            <span class="badge d-flex align-items-center gap-1 shadow-sm px-3 py-2 rounded-pill" :class="getBadgeColor()">
+                                    <div class="card h-100 border-0 shadow-sm overflow-hidden position-relative bg-white text-center d-flex flex-column" style="min-height: 350px;">
+                                         <div class="position-absolute top-0 start-0 w-100 d-flex justify-content-between align-items-start z-2">
+                                            <span class="badge d-flex align-items-center gap-1 shadow-sm px-3 py-2 rounded-end-pill rounded-start-0" :class="getBadgeColor()">
                                                 <i class="bi fs-6" :class="getBadgeIcon()"></i>
                                                 <span class="fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;" x-text="getBadgeLabel()"></span>
                                             </span>
                                         </div>
-                                        <div class="position-relative bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                            <i class="bi bi-image fs-1 text-muted"></i>
-                                            <span class="ms-2 text-muted small">Imagem do Produto</span>
+                                        <div class="position-relative w-100" style="aspect-ratio: 1/1; background-color: #f8f9fa;">
+                                            {{-- Placeholder Image --}}
+                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                                                 <div class="text-center">
+                                                    <i class="bi bi-image fs-1 d-block mb-1"></i>
+                                                    <small>Imagem do Produto</small>
+                                                 </div>
+                                            </div>
                                         </div>
-                                        <div class="card-body">
-                                            <h5 class="card-title fw-bold text-dark mb-1">Nome do Produto</h5>
-                                            <span class="fw-bold text-dark fs-4">R$ 199,90</span>
-                                            <button class="btn w-100 rounded-pill fw-bold mt-3" :class="badge_type == 'big_discount' ? 'btn-danger' : 'btn-dark'">
-                                                <i class="bi bi-cart-plus me-1"></i> Adicionar
-                                            </button>
+                                        <div class="card-body d-flex flex-column p-3 text-start">
+                                            <div class="card-title fw-bold h3 mb-1" style="color: #000000; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.6rem; line-height: 1.3;">
+                                                Blusa Tradicional Em Algodão Natural Elegante – Preto Tamanho P
+                                            </div>
+                                            <span class="fw-bold fs-5 mb-3" style="color: #1a1a1a;">R$ 150,00</span>
+                                            
+                                            <div class="mt-auto w-100">
+                                                <button class="btn btn-sm w-100 fw-bold text-uppercase" 
+                                                        :class="badge_type == 'big_discount' ? 'btn-danger' : 'btn-dark'"
+                                                        style="border-radius: 4px; padding-top: 0.4rem; padding-bottom: 0.4rem;"> 
+                                                    <i class="bi bi-cart-plus me-1"></i> Adicionar
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>

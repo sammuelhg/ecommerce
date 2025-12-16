@@ -16,9 +16,18 @@ class Wishlist extends Component
 
     public function removeItem($id)
     {
-        $this->wishlistService->remove($id);
-        $this->dispatch('wishlistUpdated');
-        $this->dispatch('toast-info', 'Produto removido da lista de desejos.');
+        // Inject dependencies if not in constructor
+        $service = app(WishlistService::class); 
+        $service->remove($id);
+        
+        // Dispatch generic update for header icon
+        $this->dispatch('wishlistUpdated'); 
+        
+        // Dispatch specific update for Product Cards
+        // Use explicit array to guarantee JS receives it as event.detail[0]
+        $this->dispatch('wishlist-updated', ['id' => $id, 'is_favorite' => false]);
+        
+        $this->dispatch('toast-info', message: 'Produto removido da lista de desejos.');
     }
 
     public function moveToCart($id)
@@ -30,8 +39,34 @@ class Wishlist extends Component
                 $dto = new CartItemDTO($product->id, 1);
                 $this->cartService->add($dto);
                 $this->dispatch('cartUpdated');
-                $this->dispatch('toast-success', 'Produto movido para o carrinho!');
+                $this->dispatch('toast-success', message: 'Produto movido para o carrinho!');
             }
+        }
+    }
+
+    #[On('toggle-wishlist')]
+    public function toggle($data)
+    {
+        // $data is strictly the array ['id' => 123]
+        $id = $data['id'] ?? null;
+        if (!$id) return;
+        
+        // Find real model to pass to service
+        $model = Product::find($id);
+        if (!$model) return;
+
+        $isAdded = $this->wishlistService->toggle($model);
+        
+        // Notify UI components
+        $this->dispatch('wishlistUpdated'); // Global count
+        $this->dispatch('wishlist-updated', ['id' => $model->id, 'is_favorite' => $isAdded]);
+        
+        $msg = $isAdded ? 'Adicionado à lista de desejos!' : 'Removido da lista de desejos.';
+        // Use appropriate toast type
+        if ($isAdded) {
+            $this->dispatch('toast-success', message: $msg);
+        } else {
+            $this->dispatch('toast-info', message: $msg);
         }
     }
 }

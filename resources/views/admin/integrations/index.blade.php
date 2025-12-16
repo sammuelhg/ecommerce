@@ -5,7 +5,7 @@
 @section('content')
     
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-        <h1 class="h2">Central de Integrações</h1>
+        <h1 class="h2"><i class="bi bi-hdd-network text-primary me-2"></i>Central de Integrações</h1>
         {{-- Botão Global removido conforme pedido --}}
     </div>
 
@@ -17,17 +17,17 @@
     <ul class="nav nav-tabs mb-4" id="integrationTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link {{ $activeTab === 'meta' ? 'active' : '' }}" id="meta-tab" data-bs-toggle="tab" data-bs-target="#meta" type="button" role="tab" aria-controls="meta" aria-selected="{{ $activeTab === 'meta' ? 'true' : 'false' }}">
-                <i class="bi bi-facebook me-1"></i> Meta Ads
+                <i class="bi bi-facebook me-2 fs-4"></i> Meta Ads
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link {{ $activeTab === 'google' ? 'active' : '' }}" id="google-tab" data-bs-toggle="tab" data-bs-target="#google" type="button" role="tab" aria-controls="google" aria-selected="{{ $activeTab === 'google' ? 'true' : 'false' }}">
-                <i class="bi bi-google me-1"></i> Google Ads
+                <i class="bi bi-google me-2 fs-4"></i> Google Ads
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link {{ $activeTab === 'tiktok' ? 'active' : '' }}" id="tiktok-tab" data-bs-toggle="tab" data-bs-target="#tiktok" type="button" role="tab" aria-controls="tiktok" aria-selected="{{ $activeTab === 'tiktok' ? 'true' : 'false' }}">
-                <i class="bi bi-tiktok me-1"></i> TikTok Ads
+                <i class="bi bi-tiktok me-2 fs-4"></i> TikTok Ads
             </button>
         </li>
     </ul>

@@ -94,7 +94,7 @@
                                                                      style="width: 80px; height: 80px; font-size: 2rem;">
                                                                     {{ strtoupper(substr($person['name'], 0, 1)) }}
                                                                 </div>
-                                                                <h3 class="h4 mb-1">{{ $person['name'] }}</h3>
+                                                                <h2 class="h4 mb-1">{{ $person['name'] }}</h2>
                                                                 <p class="text-muted mb-3">{{ $person['email'] }}</p>
                                                                 
                                                                 <div class="d-flex justify-content-center gap-2">

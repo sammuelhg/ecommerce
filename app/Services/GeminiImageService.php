@@ -15,7 +15,7 @@ class GeminiImageService
 
     public function __construct()
     {
-        $this->apiKey = config('services.gemini.api_key', 'AIzaSyDipBtMGE_V9oqIsTatKLC0uqdXHIEPrWc');
+        $this->apiKey = \App\Models\StoreSetting::get('gemini_api_key') ?: config('services.gemini.api_key', 'AIzaSyDipBtMGE_V9oqIsTatKLC0uqdXHIEPrWc');
     }
 
     /**
@@ -205,59 +205,52 @@ class GeminiImageService
      * Build optimized prompt for image generation
      * Uses template from store settings with variable replacement
      */
+    /**
+     * Build optimized prompt for image generation
+     * Uses template from store settings with variable replacement
+     */
     private function buildPrompt(array $data): string
     {
-        // Get custom template from settings or use default
-        $template = \App\Models\StoreSetting::get('ai_image_prompt_template', 
-            'Professional e-commerce product photography of {product_name}, {category} category product, {type} type, {model} model, {size} size, {flavor} flavor, {material} packaging. Studio lighting, clean white background, product centered, front view, label visible and readable, high resolution, professional packshot, 8k quality, photorealistic'
-        );
-
-        $categoria = $data['category'] ?? '';
-        $titulo = $data['name'] ?? 'Produto';
-        $tipo = $data['type'] ?? '';
-        $modelo = $data['model'] ?? '';
-        $tamanho = $data['size'] ?? '';
-        $sabor = $data['color'] ?? '';
-        $material = $data['material'] ?? '';
-
-        // Determine if it's a supplement to use flavor or color
-        $isSupplement = stripos($categoria, 'suplemento') !== false;
-        $flavorOrColor = $sabor ? ($isSupplement ? $sabor . ' flavor' : $sabor . ' color') : '';
-
-        // Replace variables in template
-        $replacements = [
-            '{product_name}' => $titulo,
-            '{category}' => $categoria,
-            '{type}' => $tipo,
-            '{model}' => $modelo,
-            '{size}' => $tamanho,
-            '{flavor}' => $flavorOrColor,
-            '{material}' => $material,
-        ];
-
-        $prompt = $template;
-        foreach ($replacements as $variable => $value) {
-            // Remove the variable placeholder if value is empty
-            if (empty($value)) {
-                // Remove the variable and surrounding commas/spaces
-                $prompt = preg_replace('/,?\s*' . preg_quote($variable, '/') . '\s*(?:type|model|size|flavor|color|packaging|category product)?,?/', '', $prompt);
-                $prompt = str_replace($variable, '', $prompt);
-            } else {
-                $prompt = str_replace($variable, $value, $prompt);
+        // Use the new AiContentService to build the prompt to ensure consistency across the application
+        // If AiContentService is not found or fails, we fall back to local logic (which is now identical)
+        try {
+            return app(\App\Services\AiContentService::class)->buildImagePrompt($data);
+        } catch (\Exception $e) {
+            Log::warning('AiContentService not available, using fallback prompt logic', ['error' => $e->getMessage()]);
+            
+            // Fallback logic (Identical to AiContentService for robustness)
+            $template = \App\Models\StoreSetting::get('ai_image_prompt_template', 
+                'Professional e-commerce product photography of {product_name}, {category} category, {model} model. The product features a {color} color palette and visual cues of {flavor} flavor (if applicable). {material} texture details. Studio lighting, clean white background, product centered, front view, label visible and readable, 8k quality, photorealistic, commercial packshot.'
+            );
+    
+            $categoria = $data['category'] ?? '';
+            $titulo = $data['name'] ?? 'Produto';
+            $modelo = $data['model'] ?? '';
+            $sabor = $data['flavor'] ?? '';
+            $cor = $data['color'] ?? '';
+            $material = $data['material'] ?? '';
+    
+            $replacements = [
+                '{product_name}' => $titulo,
+                '{category}' => $categoria,
+                '{model}' => $modelo,
+                '{color}' => $cor ?: 'neutral',
+                '{flavor}' => $sabor,
+                '{material}' => $material,
+            ];
+    
+            $prompt = $template;
+            foreach ($replacements as $variable => $value) {
+                if (empty($value) && $variable === '{flavor}') {
+                     $prompt = str_replace('and visual cues of {flavor} flavor (if applicable)', '', $prompt); 
+                     $prompt = str_replace('{flavor}', '', $prompt);
+                } else {
+                    $prompt = str_replace($variable, (string)$value, $prompt);
+                }
             }
+    
+            $prompt = preg_replace('/\s+/', ' ', $prompt);
+            return trim($prompt);
         }
-
-        // Clean up extra commas and spaces
-        $prompt = preg_replace('/,\s*,/', ',', $prompt);
-        $prompt = preg_replace('/,\s*\./', '.', $prompt);
-        $prompt = preg_replace('/\s+/', ' ', $prompt);
-        $prompt = trim($prompt);
-        
-        Log::info('Generated prompt from template', [
-            'template_used' => substr($template, 0, 100) . '...',
-            'final_prompt' => $prompt
-        ]);
-        
-        return $prompt;
     }
 }

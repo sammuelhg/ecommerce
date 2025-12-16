@@ -24,6 +24,26 @@ class UtmExtractorService
      */
     public function extract(Request $request): \App\DTOs\TrackingDataDTO
     {
-        return \App\DTOs\TrackingDataDTO::fromRequest($request);
+        // 1. Get from Request
+        $requestData = [];
+        foreach (self::UTM_FIELDS as $field) {
+            if ($request->has($field)) {
+                $requestData[$field] = $request->input($field);
+            }
+        }
+
+        // 2. Get from Session
+        $sessionData = session('utm_tracking', []);
+
+        // 3. Merge (Request takes precedence if new params are present)
+        $finalData = array_merge($sessionData, $requestData);
+
+        return new \App\DTOs\TrackingDataDTO(
+            utm_source: $finalData['utm_source'] ?? null,
+            utm_medium: $finalData['utm_medium'] ?? null,
+            utm_campaign: $finalData['utm_campaign'] ?? null,
+            utm_term: $finalData['utm_term'] ?? null,
+            utm_content: $finalData['utm_content'] ?? null
+        );
     }
 }

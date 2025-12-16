@@ -11,6 +11,34 @@
     <meta property="og:image" content="{{ $product->image ? (Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image)) : asset('logo.svg') }}">
     <meta property="product:price:amount" content="{{ $product->price }}">
     <meta property="product:price:currency" content="BRL">
+
+    @php
+    $productSchema = [
+        "@context" => "https://schema.org/",
+        "@type" => "Product",
+        "name" => $product->name,
+        "image" => [
+            $product->image ? (Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image)) : asset('logo.svg')
+        ],
+        "description" => Str::limit(strip_tags($product->marketing_description ?? $product->description), 160),
+        "sku" => $product->sku ?? (string)$product->id,
+        "brand" => [
+            "@type" => "Brand",
+            "name" => config('app.name')
+        ],
+        "offers" => [
+            "@type" => "Offer",
+            "url" => url()->current(),
+            "priceCurrency" => "BRL",
+            "price" => $product->price,
+            "availability" => $product->stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "itemCondition" => "https://schema.org/NewCondition"
+        ]
+    ];
+    @endphp
+    <script type="application/ld+json">
+    {!! json_encode($productSchema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
+    </script>
 @endsection
 
 @section('content')
@@ -308,9 +336,7 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description-pane" type="button" role="tab" aria-controls="description-pane" aria-selected="true">Descrição Completa</button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs-pane" type="button" role="tab" aria-controls="specs-pane" aria-selected="false">Especificações</button>
-                    </li>
+
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-pane" type="button" role="tab" aria-controls="reviews-pane" aria-selected="false">Avaliações (128)</button>
                     </li>
@@ -321,10 +347,82 @@
                     <div class="tab-pane fade show active" id="description-pane" role="tabpanel" aria-labelledby="description-tab">
                         <h4 class="h5 mb-3">Sobre o Produto</h4>
                         @if($product->description)
-                            <p>{{ $product->description }}</p>
+                            <div class="product-description">
+                                {!! $product->description !!}
+                            </div>
                         @else
                             <p class="text-muted">Descrição detalhada não disponível.</p>
                         @endif
+                        
+                        <div class="mt-4 mb-4">
+                            <h5 class="mb-3">Especificações Técnicas</h5>
+                            <table class="table table-striped table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" style="width: 30%;">SKU</th>
+                                        <td>{{ $product->sku ?? 'PROD-'.$product->id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Categoria</th>
+                                        <td>{{ $product->category->name ?? 'Geral' }}</td>
+                                    </tr>
+                                    @if($product->productType)
+                                    <tr>
+                                        <th scope="row">Tipo</th>
+                                        <td>{{ $product->productType->name }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->productModel)
+                                    <tr>
+                                        <th scope="row">Modelo</th>
+                                        <td>{{ $product->productModel->name }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->productMaterial)
+                                    <tr>
+                                        <th scope="row">Material/Ingredientes</th>
+                                        <td>{{ $product->productMaterial->name }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->color)
+                                    <tr>
+                                        <th scope="row">Variante (Cor)</th>
+                                        <td>{{ $product->color }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->flavor)
+                                    <tr>
+                                        <th scope="row">Variante (Sabor)</th>
+                                        <td>{{ $product->flavor->name ?? $product->flavor }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->size)
+                                    <tr>
+                                        <th scope="row">Tamanho</th>
+                                        <td>{{ $product->size }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->attribute)
+                                    <tr>
+                                        <th scope="row">Atributo</th>
+                                        <td>{{ $product->attribute }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->weight)
+                                    <tr>
+                                        <th scope="row">Peso</th>
+                                        <td>{{ $product->weight }} kg</td>
+                                    </tr>
+                                    @endif
+                                    @if($product->warranty)
+                                    <tr>
+                                        <th scope="row">Garantia</th>
+                                        <td>{{ $product->warranty }}</td>
+                                    </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
                         
                         <h5 class="mt-4">Destaques</h5>
                         <ul class="list-group list-group-flush">
@@ -334,29 +432,7 @@
                         </ul>
                     </div>
                     
-                    <!-- Aba Especificações -->
-                    <div class="tab-pane fade" id="specs-pane" role="tabpanel" aria-labelledby="specs-tab">
-                        <table class="table table-striped">
-                            <tbody>
-                                <tr>
-                                    <th scope="row" style="width: 30%;">SKU</th>
-                                    <td>{{ $product->sku ?? 'PROD-'.$product->id }}</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Categoria</th>
-                                    <td>{{ $product->category->name ?? 'Geral' }}</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Peso</th>
-                                    <td>{{ $product->weight ? $product->weight . ' kg' : 'N/A' }}</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Garantia</th>
-                                    <td>{{ $product->warranty ?? '90 dias' }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+
                     
                     <!-- Aba Avaliações -->
                     <div class="tab-pane fade" id="reviews-pane" role="tabpanel" aria-labelledby="reviews-tab">
@@ -390,7 +466,7 @@
     <!-- Produtos Relacionados -->
     @if($relatedProducts->count() > 0)
         <div class="mt-5 pt-4 border-top">
-            <h3 class="h4 mb-4">Produtos Relacionados</h3>
+            <h2 class="h4 mb-4">Produtos Relacionados</h2>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 @foreach($relatedProducts as $related)
                     <div class="col">

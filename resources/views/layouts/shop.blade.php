@@ -88,8 +88,26 @@
     <script src="{{ asset('js/shop-alpine.js') }}"></script>
     
     <!-- Server-Side Cart Data Injection -->
+    @php
+        $dbProducts = \App\Models\Product::where('is_active', true)
+            ->select(['id', 'name', 'price', 'image', 'is_offer', 'old_price'])
+            ->get()
+            ->map(function($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'price' => (float) $p->price,
+                    'image' => $p->image,
+                    'isOffer' => (bool) $p->is_offer,
+                    'oldPrice' => $p->old_price ? (float) $p->old_price : null,
+                ];
+            });
+    @endphp
     <script>
         window.SERVER_CART = @json(array_values(app(\App\Services\CartService::class)->get()));
+        
+        // Inject all active products for Alpine hydration (Wishlist/Cart sync)
+        window.DB_PRODUCTS = @json($dbProducts);
     </script>
     
     @livewireScripts

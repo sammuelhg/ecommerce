@@ -28,7 +28,7 @@ class NewsletterCampaign extends Model
 
     public function emails(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(NewsletterEmail::class)->orderBy('sort_order');
+        return $this->hasMany(NewsletterEmail::class)->orderBy('step_order');
     }
 
     // Deprecated: Access products via emails->first()->products

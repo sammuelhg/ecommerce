@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\CreateLeadAction;
+use App\Actions\Leads\CreateLeadAction;
 use App\DTOs\LeadDTO;
 use App\Services\UtmExtractorService;
 use Illuminate\Http\JsonResponse;

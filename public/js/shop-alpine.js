@@ -82,6 +82,8 @@ function shopApp() {
                 this.wishlist.push(product);
                 this.showAlert(`"${this.truncate(product.name, 20)}" salvo na lista de desejos!`, 'success');
             }
+            // Notify other components (like product cards) to re-check their state
+            setTimeout(() => { window.dispatchEvent(new CustomEvent('wishlist-updated')); }, 50);
         },
         showAlert(msg, type = 'info') {
             // Map 'danger' to 'error' for compatibility with toasts.blade.php

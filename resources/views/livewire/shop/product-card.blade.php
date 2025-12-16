@@ -1,65 +1,98 @@
-<div class="card product-card h-100" x-data='{ product: {!! json_encode($product, JSON_HEX_APOS | JSON_HEX_QUOT) !!} }'>
-    <!-- Imagem do Produto -->
-    <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="text-decoration-none">
-        <div class="ratio ratio-1x1">
+<div class="card h-100 shadow-sm border-0 group" 
+     x-data="{ 
+        product: {{ json_encode($product) }},
+        isFavorite: false, 
+        init() {
+            // Sync with server state first (if available) then check local storage (source of truth for guests)
+            this.isFavorite = {{ $product->is_favorite ? 'true' : 'false' }} || this.checkLocalWishlist();
+        },
+        checkLocalWishlist() {
+            try {
+                const list = JSON.parse(localStorage.getItem('myShopWishlist') || '[]');
+                return list.some(i => i.id == this.product.id);
+            } catch(e) { return false; }
+        },
+        toggleFav() {
+            this.isFavorite = !this.isFavorite;
+            // Send only ID to avoid large payload
+            $dispatch('toggle-wishlist', this.product); // Send full product so offcanvas can render it
+        },
+        updateState(event) {
+            // Optional: Listen to global changes if needed, but the button click handles it locally
+            // This is kept if other components change the state of THIS product
+        }
+     }"
+     @wishlist-updated.window="isFavorite = checkLocalWishlist()"
+     >
+     
+    {{-- Imagem com Link --}}
+    <div class="position-relative overflow-hidden">
+        <a href="{{ route('shop.show', $product->slug) }}">
             @if($product->image)
-                <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" 
+                <img src="{{ 
+                        str_starts_with($product->image, 'http') 
+                        ? $product->image 
+                        : asset('storage/' . $product->image) 
+                     }}" 
                      class="card-img-top object-fit-cover" 
                      alt="{{ $product->name }}"
-                     onerror="this.onerror=null;this.src='https://placehold.co/500x500/f0f8ff/1a1a1a?text=Imagem+Indispon%C3%ADvel';">
+                     style="aspect-ratio: 1 / 1; width: 100%; height: auto;"
+                     onerror="this.onerror=null;this.src='https://placehold.co/250x250/f3f4f6/6c757d?text=Sem+Imagem';">
             @else
-                <img src="https://placehold.co/500x500/f0f8ff/1a1a1a?text={{ urlencode($product->name) }}" 
-                     class="card-img-top object-fit-cover" 
-                     alt="{{ $product->name }}">
+                <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="height: 250px;">
+                    <i class="bi bi-image" style="font-size: 2rem;"></i>
+                </div>
             @endif
-        </div>
-    </a>
-    
+        </a>
+
+        {{-- Badge de Oferta (Opcional) --}}
+        @if($product->is_offer ?? false)
+            <span class="position-absolute top-0 start-0 badge bg-danger m-2">
+                Oferta
+            </span>
+        @endif
+    </div>
+
+    {{-- Corpo do Card --}}
     <div class="card-body d-flex flex-column">
-        <!-- Título do Produto -->
-        <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="text-decoration-none">
-            <h5 class="card-title fw-bold text-primary mb-0">{{ $product->name }}</h5>
+        <a href="{{ route('shop.show', $product->slug) }}" class="card-title fw-bold text-decoration-none h3 mb-1" style="color: #000000; line-height: 1.3;">
+            {{ $product->name }}
         </a>
         
-        <!-- Preço e Ícones na Mesma Linha -->
-        <div class="d-flex justify-content-between align-items-center mt-1 mb-3">
-            <!-- Preço -->
-            <div>
-                @if($product->is_offer && $product->old_price)
-                    <div>
-                        <span class="fw-bolder text-success fs-5">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
-                        <br>
-                        <small class="text-muted text-decoration-line-through">R$ {{ number_format($product->old_price, 2, ',', '.') }}</small>
-                    </div>
-                @else
-                    <span class="fw-bolder text-success fs-5">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
-                @endif
+        <div class="mt-auto">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-primary" style="font-size: 1.2rem;">
+                    R$ {{ number_format($product->price, 2, ',', '.') }}
+                </span>
+                
+                {{-- Ações Secundárias (Favorito e Share) --}}
+                <div class="d-flex gap-2">
+                    <button type="button" 
+                            @click="toggleFav()"
+                            class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                            :class="isFavorite ? 'btn-danger text-white' : 'btn-warning text-dark'"
+                            style="width: 32px; height: 32px;"
+                            title="Adicionar aos Favoritos">
+                        <i class="bi" :class="isFavorite ? 'bi-heart-fill' : 'bi-heart'"></i>
+                    </button>
+                    
+                    <button type="button" 
+                            @click.prevent="navigator.share ? navigator.share({title: '{{ $product->name }}', url: '{{ route('shop.show', $product->slug) }}'}) : alert('Compartilhamento não suportado nesta plataforma')"
+                            class="btn btn-sm btn-warning text-dark rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px;"
+                            title="Compartilhar">
+                        <i class="bi bi-share-fill"></i>
+                    </button>
+                </div>
             </div>
             
-            <!-- Ícones de Ação -->
-            <div>
-                <!-- Ícone Favoritar -->
-                <button @click="$dispatch('toggle-wishlist', product)" 
-                        class="btn btn-warning btn-icon-shape btn-sm rounded-circle d-flex align-items-center justify-content-center me-2" 
-                        :class="isInWishlist(product.id) ? 'text-danger' : 'text-dark'"
-                        title="Adicionar aos Favoritos">
-                    <i class="bi" :class="isInWishlist(product.id) ? 'bi-heart-fill' : 'bi-heart'"></i>
-                </button>
-                
-                <!-- Ícone Compartilhar -->
-                <button class="btn btn-warning btn-icon-shape btn-sm rounded-circle d-flex align-items-center justify-content-center" 
-                        title="Compartilhar este item"
-                        @click.prevent="navigator.share ? navigator.share({title: '{{ $product->name }}', url: '{{ route('shop.show', $product->slug ?: $product->id) }}'}) : alert('Compartilhamento não suportado')">
-                    <i class="bi bi-share-fill"></i>
-                </button>
-            </div>
+            {{-- Botão Principal: Adicionar ao Carrinho --}}
+            <button type="button" 
+                    @click="$dispatch('add-to-cart', { product: product, quantity: 1 })"
+                    class="btn btn-warning w-100 btn-sm d-flex align-items-center justify-content-center" style="padding-top: 0.4rem; padding-bottom: 0.4rem;">
+                <i class="bi bi-cart-plus-fill me-2"></i>
+                Adicionar
+            </button>
         </div>
-        
-        <!-- Botão Adicionar ao Carrinho -->
-        <button @click="$dispatch('add-to-cart', { product: product, quantity: 1 })" 
-                class="btn btn-warning w-100 d-flex align-items-center justify-content-center py-2 mt-auto">
-            <i class="bi bi-cart-plus-fill me-2"></i>
-            <span>Adicionar</span>
-        </button>
     </div>
 </div>

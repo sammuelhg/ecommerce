@@ -4,7 +4,7 @@
             <div class="mb-4">
                 <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
             </div>
-            <h3 class="fw-bold mb-3">Mensagem Enviada!</h3>
+            <h2 class="fw-bold mb-3 h3">Mensagem Enviada!</h2>
             <p class="text-muted mb-4">Obrigado pelo contato. Responderemos o mais breve possível.</p>
             <button wire:click="$set('success', false)" class="btn btn-outline-dark rounded-pill px-4">
                 Enviar outra mensagem

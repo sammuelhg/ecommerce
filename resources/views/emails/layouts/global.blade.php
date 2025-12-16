@@ -31,6 +31,125 @@
       .main-content { padding: 10px !important; }
       .wrapper { padding: 10px 0 !important; }
   }
+
+  /* EMAIL CARD STYLES (Injected) */
+  :root {
+      --brand-primary: #000000;
+      --text-color-dark: #1a1a1a;
+      --text-color-light: #555555;
+      --background-color: #eef1f5;
+  }
+
+  .custom-card {
+      background-color: #ffffff;
+      width: 340px;
+      height: 200px;
+      border-radius: 16px;
+      border-top: 5px solid #000000; /* var(--brand-primary) fallback */
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0 auto;
+  }
+
+  .card-main-content {
+      display: flex;
+      flex-direction: row;
+      flex: 1;
+      position: relative;
+  }
+
+  .card-image-section {
+      width: 120px;
+      background-color: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+  }
+
+  .card-image-section img.photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+  .card-image-section img.logo {
+      max-width: 100px;
+      height: auto;
+  }
+
+  .card-logo-corner {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 52px;
+      opacity: 0.9;
+  }
+
+  .card-text-section {
+      flex: 1;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+  }
+
+  .card-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 0 0 2px 0;
+      color: #000000;
+      line-height: 1.2;
+  }
+
+  .card-subtitle {
+      font-size: 9px;
+      color: #555555;
+      text-transform: uppercase;
+      margin: 0 0 10px 0;
+  }
+
+  .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+  }
+
+  .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+  }
+
+  .contact-item img {
+      width: 16px;
+      height: 16px;
+  }
+
+  .contact-link {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1a1a1a;
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+
+  .custom-card .card-footer {
+      background-color: #000000;
+      color: #ffffff;
+      padding: 6px;
+      padding-top: 8px; /* Adjustment for visuals */
+      text-align: center;
+      font-size: 10px;
+      font-style: italic;
+      width: 100%;
+  }
 </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #eef1f5;">
@@ -46,14 +165,14 @@
     
     // Fallback data
     if ($emailCard) {
-        $senderName = $emailCard->sender_name;
-        $senderRole = $emailCard->sender_role;
+        $senderName = $emailCard->name; // SignCard field
+        $senderRole = $emailCard->role; // SignCard field
         $instagram = $emailCard->instagram;
         $website = $emailCard->website;
         $slogan = $emailCard->slogan;
         
-        // Handle Photo URL (Support both Storage and legacy Uploads)
-        $photo = $emailCard->photo;
+        // Handle Photo URL
+        $photo = $emailCard->avatar_url; // SignCard field
         if (!$photo) {
             $photoUrl = null;
         } elseif (preg_match('/^http/', $photo)) {
@@ -61,13 +180,7 @@
         } elseif (str_starts_with($photo, 'uploads/')) {
              $photoUrl = url($photo);
         } else {
-             // Check if file exists in public/uploads (legacy direct upload)
-             if (file_exists(public_path('uploads/' . $photo))) {
-                 $photoUrl = url('uploads/' . $photo);
-             } else {
-                 // Default to Storage
-                 $photoUrl = asset('storage/' . $photo);
-             }
+             $photoUrl = asset('storage/' . $photo);
         }
     } else {
         $senderName = 'LosFit Team';

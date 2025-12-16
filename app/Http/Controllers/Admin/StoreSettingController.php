@@ -18,22 +18,27 @@ class StoreSettingController extends Controller
 
     public function index($tab = 'identity')
     {
-        $allowedTabs = ['identity', 'colors', 'info', 'ai', 'modals', 'security', 'email'];
+        $allowedTabs = ['identity', 'info', 'ai', 'modals', 'security', 'email'];
         if (!in_array($tab, $allowedTabs)) {
             $tab = 'identity';
         }
 
         $settings = StoreSetting::all()->mapWithKeys(function ($item) {
              // Fix for localhost URLs in production dump (Handle standard and port 8000 and double port edge case)
-             $value = str_replace(
-                [
-                    'http://localhost:8000/:8000', 'https://localhost:8000/:8000', // Double port edge case
-                    'http://localhost:8000', 'https://localhost:8000', 
-                    'http://localhost', 'https://localhost'
-                ], 
-                '', 
-                $item->value
-             );
+             $value = $item->value;
+             
+             if (is_string($value)) {
+                 $value = str_replace(
+                    [
+                        'http://localhost:8000/:8000', 'https://localhost:8000/:8000', // Double port edge case
+                        'http://localhost:8000', 'https://localhost:8000', 
+                        'http://localhost', 'https://localhost'
+                    ], 
+                    '', 
+                    $value
+                 );
+             }
+
              return [$item->key => $value];
         });
         
@@ -56,7 +61,13 @@ class StoreSettingController extends Controller
             'store_cnpj' => 'nullable|string',
             'store_phone' => 'nullable|string',
             'google_maps_embed_url' => 'nullable|string',
+            'gemini_api_key' => 'nullable|string',
+            'openai_api_key' => 'nullable|string',
+            'deepseek_api_key' => 'nullable|string',
+            'ai_provider' => 'nullable|string|in:gemini,openai,deepseek',
             'ai_image_prompt_template' => 'nullable|string',
+            'ai_seo_prompt_template' => 'nullable|string',
+            'ai_description_prompt_template' => 'nullable|string',
             'modal_about' => 'nullable|string',
             'modal_careers' => 'nullable|string',
             'modal_contact' => 'nullable|string',
@@ -85,7 +96,7 @@ class StoreSettingController extends Controller
         
         $this->service->updateSettings($dto);
 
-        $this->service->updateSettings($dto);
+
 
         $tab = $request->input('redirect_tab', 'identity');
         return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações atualizadas com sucesso!');
@@ -100,6 +111,17 @@ class StoreSettingController extends Controller
         }
 
         return redirect()->back()->with('success', 'Certificado removido com sucesso!');
+    }
+
+    public function resetAiPrompts()
+    {
+        StoreSetting::set('ai_image_prompt_template', 'Professional e-commerce product photography of {product_name}, {category} category product, {type} type, {model} model, {size} size, {variant}, {material} style. Studio lighting, clean white background, product centered, front view, label visible and readable, high resolution, professional packshot, 8k quality, photorealistic');
+        
+        StoreSetting::set('ai_seo_prompt_template', "Atue como um Especialista em SEO para E-commerce. Escreva uma meta-descrição persuasiva de no máximo 160 caracteres para o produto abaixo.\n\nRegras:\n1. Comece com um verbo de ação.\n2. Inclua: {product_name} e {category}.\n3. Call to Action no final.\n\nDados do Produto:\nProduto: {product_name}\nCategoria: {category}\nModelo/Tipo: {model} / {type}\nVariante: {variant}");
+        
+        StoreSetting::set('ai_description_prompt_template', "Atue como um Copywriter Sênior de E-commerce. Escreva uma descrição de produto completa e envolvente para a página de vendas em formato HTML.\n\nEstrutura Obrigatória (Use tags HTML):\n1. Título: Use <h1> para um título criativo com o nome do produto.\n2. Gancho Emocional: Use <p> para 2-3 frases focadas no problema/solução.\n3. Benefícios: Use <ul> e <li>. Use <strong> para destacar palavras-chave.\n4. Experiência: Use <p> para descrever material ({material}) e variante ({variant}).\n5. Regras Finais: NÃO inclua Chamada para Ação (CTA). NÃO use Markdown (** ou ##). Apenas HTML puro.\n\nDados do Produto:\nNome: {product_name}\nCategoria: {category}\nMaterial/Ingredientes: {material}\nDetalhes da Variante: {variant}\nTamanho: {size}");
+
+        return redirect()->back()->with('success', 'Prompts resetados para o padrão original!');
     }
     public function previewEmail($type)
     {

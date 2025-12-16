@@ -105,7 +105,7 @@
                                         {{ substr(auth()->user()->name, 0, 1) }}
                                     </span>
                                 </div>
-                                <h3 class="mt-3">{{ auth()->user()->name }}</h3>
+                                <h2 class="mt-3 h3">{{ auth()->user()->name }}</h2>
                                 <p class="text-muted">{{ auth()->user()->email }}</p>
                             </div>
 

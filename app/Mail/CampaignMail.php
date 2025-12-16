@@ -9,22 +9,20 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class CampaignMail extends Mailable
+class CampaignMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $campaign;
-    public $subscriber;
-    public $emailStep;
+    public $htmlContent;
+    public $subjectLine;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(\App\Models\NewsletterCampaign $campaign, $subscriber, $emailStep)
+    public function __construct(string $htmlContent, string $subject)
     {
-        $this->campaign = $campaign;
-        $this->subscriber = $subscriber;
-        $this->emailStep = $emailStep;
+        $this->htmlContent = $htmlContent;
+        $this->subjectLine = $subject;
     }
 
     /**
@@ -33,7 +31,7 @@ class CampaignMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->emailStep->subject ?? $this->campaign->subject,
+            subject: $this->subjectLine,
         );
     }
 
@@ -42,26 +40,9 @@ class CampaignMail extends Mailable
      */
     public function content(): Content
     {
-        $trackingUrl = route('tracking.open', [
-            'campaign' => $this->campaign->id, 
-            'lead' => $this->subscriber->id,
-            'email_id' => $this->emailStep->id ?? null // Handle potential null emailStep id if strictly required by route
-        ]);
-
-        // Process placeholder replacements
-        // Support {{ name }} and {{ $user->name }} commonly used by users
-        $body = str_replace(
-            ['{{ name }}', '{{ $user->name }}', '{{$user->name}}'], 
-            $this->subscriber->name ?? 'Cliente', 
-            $this->emailStep->body
-        );
-
+        // Using raw html string view/render
         return new Content(
-            markdown: 'emails.newsletter.campaign',
-            with: [
-                'content' => $body,
-                'trackingUrl' => $trackingUrl,
-            ],
+            htmlString: $this->htmlContent,
         );
     }
 

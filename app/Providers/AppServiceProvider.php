@@ -21,34 +21,42 @@ class AppServiceProvider extends ServiceProvider
     {
         // Configure pagination to use Bootstrap 5
         \Illuminate\Pagination\Paginator::useBootstrapFive();
+
+        // Register Event Listeners
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\LeadCaptured::class,
+            \App\Listeners\AttachLeadToCampaign::class
+        );
+        
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\OrderPaid::class,
+            \App\Listeners\EvaluateFunnelRules::class
+        );
         
         // Share settings with all views
-        view()->composer('*', function ($view) {
-            // Cache settings for performance if needed, but for now direct query
-            // Check if table exists to avoid errors during migration
-            if (\Schema::hasTable('store_settings')) {
-                $settings = \App\Models\StoreSetting::all()->mapWithKeys(function ($item) {
-                     // Fix for localhost URLs in production dump (Handle standard and port 8000 and double port edge case)
-                     $value = str_replace(
-                        [
-                            'http://localhost:8000/:8000', 'https://localhost:8000/:8000', // Double port edge case
-                            'http://localhost:8000', 'https://localhost:8000', 
-                            'http://localhost', 'https://localhost'
-                        ], 
-                        '', 
-                        $item->value
-                     );
-                     return [$item->key => $value];
-                });
-                $view->with('storeSettings', $settings);
+        // Share settings with all views - Optimized
+        // Using a closure for lazy loading, but target specific layouts to avoid overhead
+        view()->composer(['layouts.admin', 'layouts.app', 'shop.*', 'livewire.*'], function ($view) {
+            static $settings;
+
+            if ($settings === null) {
+                try {
+                    // Direct DB fetch to avoid Cache locking issues on Windows/File driver
+                    // Also reduced memory usage by not caching the entire collection structure if it's large
+                    $settings = \App\Models\StoreSetting::all()->mapWithKeys(function ($item) {
+                           return [$item->key => $item->value];
+                    });
+                } catch (\Throwable $e) {
+                    $settings = collect();
+                }
             }
+            
+            $view->with('storeSettings', $settings);
         });
 
         // Story Status Composer
         view()->composer(['shop.partials.header', 'shop.partials.user-offcanvas'], function ($view) {
             $service = app(\App\Services\Story\CheckUserStoriesService::class);
-            // Auth facade requires alias or full path if not imported. 
-            // It is not imported in the file view, so using full path or helping helper.
             $userId = \Illuminate\Support\Facades\Auth::id();
             $view->with('storyStatus', $service->handle($userId));
         });

@@ -1,7 +1,11 @@
+@section('title')
+    <i class="bi bi-chat-left-text text-info me-2"></i>Contatos
+@endsection
+
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Contatos do Site</h1>
+            <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-chat-left-text text-info me-2"></i>Contatos do Site</h1>
             <div class="d-flex gap-2">
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Buscar contatos...">
             </div>

@@ -19,11 +19,7 @@
                                 <i class="bi bi-palette me-2"></i>Identidade Visual
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $activeTab == 'colors' ? 'active' : '' }}" href="{{ route('admin.settings.index', 'colors') }}">
-                                <i class="bi bi-paint-bucket me-2"></i>Cores
-                            </a>
-                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link {{ $activeTab == 'info' ? 'active' : '' }}" href="{{ route('admin.settings.index', 'info') }}">
                                 <i class="bi bi-building me-2"></i>Informações
@@ -136,55 +132,7 @@
                         @endif
 
                         <!-- Cores -->
-                        @if($activeTab == 'colors')
-                        <form action="{{ $formAction }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="redirect_tab" value="colors">
 
-                            <h5 class="mb-4 text-primary border-bottom pb-2">Cores do Tema (Bootstrap Custom)</h5>
-                            <div class="row mb-4">
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Cor Primária (Primary)</label>
-                                    <div class="input-group">
-                                        <input type="color" class="form-control form-control-color bg-white" name="color_primary" value="{{ $settings['color_primary'] ?? '#0d6efd' }}">
-                                        <input type="text" class="form-control bg-white" value="{{ $settings['color_primary'] ?? '#0d6efd' }}" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Cor Secundária (Secondary)</label>
-                                    <div class="input-group">
-                                        <input type="color" class="form-control form-control-color bg-white" name="color_secondary" value="{{ $settings['color_secondary'] ?? '#6c757d' }}">
-                                        <input type="text" class="form-control bg-white" value="{{ $settings['color_secondary'] ?? '#6c757d' }}" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Cor de Destaque (Accent)</label>
-                                    <div class="input-group">
-                                        <input type="color" class="form-control form-control-color bg-white" name="color_accent" value="{{ $settings['color_accent'] ?? '#ffc107' }}">
-                                        <input type="text" class="form-control bg-white" value="{{ $settings['color_accent'] ?? '#ffc107' }}" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Cor de Fundo (Background)</label>
-                                    <div class="input-group">
-                                        <input type="color" class="form-control form-control-color bg-white" name="color_background" value="{{ $settings['color_background'] ?? '#f8f9fa' }}">
-                                        <input type="text" class="form-control bg-white" value="{{ $settings['color_background'] ?? '#f8f9fa' }}" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Cor Barra Categorias</label>
-                                    <div class="input-group">
-                                        <input type="color" class="form-control form-control-color bg-white" name="color_category_bar" value="{{ $settings['color_category_bar'] ?? '#f0f8ff' }}">
-                                        <input type="text" class="form-control bg-white" value="{{ $settings['color_category_bar'] ?? '#f0f8ff' }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-2"></i>Salvar Cores</button>
-                            </div>
-                        </form>
-                        @endif
 
                         <!-- Informações da Loja -->
                         @if($activeTab == 'info')
@@ -226,15 +174,98 @@
                             @csrf
                             <input type="hidden" name="redirect_tab" value="ai">
 
-                            <h5 class="mb-4 text-primary border-bottom pb-2">Template de Geração de Imagens com IA</h5>
+                            <h5 class="mb-4 text-primary border-bottom pb-2">Configuração da API de Inteligência Artificial</h5>
+                            
+                            <!-- Provedor -->
                             <div class="row mb-4">
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label fw-bold">Prompt Template</label>
-                                    <textarea class="form-control bg-white font-monospace" name="ai_image_prompt_template" rows="6" placeholder="Professional e-commerce product photography of {product_name}...">{!! $settings['ai_image_prompt_template'] ?? 'Professional e-commerce product photography of {product_name}, {category} category product, {type} type, {model} model, {size} size, {flavor} flavor, {material} packaging. Studio lighting, clean white background, product centered, front view, label visible and readable, high resolution, professional packshot, 8k quality, photorealistic' !!}</textarea>
-                                    <div class="form-text">
-                                        <strong>Variáveis disponíveis:</strong> 
-                                        <code>{product_name}</code>, <code>{category}</code>, <code>{type}</code>, 
-                                        <code>{model}</code>, <code>{size}</code>, <code>{flavor}</code>, <code>{material}</code>
+                                    <label class="form-label fw-bold">Provedor de IA (Modelo)</label>
+                                    <select class="form-select bg-white" name="ai_provider" id="aiProviderSelect" onchange="toggleAiFields()">
+                                        <option value="gemini" {{ ($settings['ai_provider'] ?? 'gemini') == 'gemini' ? 'selected' : '' }}>Google Gemini (Recomendado - Gratuito/Rápido)</option>
+                                        <option value="openai" {{ ($settings['ai_provider'] ?? '') == 'openai' ? 'selected' : '' }}>OpenAI (GPT-4o/Turbo)</option>
+                                        <option value="deepseek" {{ ($settings['ai_provider'] ?? '') == 'deepseek' ? 'selected' : '' }}>DeepSeek (V3 - Econômico)</option>
+                                    </select>
+                                    <div class="form-text">Escolha qual serviço de IA será utilizado para gerar os textos.</div>
+                                </div>
+                            </div>
+
+                            <!-- Gemini Key -->
+                            <div class="row mb-4 ai-field" id="field-gemini">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">Gemini API Key</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-google text-danger"></i></span>
+                                        <input type="password" class="form-control bg-white" name="gemini_api_key" value="{{ $settings['gemini_api_key'] ?? '' }}" placeholder="AIzaSy...">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="const i = this.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password';"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                    <div class="form-text text-muted">Se vazio, usa do .env.</div>
+                                </div>
+                            </div>
+
+                            <!-- OpenAI Key -->
+                            <div class="row mb-4 ai-field" id="field-openai" style="display: none;">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">OpenAI API Key</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-robot text-success"></i></span>
+                                        <input type="password" class="form-control bg-white" name="openai_api_key" value="{{ $settings['openai_api_key'] ?? '' }}" placeholder="sk-...">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="const i = this.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password';"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- DeepSeek Key -->
+                            <div class="row mb-4 ai-field" id="field-deepseek" style="display: none;">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">DeepSeek API Key</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-code-slash text-primary"></i></span>
+                                        <input type="password" class="form-control bg-white" name="deepseek_api_key" value="{{ $settings['deepseek_api_key'] ?? '' }}" placeholder="sk-...">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="const i = this.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password';"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                function toggleAiFields() {
+                                    const provider = document.getElementById('aiProviderSelect').value;
+                                    document.querySelectorAll('.ai-field').forEach(el => el.style.display = 'none');
+                                    document.getElementById('field-' + provider).style.display = 'flex';
+                                }
+                                document.addEventListener('DOMContentLoaded', toggleAiFields);
+                            </script>
+
+                            <h5 class="mb-4 text-primary border-bottom pb-2">Templates de Geração de Conteúdo (Instruções para a IA)</h5>
+                            
+                            <!-- Prompt de Imagem -->
+                            <div class="row mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">Prompt de Imagem</label>
+                                    <textarea class="form-control bg-white font-monospace" name="ai_image_prompt_template" rows="4" placeholder="Professional e-commerce product photography...">{!! $settings['ai_image_prompt_template'] ?? 'Professional e-commerce product photography of {product_name}, {category} category product, {type} type, {model} model, {size} size, {variant}, {material} style. Studio lighting, clean white background, product centered, front view, label visible and readable, high resolution, professional packshot, 8k quality, photorealistic' !!}</textarea>
+                                    <div class="form-text text-muted small">
+                                        <strong>Variáveis:</strong> <code>{product_name}</code>, <code>{category}</code>, <code>{model}</code>, <code>{size}</code>, <code>{variant}</code>, <code>{material}</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Prompt SEO -->
+                             <div class="row mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">Prompt para SEO (Meta Description)</label>
+                                    <textarea class="form-control bg-white font-monospace" name="ai_seo_prompt_template" rows="4" placeholder="Atue como especialista em SEO...">{!! $settings['ai_seo_prompt_template'] ?? "Atue como um Especialista em SEO para E-commerce. Escreva uma meta-descrição persuasiva de no máximo 160 caracteres para o produto abaixo.\n\nRegras:\n1. Comece com um verbo de ação.\n2. Inclua: {product_name} e {category}.\n3. Call to Action no final." !!}</textarea>
+                                    <div class="form-text text-muted small">
+                                        <strong>Variáveis:</strong> <code>{product_name}</code>, <code>{category}</code>, <code>{model}</code>, <code>{type}</code>, <code>{variant}</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Prompt Descrição Completa -->
+                            <div class="row mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">Prompt para Descrição Completa</label>
+                                    <textarea class="form-control bg-white font-monospace" name="ai_description_prompt_template" rows="6" placeholder="Atue como Copywriter...">{!! $settings['ai_description_prompt_template'] ?? "Atue como um Copywriter Sênior de E-commerce. Escreva uma descrição completa e envolvente.\n\nEstrutura:\n1. Título H1 Criativo\n2. Gancho Emocional\n3. Lista de Benefícios (4 itens)\n4. Experiência Sensorial ({variant})\n5. Regras Finais" !!}</textarea>
+                                    <div class="form-text text-muted small">
+                                        <strong>Variáveis:</strong> <code>{product_name}</code>, <code>{category}</code>, <code>{material}</code>, <code>{variant}</code>, <code>{size}</code>
                                     </div>
                                 </div>
                             </div>
@@ -243,6 +274,13 @@
                                 <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-2"></i>Salvar IA</button>
                             </div>
                         </form>
+
+                        <div class="d-flex justify-content-start mt-n5 mb-4" style="margin-top: -3.5rem; position: relative; z-index: 10;">
+                            <form action="{{ route('admin.settings.reset-prompts') }}" method="POST" onsubmit="return confirm('Tem certeza? Isso irá sobrescrever seus prompts personalizados com os padrões do sistema.');">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-danger"><i class="bi bi-arrow-counterclockwise me-2"></i>Restaurar Padrões</button>
+                            </form>
+                        </div>
                         @endif
 
                         <!-- Modais Informativos -->

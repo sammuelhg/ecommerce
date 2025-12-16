@@ -53,26 +53,25 @@
     </div>
 
     {{-- Content --}}
-    <div class="card-body d-flex flex-column justify-content-between bg-white text-center pb-4 pt-3">
+    <div class="card-body d-flex flex-column justify-content-between bg-white text-center pb-3 pt-2">
         <div class="mb-2">
-            <h5 class="card-title fw-bold text-dark mb-1 position-relative d-inline-block">
-                <a href="{{ route('shop.show', $product->slug) }}" class="text-decoration-none text-dark stretched-link">
-                    {{ $product->name }}
-                </a>
-            </h5>
+            <a href="{{ route('shop.show', $product->slug) }}" class="card-title fw-bold text-decoration-none h3 mb-1 position-relative d-inline-block" style="color: #000000; line-height: 1.3;">
+                {{ $product->name }}
+            </a>
         </div>
 
         <div>
-           <div class="d-flex justify-content-center align-items-baseline gap-2 mb-3">
+           <div class="d-flex justify-content-center align-items-baseline gap-2 mb-2">
                 @if($product->on_sale)
-                    <small class="text-decoration-line-through text-muted">R$ {{ number_format($product->price, 2, ',', '.') }}</small>
-                    <span class="fw-bold text-danger fs-4">R$ {{ number_format($product->sale_price, 2, ',', '.') }}</span>
+                    <small class="text-decoration-line-through text-muted" style="font-size: 0.75rem;">R$ {{ number_format($product->price, 2, ',', '.') }}</small>
+                    <span class="fw-bold text-dark" style="font-size: 1.2rem;">R$ {{ number_format($product->sale_price, 2, ',', '.') }}</span>
                 @else
-                    <span class="fw-bold text-dark fs-4">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
+                    <span class="fw-bold text-dark" style="font-size: 1.2rem;">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
                 @endif
            </div>
            
-           <button wire:click.prevent="addToCart({{ $product->id }})" class="btn {{ $badgeType == 'big_discount' ? 'btn-danger' : 'btn-dark' }} w-100 rounded-pill fw-bold">
+           <button wire:click.prevent="addToCart({{ $product->id }})" class="btn {{ $badgeType == 'big_discount' ? 'btn-danger' : 'btn-dark' }} w-100 fw-bold btn-sm text-uppercase" 
+                   style="border-radius: 4px; padding-top: 0.4rem; padding-bottom: 0.4rem;">
                <i class="bi bi-cart-plus me-1"></i> Adicionar
            </button>
         </div>

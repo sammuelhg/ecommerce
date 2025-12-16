@@ -1,6 +1,16 @@
 @props(['product'])
 
-<div class="card product-card h-100" x-data='{ product: {!! json_encode($product, JSON_HEX_APOS | JSON_HEX_QUOT) !!} }'>
+<div class="card product-card h-100" x-data='{ 
+    product: { 
+        id: {{ $product->id }}, 
+        name: "{{ addslashes($product->name) }}", 
+        slug: "{{ $product->slug ?: $product->id }}",
+        price: {{ $product->price }}, 
+        old_price: {{ $product->old_price ?? "null" }},
+        is_offer: {{ $product->is_offer ? "true" : "false" }},
+        image: "{{ $product->image ? (Str::startsWith($product->image, "http") ? $product->image : asset("storage/" . $product->image)) : "" }}"
+    } 
+}'>
     <!-- Imagem do Produto -->
     <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="text-decoration-none">
         <div class="ratio ratio-1x1">
@@ -19,24 +29,32 @@
     
     <div class="card-body d-flex flex-column">
         <!-- Título do Produto -->
-        <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="text-decoration-none">
-            <h5 class="card-title fw-bold text-primary mb-0">{{ $product->name }}</h5>
+        <!-- Título do Produto -->
+        <a href="{{ route('shop.show', $product->slug ?: $product->id) }}" class="card-title fw-bold text-decoration-none h3 mb-1 position-relative" style="color: #000000; line-height: 1.3;">
+            {{ $product->name }}
         </a>
         
         <!-- Preço e Ícones na Mesma Linha -->
-        <div class="d-flex justify-content-between align-items-center mt-1 mb-3">
+        <div class="d-flex flex-column mt-1 mb-2">
             <!-- Preço -->
             <div>
                 @if($product->is_offer && $product->old_price)
                     <div>
-                        <span class="fw-bolder text-success fs-5">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
-                        <br>
-                        <small class="text-muted text-decoration-line-through">R$ {{ number_format($product->old_price, 2, ',', '.') }}</small>
+                         <small class="text-muted text-decoration-line-through d-block" style="font-size: 0.75rem; line-height: 1;">R$ {{ number_format($product->old_price, 2, ',', '.') }}</small>
+                         <div class="d-flex align-items-baseline gap-1">
+                            <span class="fw-normal text-dark" style="font-size: 1.2rem;">R$ {{ number_format(floor($product->price), 0, ',', '.') }}<sup style="font-size: 0.75rem;">,{{ substr(number_format($product->price, 2, '', ''), -2) }}</sup></span>
+                            <span class="text-danger fw-bold" style="font-size: 0.75rem;">{{ round((($product->old_price - $product->price) / $product->old_price) * 100) }}% OFF</span>
+                         </div>
                     </div>
                 @else
-                    <span class="fw-bolder text-success fs-5">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
+                    <span class="fw-normal text-dark" style="font-size: 1.2rem;">R$ {{ number_format(floor($product->price), 0, ',', '.') }}<sup style="font-size: 0.75rem;">,{{ substr(number_format($product->price, 2, '', ''), -2) }}</sup></span>
                 @endif
+                
+                <div class="text-success small fw-medium" style="font-size: 0.75rem;">
+                    10x R$ {{ number_format($product->price/10, 2, ',', '.') }} sem juros
+                </div>
             </div>
+        </div>
             
             <!-- Ícones de Ação -->
             <div>
@@ -59,7 +77,7 @@
         
         <!-- Botão Adicionar ao Carrinho -->
         <button @click="$dispatch('add-to-cart', { product: product, quantity: 1 })" 
-                class="btn btn-warning w-100 d-flex align-items-center justify-content-center py-2 mt-auto">
+                class="btn btn-warning w-100 btn-sm d-flex align-items-center justify-content-center mt-auto" style="padding-top: 0.4rem; padding-bottom: 0.4rem;">
             <i class="bi bi-cart-plus-fill me-2"></i>
             <span>Adicionar</span>
         </button>

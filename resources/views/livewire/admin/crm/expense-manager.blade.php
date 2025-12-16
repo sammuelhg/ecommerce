@@ -3,16 +3,37 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
-                    <i class="bi bi-currency-dollar me-2"></i> Gestão de Tráfego Pago
-                    @if($sourceFilter)
-                        <span class="badge bg-white text-primary ms-2">{{ ucfirst($sourceFilter) }}</span>
+                    @if($fixedSource)
+                        Investimentos: {{ ucfirst($fixedSource === 'meta' ? 'Meta Ads' : ($fixedSource === 'google' ? 'Google Ads' : ($fixedSource === 'tiktok' ? 'TikTok Ads' : 'Gerais/Outros'))) }}
+                    @else
+                        <i class="bi bi-currency-dollar me-2"></i> Gestão de Tráfego Pago
+                        @if($sourceFilter)
+                            <span class="badge bg-white text-primary ms-2">{{ ucfirst($sourceFilter) }}</span>
+                        @endif
                     @endif
                 </h5>
                 <button wire:click="create" class="btn btn-light btn-sm">
                     <i class="bi bi-plus-lg"></i> Adicionar Despesa
                 </button>
             </div>
+            
             <div class="card-body">
+                @if(!$fixedSource)
+                <ul class="nav nav-tabs mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link {{ $sourceFilter === '' || $sourceFilter === 'all' ? 'active' : '' }}" href="{{ route('admin.crm.paid-traffic') }}">Todos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ $sourceFilter === 'meta' ? 'active' : '' }}" href="{{ route('admin.crm.paid-traffic', ['source' => 'meta']) }}">Meta Ads</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ $sourceFilter === 'google' ? 'active' : '' }}" href="{{ route('admin.crm.paid-traffic', ['source' => 'google']) }}">Google Ads</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ $sourceFilter === 'tiktok' ? 'active' : '' }}" href="{{ route('admin.crm.paid-traffic', ['source' => 'tiktok']) }}">TikTok Ads</a>
+                    </li>
+                </ul>
+                @endif
                 
                 @if(session('message'))
                     <div class="alert alert-success alert-dismissible fade show">
@@ -84,12 +105,22 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Plataforma</label>
-                            <select wire:model="source" class="form-select">
-                                <option value="meta">Meta ADS (Facebook/Instagram)</option>
-                                <option value="google">Google ADS</option>
-                                <option value="tiktok">TikTok ADS</option>
-                                <option value="other">Outros</option>
-                            </select>
+                            @php
+                                $lockedSource = $fixedSource ?? ($sourceFilter && $sourceFilter !== 'all' ? $sourceFilter : null);
+                            @endphp
+
+                            @if($lockedSource)
+                                <div class="form-control bg-light text-muted">
+                                    <i class="bi bi-lock-fill me-1"></i> {{ ucfirst($lockedSource === 'meta' ? 'Meta Ads' : ($lockedSource === 'google' ? 'Google Ads' : ($lockedSource === 'tiktok' ? 'TikTok Ads' : 'Outros'))) }}
+                                </div>
+                            @else
+                                <select wire:model="source" class="form-select">
+                                    <option value="meta">Meta ADS (Facebook/Instagram)</option>
+                                    <option value="google">Google ADS</option>
+                                    <option value="tiktok">TikTok ADS</option>
+                                    <option value="other">Outros</option>
+                                </select>
+                            @endif
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Valor Investido (R$)</label>

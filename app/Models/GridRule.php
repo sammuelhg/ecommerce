@@ -12,6 +12,7 @@ class GridRule extends Model
         'col_span',
         'configuration',
         'is_active',
+        'form_id',
     ];
 
     protected $casts = [
@@ -24,5 +25,10 @@ class GridRule extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function form(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Form::class);
     }
 }

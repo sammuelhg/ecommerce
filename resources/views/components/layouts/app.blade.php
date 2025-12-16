@@ -24,7 +24,7 @@
                         <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('forms.create') }}">Criar Campanha</a>
+                        <a class="nav-link" href="{{ route('admin.forms.create') }}">Criar Campanha</a>
                     </li>
                 </ul>
             </div>

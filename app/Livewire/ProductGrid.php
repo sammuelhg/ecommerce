@@ -7,9 +7,17 @@ use App\Services\GridComposer;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+use App\DTOs\Cart\CartItemDTO;
+use App\Services\CartService;
+use App\Actions\Shop\ListStoreFrontProductsAction;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
+
 class ProductGrid extends Component
 {
     use WithPagination;
+
+    protected string $paginationTheme = 'bootstrap';
 
     public ?int $campaignId = null;
     public $variant = 'A';
@@ -29,73 +37,46 @@ class ProductGrid extends Component
         }
     }
 
-    public $newsletterEmail = '';
-    public $newsletterSuccess = false;
-    public $source = 'grid';
-
-    public function newsletterSubscribe($campaignId = null, $customMessage = null)
+    public function addToCart(int $productId, CartService $cart)
     {
-        $action = app(\App\Actions\SubscribeToNewsletterAction::class);
-
-        $this->validate([
-            'newsletterEmail' => 'required|email'
-        ], [
-            'newsletterEmail.required' => 'Por favor, informe um email.',
-            'newsletterEmail.email' => 'Email inválido.'
-        ]);
-
-        $targetCampaignId = $campaignId ?: $this->campaignId;
-
-        $action->execute($this->newsletterEmail, $this->source, [], $targetCampaignId);
-
-        $this->newsletterSuccess = true;
-        $this->newsletterEmail = '';
-        
-        $message = $customMessage ?: 'Inscrição realizada com sucesso! Ganhe 15% OFF com o cupom: WELCOME15';
-        session()->flash('newsletter_message', $message);
+        $dto = new CartItemDTO($productId, 1);
+        $cart->add($dto);
+        $this->dispatch('cartUpdated');
+        $this->dispatch('toast-success', message: 'Produto adicionado ao carrinho!');
     }
 
-    public function render(GridComposer $composer)
-    {
-        // 1. Fetch Products
-        $products = Product::where('is_active', true)
-                         ->orderBy('id', 'desc')
-                         ->paginate(20);
+    // Injeção de dependência no método render é o padrão do Livewire para Actions stateless
+    public function render(
+        ListStoreFrontProductsAction $listProducts,
+        GridComposer $composer
+    ): View {
+        // 1. Busca os dados brutos via Action
+        $products = $listProducts->execute(20);
+
+        // 2. Diagnóstico de Grid
+        Log::info("ProductGrid: Enviando " . $products->count() . " produtos para o GridComposer.");
 
         $rules = [];
-
-        // Disable rules for simple variant
+        // Disable rules for simple variant if needed
         if ($this->variant === 'simple') {
-            $rules = [];
+             // Keep rules empty
+             $useDbRules = false;
+        } else {
+             $useDbRules = true;
         }
 
-        // Inject Newsletter Card if Campaign Found (only if not simple variant)
-        if ($this->campaignId && $this->variant !== 'simple') {
-            $campaign = \App\Models\NewsletterCampaign::find($this->campaignId);
-            if ($campaign) {
-                // Determine position (e.g. 5)
-                $rules[5] = [
-                    'type' => 'card.newsletter_form', // This maps to components/cards/newsletter_form 
-                    // GridComposer maps 'card.newsletter' to a view. 
-                    // I need to ensure GridComposer handles this or use a generic 'raw' type.
-                    // Assuming 'newsletter_form' is the view name partially.
-                    // Let's assume 'card.newsletter' maps to 'components.cards.newsletter_form'.
-                    'col_span' => 1,
-                    'content' => [
-                        'image' => $campaign->promo_image_url,
-                        'title' => $campaign->subject,
-                    ]
-                ];
-            }
+        // 3. Mescla Produtos com Regras de Layout (Banners, Destaques)
+        try {
+            $gridItems = $composer->merge($products, $rules, $useDbRules); 
+        } catch (\Exception $e) {
+            Log::error("ProductGrid: Erro fatal no GridComposer: " . $e->getMessage());
+            // Fallback: mostra apenas os produtos se o grid falhar
+            $gridItems = $products->getCollection(); 
         }
-
-        // 3. Compose the Grid
-        $useDbRules = ($this->variant !== 'simple');
-        $gridItems = $composer->merge($products, $rules, $useDbRules);
 
         return view('livewire.shop.product-grid', [
             'gridItems' => $gridItems,
-            'products' => $products 
+            'products'  => $products // Necessário para a paginação funcionar na view
         ]);
     }
 }

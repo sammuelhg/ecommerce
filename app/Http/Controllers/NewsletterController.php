@@ -7,41 +7,20 @@ use App\Models\NewsletterSubscriber; // Added this import
 
 class NewsletterController extends Controller
 {
-    public function show(\App\Models\NewsletterCampaign $campaign)
+    public function show(\App\Models\Campaign $campaign)
     {
-        // Helper to render public view
-        $overrideCard = $campaign->email_card_id ? \App\Models\EmailCard::find($campaign->email_card_id) : null;
+        // New System: Use Campaign model
+        $overrideCard = $campaign->signCard;
         $overrideProducts = $campaign->products;
+        
+        // Mock User for template rendering
         $user = new \App\Models\User(['name' => 'Assinante', 'email' => '']);
 
         return view('newsletter.show', compact('campaign', 'overrideCard', 'overrideProducts', 'user'));
     }
 
-    public function preview(\App\Models\NewsletterEmail $email)
-    {
-        $email->load('products'); // Ensure products are loaded
-        $campaign = $email->campaign;
-        
-        // Card is usually defined at Campaign level
-        $overrideCard = $campaign->email_card_id ? \App\Models\EmailCard::find($campaign->email_card_id) : null;
-        
-        // Products are defined at Step level (Email)
-        $overrideProducts = $email->products;
-        
-        // Safety Fallback: if step has no products, try campaign fallback? 
-        // User complained "products didn't appear". If they didn't select any, maybe they expect nothing.
-        // But let's trust that if the collection is empty, the view handles it.
-        
-        $user = new \App\Models\User(['name' => 'Assinante', 'email' => '']);
-
-        return view('newsletter.show', [
-            'campaign' => $email, // View uses $campaign->body
-            'subject' => $email->subject,
-            'overrideCard' => $overrideCard,
-            'overrideProducts' => $overrideProducts,
-            'user' => $user
-        ]);
-    }
+    // Legacy method - keeping for reference or unused routes, but safer to remove if conflicting
+    /* public function preview(\App\Models\NewsletterEmail $email) { ... } */
 
     public function unsubscribe(Request $request, int $subscriberId)
     {

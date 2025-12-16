@@ -1,5 +1,6 @@
-@props(['data' => []])
-<div {{ $attributes->merge(['class' => 'card h-100 border-0 d-flex align-items-center justify-content-center p-4 position-relative overflow-hidden shadow-sm ' . ($data['bg_color'] ?? 'bg-light') . ' ' . ($data['text_color'] ?? 'text-dark')]) }}>
+@props(['data' => [], 'cols' => 1])
+<div {{ $attributes->merge(['class' => 'card h-100 border-0 d-flex flex-column p-0 position-relative overflow-hidden shadow-sm ' . ($data['bg_color'] ?? 'bg-white') . ' ' . ($data['text_color'] ?? '')]) }}
+     style="color: {{ isset($data['text_color']) && $data['text_color'] ? '' : '#1a1a1a' }};">
     @php
         $imageStyle = $data['image_style'] ?? 'background';
     @endphp
@@ -11,41 +12,14 @@
             <img src="{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}" style="display:none;" onerror="this.previousElementSibling.style.display='none'; this.closest('.card').classList.add('bg-light');">
         @else
             <div class="w-100 flex-shrink-0">
-                <img src="{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}" class="card-img-top object-fit-cover" style="height: 150px;" onerror="this.style.display='none'; this.closest('.card').classList.add('bg-light');">
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($data['image']) }}" class="card-img-top object-fit-cover" style="aspect-ratio: {{ $cols }} / 1; width: 100%; height: auto;" onerror="this.style.display='none'; this.closest('.card').classList.add('bg-light');">
             </div>
         @endif
     @endif
-    <div class="w-100 p-3 position-relative" style="z-index: 2;">
-        <div class="text-center mb-3">
-            <h5 class="fw-bold mb-2">
-                {{ $data['title'] ?? '📧 Newsletter' }}
-            </h5>
-            <div class="small lh-sm">
-                @if(isset($data['text']) && !empty($data['text']))
-                    {!! $data['text'] !!}
-                @else
-                    Ganhe <strong class="text-danger fw-bold" style="text-shadow: 0 0 1px rgba(0,0,0,0.1);">15% OFF</strong> na 1ª compra!
-                @endif
-            </div>
-        </div>
-
-        @if(session()->has('newsletter_message'))
-            <div class="alert alert-success small mb-0 p-2 text-center lh-1">
-                {{ session('newsletter_message') }}
-            </div>
-        @else
-            <form wire:submit.prevent="newsletterSubscribe({{ $data['campaign_id'] ?? 'null' }}, '{{ addslashes($data['success_message'] ?? '') }}')" class="d-flex flex-column gap-2">
-                <input type="email" wire:model="newsletterEmail" class="form-control form-control-sm bg-white border border-secondary text-center" placeholder="seu@email.com" required>
-                <button class="btn {{ $data['btn_color'] ?? 'btn-danger' }} btn-sm fw-bold w-100 text-uppercase d-flex align-items-center justify-content-center gap-2" 
-                        type="submit" 
-                        wire:loading.attr="disabled"
-                        wire:target="newsletterSubscribe">
-                    <span wire:loading.remove wire:target="newsletterSubscribe">{{ $data['button_text'] ?? 'QUERO DESCONTO' }}</span>
-                    <span wire:loading wire:target="newsletterSubscribe" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span wire:loading wire:target="newsletterSubscribe">Enviando...</span>
-                </button>
-            </form>
-            @error('newsletterEmail') <div class="text-danger small mt-1 text-center">{{ $message }}</div> @enderror
+    <div class="w-100 p-3 position-relative d-flex flex-column h-100" style="z-index: 2;">
+        @if(!empty($data['form_id']))
+            {{-- New Architecture: Use Universal Form --}}
+            <livewire:cms.universal-form :formId="$data['form_id']" :headless="true" />
         @endif
     </div>
 </div>

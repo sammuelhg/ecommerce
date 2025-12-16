@@ -52,7 +52,7 @@ class NewsletterDashboard extends Component
         // Recent Campaigns with granular stats
         $this->recentCampaigns = \App\Models\NewsletterCampaign::withCount('subscribers')
             ->with(['emails' => function($q) {
-                $q->withCount('opens')->orderBy('sort_order');
+                $q->withCount('opens')->orderBy('step_order');
             }])
             ->orderBy('created_at', 'desc')
             ->take(5)

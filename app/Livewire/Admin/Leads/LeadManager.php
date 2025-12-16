@@ -13,6 +13,7 @@ class LeadManager extends Component
     public string $search = '';
     public string $filter = 'all'; // all, active, banned
     public string $sourceFilter = '';
+    public string $trafficType = '';
 
     // Reset pagination when searching
     public function updatedSearch(): void
@@ -26,6 +27,11 @@ class LeadManager extends Component
     }
 
     public function updatedSourceFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedTrafficType(): void
     {
         $this->resetPage();
     }
@@ -79,6 +85,22 @@ class LeadManager extends Component
 
         // Get unique sources
         $sources = Lead::select('source')->distinct()->pluck('source');
+
+        if ($this->trafficType === 'paid') {
+            $query->whereNotNull('utm_source')
+                  ->where(function ($q) {
+                      $q->where('utm_medium', 'cpc')
+                        ->orWhere('utm_medium', 'ads')
+                        ->orWhere('utm_medium', 'paid')
+                        ->orWhere('utm_medium', 'ppc');
+                  });
+        } elseif ($this->trafficType === 'organic') {
+            $query->where(function ($q) {
+                $q->whereNull('utm_source')
+                  ->orWhere('utm_medium', 'organic')
+                  ->orWhereNull('utm_medium');
+            });
+        }
 
         return view('livewire.admin.leads.lead-manager', [
             'leads' => $query->paginate(20),

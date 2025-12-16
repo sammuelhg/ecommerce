@@ -24,8 +24,10 @@ class StoreSettingsDTO extends BaseDTO
         // Define known text fields to extract
         $textFields = [
             'store_address', 'store_cnpj', 'store_phone',
-            'google_maps_embed_url', 'ai_image_prompt_template',
-            'modal_about', 'modal_careers', 'modal_contact', 'modal_returns', 'modal_faq',
+            'google_maps_embed_url', 
+            'gemini_api_key', 'openai_api_key', 'deepseek_api_key', 'ai_provider',
+            'ai_image_prompt_template', 'ai_seo_prompt_template', 'ai_description_prompt_template',
+            'modal_about', 'modal_careers', 'modal_contact', 'modal_returns', 'modal_faq', 'modal_privacy', 'modal_blog', 'modal_tracking',
             'color_primary', 'color_secondary', 'color_accent', 'color_background', 'color_category_bar',
             'email_card_id',
             'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'email_subject_prefix', 'global_showcase_products'

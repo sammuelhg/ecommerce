@@ -12,27 +12,46 @@
                 @foreach($wishlistItems as $item)
                     <div class="list-group-item px-0 py-3 border-bottom" wire:key="wishlist-item-{{ $item['id'] }}">
                         <div class="d-flex gap-3">
+                            {{-- Imagem --}}
                             <div class="flex-shrink-0">
-                                <img src="https://placehold.co/80x80/2c3e50/ffffff?text={{ $item['image'] ?? 'Prod' }}" 
-                                     class="img-fluid rounded" alt="{{ $item['name'] }}" style="width: 80px; height: 80px; object-fit: cover;">
+                                @php
+                                    $imgSrc = $item['image'] ?? null;
+                                    if ($imgSrc && !str_starts_with($imgSrc, 'http')) {
+                                        $imgSrc = asset('storage/' . $imgSrc);
+                                    }
+                                @endphp
+                                <img src="{{ $imgSrc ?? 'https://placehold.co/80x80/2c3e50/ffffff?text=No+Img' }}" 
+                                     class="img-fluid rounded object-fit-cover" 
+                                     alt="{{ $item['name'] }}" 
+                                     style="width: 80px; height: 80px;">
                             </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h6 class="mb-1 line-clamp-2">{{ $item['name'] }}</h6>
-                                    <button wire:click="removeItem({{ $item['id'] }})" class="btn btn-link text-danger p-0 ms-2" wire:loading.attr="disabled">
+                            
+                            {{-- Conteúdo --}}
+                            <div class="flex-grow-1 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h6 class="mb-1 line-clamp-2" style="font-size: 0.95rem;">{{ $item['name'] }}</h6>
+                                </div>
+                                
+                                <div class="d-flex gap-2 mt-2 align-items-center">
+                                    {{-- Botão Adicionar --}}
+                                    <button wire:click="moveToCart({{ $item['id'] }})" 
+                                            class="btn btn-warning flex-grow-1 d-flex align-items-center justify-content-center gap-2 text-dark fw-bold" 
+                                            style="font-size: 0.9rem;"
+                                            wire:loading.attr="disabled">
+                                        <i class="bi bi-cart-plus-fill"></i> 
+                                        <span>Adicionar</span>
+                                    </button>
+
+                                    {{-- Botão Remover --}}
+                                    <button wire:click="removeItem({{ $item['id'] }})" 
+                                            class="btn btn-outline-danger d-flex align-items-center justify-content-center"
+                                            style="width: 38px; height: 38px;"
+                                            title="Remover"
+                                            wire:loading.attr="disabled">
                                         <i class="bi bi-trash" wire:loading.remove wire:target="removeItem({{ $item['id'] }})"></i>
                                         <span class="spinner-border spinner-border-sm" wire:loading wire:target="removeItem({{ $item['id'] }})"></span>
                                     </button>
                                 </div>
-                                <p class="text-primary fw-bold mb-2">R$ {{ number_format($item['price'], 2, ',', '.') }}</p>
-                                <button wire:click="moveToCart({{ $item['id'] }})" class="btn btn-sm btn-outline-primary w-100" wire:loading.attr="disabled">
-                                    <span wire:loading.remove wire:target="moveToCart({{ $item['id'] }})">
-                                        <i class="bi bi-cart-plus me-1"></i> Mover p/ Carrinho
-                                    </span>
-                                    <span wire:loading wire:target="moveToCart({{ $item['id'] }})">
-                                        <span class="spinner-border spinner-border-sm me-1"></span> Movendo...
-                                    </span>
-                                </button>
                             </div>
                         </div>
                     </div>

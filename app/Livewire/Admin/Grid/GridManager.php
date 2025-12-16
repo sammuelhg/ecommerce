@@ -32,9 +32,12 @@ class GridManager extends Component
     public $config_badge_type = 'best_buy';
     
     public $config_image; // Shared file upload (Newsletter & Banner)
+    public $existingImage; // Shared existing image
     public $config_image_style = 'background'; // 'background' or 'top'
-    public $config_campaign_id; 
-    public $config_button_text;
+    public $config_form_id; // New Form ID
+    public $config_campaign_id; // Legacy Campaign ID (for migration support)
+    public $config_button_text; // Button Text
+    public $availableForms = [];
 
     protected $rules_validation = [
         'position' => 'required|integer|min:1', 
@@ -46,6 +49,7 @@ class GridManager extends Component
     public function mount()
     {
         $this->loadRules();
+        $this->availableForms = \App\Models\Form::where('is_active', true)->get();
     }
 
     public function loadRules()
@@ -53,7 +57,7 @@ class GridManager extends Component
         $this->rules = \App\Models\GridRule::orderBy('position')->get();
     }
 
-    // Product Search logic also likely went missing if it was in that block, checking...
+    // Product Search logic...
     public $productSearch = '';
     public $foundProducts = [];
     public $selectedProduct = null;
@@ -107,6 +111,9 @@ class GridManager extends Component
         $this->type = $rule->type;
         $this->col_span = $rule->col_span;
         
+        // Load Form ID
+        $this->config_form_id = $rule->form_id;
+
         // Load Config
         $config = $rule->configuration ?? [];
         $this->config_title = $config['title'] ?? '';
@@ -123,6 +130,7 @@ class GridManager extends Component
         $this->config_btn_color = $config['btn_color'] ?? 'btn-primary';
         $this->config_badge_type = $config['badge_type'] ?? 'best_buy';
         $this->config_image_style = $config['image_style'] ?? 'background';
+        $this->existingImage = $config['image'] ?? null;
         
         if (isset($config['product_id'])) {
             $this->selectProduct($config['product_id']);
@@ -138,7 +146,8 @@ class GridManager extends Component
             'config_title', 'config_text', 'config_link', 
             'config_bg_class', 'config_image', 'config_campaign_id', 'config_button_text', 'config_success_message',
             'config_text_color', 'config_bg_color', 'config_btn_color', 'config_badge_type',
-            'productSearch', 'selectedProduct', 'formatted_config_product_id', 'config_image_style'
+            'productSearch', 'selectedProduct', 'formatted_config_product_id', 'config_image_style',
+            'config_form_id'
         ]);
         $this->type = 'marketing_banner'; 
         $this->col_span = 1;
@@ -163,6 +172,12 @@ class GridManager extends Component
         if ($query->exists()) {
             $this->addError('position', 'A posição ' . $this->position . ' já está ocupada.');
             return;
+        }
+
+        // Specific Validation
+        if ($this->type === 'card.newsletter_form' && empty($this->config_form_id)) {
+             $this->addError('config_form_id', 'Selecione um formulário.');
+             return;
         }
 
         $config = [];
@@ -204,32 +219,37 @@ class GridManager extends Component
                 'badge_type' => $this->config_badge_type,
             ];
         } elseif ($this->type === 'card.newsletter_form') {
+            // CLEAN CONFIG: Only visual, no content overrides
             $config = array_merge($visualConfig, [
-                'campaign_id' => $this->config_campaign_id,
-                'title' => $this->config_title,
-                'text' => $this->config_text,
-                'button_text' => $this->config_button_text,
-                'btn_color' => $this->config_btn_color,
-                'success_message' => $this->config_success_message, // Added
+                // No title, text, button_text here!
+                // form_id is saved in column
             ]);
+        }
+
+        $data = [
+            'position' => $dbPosition,
+            'type' => $this->type,
+            'col_span' => $this->col_span,
+            'configuration' => $config,
+            // 'form_id' => $this->config_form_id, // Wait, I need to check if 'form_id' is fillable in GridRule model? Assuming yes or guarded=[] by default? No, usually fillable.
+            // I updated GridRule.php but did I check $fillable? I looked at it earlier.
+            // Let's check existing GridRule.php content from previous view_file
+            // It had $fillable ['position', 'type', 'col_span', 'configuration', 'is_active'].
+            // I need to ADD 'form_id' to $fillable in GridRule.php!
+        ];
+
+        if ($this->type === 'card.newsletter_form') {
+            $data['form_id'] = $this->config_form_id;
+        } else {
+            $data['form_id'] = null;
         }
 
         if ($this->editingRuleId) {
             $rule = GridRule::find($this->editingRuleId);
-            $rule->update([
-                'position' => $dbPosition,
-                'type' => $this->type,
-                'col_span' => $this->col_span,
-                'configuration' => $config,
-            ]);
+            $rule->update($data);
         } else {
-            GridRule::create([
-                'position' => $dbPosition,
-                'type' => $this->type,
-                'col_span' => $this->col_span,
-                'configuration' => $config,
-                'is_active' => true
-            ]);
+            $data['is_active'] = true;
+            GridRule::create($data);
         }
 
         $this->showModal = false;

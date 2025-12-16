@@ -9,7 +9,7 @@ use App\Models\Lead;
 use App\Models\Form;
 use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.app')]
+#[Layout('layouts.admin')]
 class Dashboard extends Component
 {
     public int $totalLeads = 0;

@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\WishlistItem;
+use App\Services\WishlistService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -32,7 +36,7 @@ class Product extends Model
         'card_type',
     ];
 
-    protected $appends = ['image'];
+    protected $appends = ['image', 'is_favorite'];
 
     public function category()
     {
@@ -152,5 +156,19 @@ class Product extends Model
         }
 
         return asset('storage/' . $image);
+    }
+
+    /**
+     * Check if product is in wishlist for current user/session.
+     */
+    public function getIsFavoriteAttribute()
+    {
+        // Use the Service to check existence
+        // We act like a singleton helper here
+        // Ideally checking specific user relation is better for DB performance handling, 
+        // but Service handles Session fallback which Model relationship can't easily do.
+        
+        $service = app(WishlistService::class);
+        return $service->has($this->id);
     }
 }

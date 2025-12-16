@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Product;
+use App\Services\AiContentService;
 use App\Models\Category;
 use App\Models\ProductType;
 use App\Models\ProductModel;
@@ -62,6 +63,107 @@ class ProductForm extends Component
         'main-image-updated' => 'refreshImages',
         'refresh-gallery' => 'refreshImages'
     ];
+
+    public $promptPreview = '';
+    public $promptType = ''; // seo or description
+    
+    public function previewAiGeneration($type)
+    {
+        $this->promptType = $type;
+        $data = $this->prepareProductDataForAi();
+        
+        if ($type === 'seo') {
+            $this->promptPreview = app(AiContentService::class)->buildSeoPrompt($data);
+        } else {
+            $this->promptPreview = app(AiContentService::class)->buildFullDescriptionPrompt($data);
+        }
+        
+        $this->dispatch('open-prompt-modal');
+    }
+
+    public function confirmAiGeneration()
+    {
+        \Log::info("ProductForm: Confirm AI Generation Clicked");
+
+        if (!$this->promptPreview) {
+             $this->dispatch('show-validation-toast', ['error' => 'Prompt vazio.']);
+             return;
+        }
+
+        try {
+            \Log::info("ProductForm: Calling generateText");
+            $text = app(AiContentService::class)->generateText($this->promptPreview);
+            \Log::info("ProductForm: Text generated", ['text_preview' => substr($text, 0, 50)]);
+            
+            if ($this->promptType === 'seo') {
+                $this->marketing_description = $text;
+                $this->dispatch('show-validation-toast', ['success' => 'Descrição SEO gerada com sucesso!']);
+            } else {
+                $this->description = $text;
+                $this->dispatch('description-updated', $text); // Update Quill
+                $this->dispatch('show-validation-toast', ['success' => 'Descrição completa gerada com sucesso!']);
+            }
+            $this->dispatch('close-prompt-modal');
+
+        } catch (\Exception $e) {
+            \Log::error('AI Generation Error in Component: ' . $e->getMessage());
+            // Show the actual error message from the service
+            $this->dispatch('show-validation-toast', ['error' => 'Erro: ' . $e->getMessage()]);
+            // Optional: Keep modal open so user can retry or copy prompt
+        }
+    }
+
+    public function generateSeo()
+    {
+        // Legacy method kept if needed, but UI now calls previewAiGeneration
+        $this->previewAiGeneration('seo');
+    }
+
+    public function generateDescription()
+    {
+        // Legacy method kept if needed, but UI now calls previewAiGeneration
+        $this->previewAiGeneration('description');
+    }
+
+    private function prepareProductDataForAi()
+    {
+        // Resolve names from IDs
+        $categoryName = $this->category_id ? (Category::find($this->category_id)->name ?? '') : '';
+        $typeName = $this->product_type_id ? (ProductType::find($this->product_type_id)->name ?? '') : '';
+        $modelName = $this->product_model_id ? (ProductModel::find($this->product_model_id)->name ?? '') : '';
+        $materialName = $this->product_material_id ? (ProductMaterial::find($this->product_material_id)->name ?? '') : '';
+        
+        $colorName = '';
+        if ($this->product_color_id) {
+            $colorName = \App\Models\ProductColor::find($this->product_color_id)->name ?? '';
+        } elseif ($this->color) {
+            $colorName = $this->color;
+        }
+
+        $flavorName = '';
+        if ($this->product_flavor_id) {
+            $flavorName = \App\Models\Flavor::find($this->product_flavor_id)->name ?? '';
+        }
+        
+        $sizeName = '';
+        if ($this->product_size_id) {
+            $sizeName = \App\Models\ProductSize::find($this->product_size_id)->name ?? '';
+        } elseif ($this->size) {
+            $sizeName = $this->size;
+        }
+
+        return [
+            'name' => $this->name,
+            'category' => $categoryName,
+            'type' => $typeName,
+            'model' => $modelName,
+            'material' => $materialName,
+            'color' => $colorName,
+            'flavor' => $flavorName,
+            'size' => $sizeName,
+        ];
+    }
+
 
     public function rules()
     {
