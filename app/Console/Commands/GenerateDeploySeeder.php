@@ -169,11 +169,14 @@ use App\Models\SignCard;
 use App\Models\StoreSetting;
 use App\Models\GridRule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DeployRecoverySeeder extends Seeder
 {
     public function run()
     {
+        Schema::disableForeignKeyConstraints();
+
         // 1. Restore Sign Cards
         DB::table('sign_cards')->truncate();
         \$cards = {$cardsExport};
@@ -200,6 +203,8 @@ class DeployRecoverySeeder extends Seeder
             // Encode configuration if necessary, usually Model handles casting
             GridRule::create(\$rule);
         }
+
+        Schema::enableForeignKeyConstraints();
     }
 }
 PHP;

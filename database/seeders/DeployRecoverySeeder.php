@@ -7,11 +7,14 @@ use App\Models\SignCard;
 use App\Models\StoreSetting;
 use App\Models\GridRule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DeployRecoverySeeder extends Seeder
 {
     public function run()
     {
+        Schema::disableForeignKeyConstraints();
+
         // 1. Restore Sign Cards
         DB::table('sign_cards')->truncate();
         $cards = array (
@@ -218,5 +221,7 @@ WhatsApp: 31994161000 | Insta: testecardinsta | sammuel.com.br',
             // Encode configuration if necessary, usually Model handles casting
             GridRule::create($rule);
         }
+
+        Schema::enableForeignKeyConstraints();
     }
 }
