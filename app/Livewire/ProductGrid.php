@@ -27,14 +27,14 @@ class ProductGrid extends Component
         // Find a featured campaign (latest active with promo image)
         // Using 'sending' or 'sent' or 'draft'? Usually 'active' or 'sent'. 
         // Assuming 'sent' means it's live/running.
-        $campaign = \App\Models\NewsletterCampaign::where('status', \App\Enums\CampaignStatus::SENT) 
-            ->whereNotNull('promo_image_url')
-            ->latest()
-            ->first();
+        // $campaign = \App\Models\NewsletterCampaign::where('status', \App\Enums\CampaignStatus::SENT) 
+        //    ->whereNotNull('promo_image_url')
+        //    ->latest()
+        //    ->first();
             
-        if ($campaign) {
-            $this->campaignId = $campaign->id;
-        }
+        // if ($campaign) {
+        //    $this->campaignId = $campaign->id;
+        // }
     }
 
     public function addToCart(int $productId, CartService $cart)
