@@ -16,11 +16,17 @@
         <div class="ratio ratio-1x1">
             @if($product->image)
                 <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" 
+                     srcset="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }} 1x, {{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }} 2x"
+                     sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                     width="500" height="500"
+                     loading="lazy"
                      class="card-img-top object-fit-cover" 
                      alt="{{ $product->name }}"
                      onerror="this.onerror=null;this.src='https://placehold.co/500x500/f0f8ff/1a1a1a?text=Imagem+Indispon%C3%ADvel';">
             @else
                 <img src="https://placehold.co/500x500/f0f8ff/1a1a1a?text={{ urlencode($product->name) }}" 
+                     width="500" height="500"
+                     loading="lazy"
                      class="card-img-top object-fit-cover" 
                      alt="{{ $product->name }}">
             @endif

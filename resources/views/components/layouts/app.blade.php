@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Gem System' }}</title>
     
+    <meta name="description" content="Gem System - Sua loja favorita de roupas e acessórios. Encontre as melhores ofertas.">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    
     <!-- Bootstrap 5 & Icons (via Vite) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     

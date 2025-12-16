@@ -9,11 +9,19 @@
     @yield('meta')
     
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"></noscript>
+    
     <!-- Custom CSS -->
-    <link href="{{ asset('css/shop.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/product.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/card-styles.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/shop.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="{{ asset('css/shop.css') }}" rel="stylesheet"></noscript>
+
+    <link href="{{ asset('css/product.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="{{ asset('css/product.css') }}" rel="stylesheet"></noscript>
+
+    <link href="{{ asset('css/card-styles.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="{{ asset('css/card-styles.css') }}" rel="stylesheet"></noscript>
     
     <!-- Vite Assets (Bootstrap + Custom Theme) -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
