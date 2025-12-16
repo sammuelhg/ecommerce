@@ -252,6 +252,18 @@ Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard'); // Redirect to existing admin dashboard
 })->middleware(['auth', 'verified']);
 
+// Add route to force run seeder.
+Route::get('/force-seed', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => 'DeployRecoverySeeder',
+            '--force' => true
+        ]);
+        return 'Seeder executado com sucesso: <pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return 'Erro: ' . $e->getMessage();
+    }
+});
 
 
 // Digital Card & Linktree
