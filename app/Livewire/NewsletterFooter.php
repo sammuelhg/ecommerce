@@ -21,14 +21,14 @@ class NewsletterFooter extends Component
         // Optional: Same logic as Grid, or maybe Footer is always generic?
         // User said "formulário... do grid ou do footer... deve ter um id".
         // So let's try to attach it to the Featured Campaign if one exists.
-        $campaign = \App\Models\NewsletterCampaign::where('status', \App\Enums\CampaignStatus::SENT) 
-            ->whereNotNull('promo_image_url')
-            ->latest()
-            ->first();
+        // $campaign = \App\Models\NewsletterCampaign::where('status', \App\Enums\CampaignStatus::SENT) 
+        //     ->whereNotNull('promo_image_url')
+        //     ->latest()
+        //     ->first();
             
-        if ($campaign) {
-            $this->campaignId = $campaign->id;
-        }
+        // if ($campaign) {
+        //     $this->campaignId = $campaign->id;
+        // }
     }
 
     public function subscribe(\App\Actions\SubscribeToNewsletterAction $action)
