@@ -47,15 +47,30 @@ class GenerateDeploySeeder extends Command
         $targetKeys = ['store_logo', 'footer_logo', 'email_logo', 'profile_logo', 'favicon'];
         $storeSettings = StoreSetting::whereIn('key', $targetKeys)->get()->map(function ($setting) use ($targetDir) {
             $data = $setting->toArray();
-            $value = $setting->value;
+            $value = $setting->value; // Accessor might return array or string
             
-            if (is_string($value) && (str_contains($value, '/storage/') || str_contains($value, 'http'))) {
-                 $newPath = $this->copyAsset($value, $targetDir, 'setting');
+            // Fix: If value is an array/object (due to JSON cast/accessor), encode back to string for storage path check
+            $checkValue = is_array($value) || is_object($value) ? json_encode($value) : $value;
+            
+            if (is_string($checkValue) && (str_contains($checkValue, '/storage/') || str_contains($checkValue, 'http'))) {
+                 $newPath = $this->copyAsset($checkValue, $targetDir, 'setting');
                  if ($newPath) {
                      $data['value'] = $newPath;
-                     $this->line("Copied Setting {$setting->key}: {$value} -> {$newPath}");
+                     $this->line("Copied Setting {$setting->key}: {$checkValue} -> {$newPath}");
                  }
             }
+
+            // CRITICAL FIX: Ensure value is stored as string/json encoded for the seeder array
+            // because strict 'updateOrCreate' might fail if passed an array for a string column without mutator.
+            // AND the generated seeder code puts this into a PHP array structure.
+            // If $data['value'] is an array, var_export will output it as an array.
+            // When seeder runs: 'value' => ['foo' => 'bar']
+            // Eloquent updateOrCreate(['value' => ['foo' => 'bar']]) -> Exception: Array to string conversion if column is text.
+            
+            if (is_array($data['value']) || is_object($data['value'])) {
+                $data['value'] = json_encode($data['value']);
+            }
+
             return $data;
         });
 
@@ -63,7 +78,7 @@ class GenerateDeploySeeder extends Command
         $this->info('Processing Grid Rules...');
         $gridRules = GridRule::all()->map(function ($rule) use ($targetDir) {
             $data = $rule->toArray();
-            $config = $rule->configuration ?? [];
+            $config = $rule->configuration ?? []; // Casted to array
 
             if (isset($config['image'])) {
                 $newPath = $this->copyAsset($config['image'], $targetDir, 'grid');
@@ -73,6 +88,13 @@ class GenerateDeploySeeder extends Command
                     $this->line("Copied GridRule Image: {$newPath}");
                 }
             }
+            
+            // Fix: Ensure configuration is encoded as string if the DB expects it?
+            // GridRule casts 'configuration' => 'array'.
+            // If we pass an array to create(), Eloquent handles json_encode automatically thanks to casting.
+            // UNLIKE StoreSetting which relies on manual 'type' column and might not cast 'value' automatically.
+            // So GridRule is likely fine, but checking StoreSettings was critical.
+            
             return $data;
         });
 
