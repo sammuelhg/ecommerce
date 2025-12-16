@@ -178,30 +178,36 @@ class DeployRecoverySeeder extends Seeder
         Schema::disableForeignKeyConstraints();
 
         // 1. Restore Sign Cards
-        DB::table('sign_cards')->truncate();
-        \$cards = {$cardsExport};
-        foreach (\$cards as \$card) {
-            SignCard::create(\$card);
+        if (Schema::hasTable('sign_cards')) {
+            DB::table('sign_cards')->truncate();
+            \$cards = {$cardsExport};
+            foreach (\$cards as \$card) {
+                SignCard::create(\$card);
+            }
         }
 
         // 2. Restore Settings
-        \$settings = {$settingsExport};
-        foreach (\$settings as \$setting) {
-            StoreSetting::updateOrCreate(
-                ['key' => \$setting['key']],
-                [
-                    'value' => \$setting['value'],
-                    'type' => \$setting['type']
-                ]
-            );
+        if (Schema::hasTable('store_settings')) {
+            \$settings = {$settingsExport};
+            foreach (\$settings as \$setting) {
+                StoreSetting::updateOrCreate(
+                    ['key' => \$setting['key']],
+                    [
+                        'value' => \$setting['value'],
+                        'type' => \$setting['type']
+                    ]
+                );
+            }
         }
 
         // 3. Restore Grid Rules
-        DB::table('grid_rules')->truncate();
-        \$rules = {$rulesExport};
-        foreach (\$rules as \$rule) {
-            // Encode configuration if necessary, usually Model handles casting
-            GridRule::create(\$rule);
+        if (Schema::hasTable('grid_rules')) {
+            DB::table('grid_rules')->truncate();
+            \$rules = {$rulesExport};
+            foreach (\$rules as \$rule) {
+                // Encode configuration if necessary, usually Model handles casting
+                GridRule::create(\$rule);
+            }
         }
 
         Schema::enableForeignKeyConstraints();

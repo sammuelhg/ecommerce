@@ -31,7 +31,7 @@ class NewsletterFooter extends Component
         // }
     }
 
-    public function subscribe(\App\Actions\SubscribeToNewsletterAction $action)
+    public function subscribe(\App\Actions\Newsletter\SubscribeToNewsletterAction $action)
     {
         $this->validate();
 

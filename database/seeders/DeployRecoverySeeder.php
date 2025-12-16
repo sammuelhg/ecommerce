@@ -16,8 +16,9 @@ class DeployRecoverySeeder extends Seeder
         Schema::disableForeignKeyConstraints();
 
         // 1. Restore Sign Cards
-        DB::table('sign_cards')->truncate();
-        $cards = array (
+        if (Schema::hasTable('sign_cards')) {
+            DB::table('sign_cards')->truncate();
+            $cards = array (
   0 => 
   array (
     'id' => 3,
@@ -102,12 +103,14 @@ WhatsApp: 31994161000 | Insta: testecardinsta | sammuel.com.br',
     'deleted_at' => NULL,
   ),
 );
-        foreach ($cards as $card) {
-            SignCard::create($card);
+            foreach ($cards as $card) {
+                SignCard::create($card);
+            }
         }
 
         // 2. Restore Settings
-        $settings = array (
+        if (Schema::hasTable('store_settings')) {
+            $settings = array (
   0 => 
   array (
     'id' => 24,
@@ -154,19 +157,21 @@ WhatsApp: 31994161000 | Insta: testecardinsta | sammuel.com.br',
     'updated_at' => '2025-12-08T22:41:27.000000Z',
   ),
 );
-        foreach ($settings as $setting) {
-            StoreSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                [
-                    'value' => $setting['value'],
-                    'type' => $setting['type']
-                ]
-            );
+            foreach ($settings as $setting) {
+                StoreSetting::updateOrCreate(
+                    ['key' => $setting['key']],
+                    [
+                        'value' => $setting['value'],
+                        'type' => $setting['type']
+                    ]
+                );
+            }
         }
 
         // 3. Restore Grid Rules
-        DB::table('grid_rules')->truncate();
-        $rules = array (
+        if (Schema::hasTable('grid_rules')) {
+            DB::table('grid_rules')->truncate();
+            $rules = array (
   0 => 
   array (
     'id' => 27,
@@ -217,9 +222,10 @@ WhatsApp: 31994161000 | Insta: testecardinsta | sammuel.com.br',
     'form_id' => NULL,
   ),
 );
-        foreach ($rules as $rule) {
-            // Encode configuration if necessary, usually Model handles casting
-            GridRule::create($rule);
+            foreach ($rules as $rule) {
+                // Encode configuration if necessary, usually Model handles casting
+                GridRule::create($rule);
+            }
         }
 
         Schema::enableForeignKeyConstraints();
