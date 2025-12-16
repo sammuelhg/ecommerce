@@ -261,6 +261,11 @@ Route::get('/force-seed', function () {
         ]);
         return 'Seeder executado com sucesso: <pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
     } catch (\Exception $e) {
+        return 'Erro: ' . $e->getMessage();
+    }
+});
+
+
 Route::get('/debug-logs', function () {
     $logFile = storage_path('logs/laravel.log');
     if (!file_exists($logFile)) {
