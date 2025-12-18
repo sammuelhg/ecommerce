@@ -116,6 +116,10 @@ jobs:
           $PHP_BIN artisan optimize:clear
           $PHP_BIN artisan storage:link
           
+          # Ensure essential storage directories exist
+          mkdir -p storage/logs storage/framework/cache/data storage/framework/sessions storage/framework/views
+          touch storage/logs/laravel.log
+
           chmod -R 775 storage bootstrap/cache
           find . -type d -exec chmod 755 {} \;
           find . -type f -exec chmod 644 {} \;
