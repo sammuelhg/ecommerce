@@ -105,9 +105,25 @@
                     </div>
 
                     <!-- STEP 2: VITRINE (Products) -->
-                    <div x-show="currentStep === 2">
-                        <h5 class="fw-bold mb-4">2. Vitrine de Produtos</h5>
-                        <p class="text-muted mb-4">Quais produtos você quer destacar nesta campanha?</p>
+                    <div x-show="currentStep === 2" x-data="{
+                        selectedIds: @entangle('product_ids'),
+                        toggle(id) {
+                            if (this.selectedIds.includes(id)) {
+                                this.selectedIds = this.selectedIds.filter(i => i !== id);
+                            } else {
+                                this.selectedIds.push(id);
+                            }
+                        }
+                    }">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h5 class="fw-bold mb-0">2. Vitrine de Produtos</h5>
+                                <p class="text-muted mb-0">Quais produtos você quer destacar nesta campanha?</p>
+                            </div>
+                            <button wire:click="save" class="btn btn-primary shadow-sm" wire:loading.attr="disabled">
+                                <i class="bi bi-save me-2"></i>Salvar Campanha
+                            </button>
+                        </div>
                         
                         <div class="bg-light p-3 rounded mb-4">
                             <div class="input-group">
@@ -121,11 +137,11 @@
                             @foreach($this->availableProducts as $product)
                                 <div class="col-md-12">
                                     <div class="d-flex align-items-center p-2 border rounded bg-white hover-bg-light" style="cursor: pointer;"
-                                         wire:click="toggleProduct({{ $product->id }})">
+                                         @click="toggle({{ $product->id }})">
                                         
                                         <div class="form-check me-3">
                                             <input class="form-check-input" type="checkbox" 
-                                                   @if(in_array($product->id, $product_ids)) checked @endif 
+                                                   :checked="selectedIds.includes({{ $product->id }})"
                                                    style="pointer-events: none;">
                                         </div>
 
@@ -136,9 +152,9 @@
                                             <small class="text-muted">R$ {{ number_format($product->price ?? 0, 2, ',', '.') }}</small>
                                         </div>
                                         
-                                        @if(in_array($product->id, $product_ids))
+                                        <template x-if="selectedIds.includes({{ $product->id }})">
                                             <span class="badge bg-primary">Selecionado</span>
-                                        @endif
+                                        </template>
                                     </div>
                                 </div>
                             @endforeach
@@ -299,7 +315,7 @@
                                     <li class="mb-2">
                                         <strong>Gatilho (Forms):</strong> 
                                         @php 
-                                            $forms = \App\Models\Form::whereIn('id', $form_ids)->pluck('title')->implode(', ');
+                                            $forms = \App\Domains\Marketing\Models\Form::whereIn('id', $form_ids)->pluck('title')->implode(', ');
                                         @endphp
                                         {{ $forms ?: 'Nenhum selecionado' }}
                                     </li>

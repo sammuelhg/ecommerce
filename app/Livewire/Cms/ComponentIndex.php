@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Cms;
 
-use App\Models\CmsComponent;
+use App\Domains\Content\Models\CmsComponent;
 use Livewire\Component;
 
 class ComponentIndex extends Component

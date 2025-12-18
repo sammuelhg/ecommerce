@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Forms;
 
 use App\DTOs\FormData;
-use App\Models\Form;
+use App\Domains\Marketing\Models\Form;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 

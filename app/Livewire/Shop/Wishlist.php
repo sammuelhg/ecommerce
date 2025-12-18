@@ -3,9 +3,9 @@
 namespace App\Livewire\Shop;
 
 use Livewire\Component;
-use App\Services\WishlistService;
-use App\Services\CartService;
-use App\Models\Product;
+use App\Domains\Customer\Services\WishlistService;
+use App\Domains\Sales\Services\CartService;
+use App\Domains\Catalog\Models\Product;
 use Livewire\Attributes\On;
 
 use App\DTOs\Cart\CartItemDTO;

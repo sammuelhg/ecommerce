@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\Lead;
+use App\Domains\Marketing\Models\Lead;
 use Illuminate\Http\Request;
 
 class PixelController extends Controller

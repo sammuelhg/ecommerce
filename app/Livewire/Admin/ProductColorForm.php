@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\ProductColor;
+use App\Domains\Catalog\Models\ProductColor;
 use Livewire\Component;
 use Illuminate\Support\Str;
 

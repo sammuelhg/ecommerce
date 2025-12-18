@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\NewsletterSubscriber; // Added this import
+use App\Domains\Marketing\Models\Lead; // Changed from NewsletterSubscriber
 
 class NewsletterController extends Controller
 {
-    public function show(\App\Models\Campaign $campaign)
+    public function show(\App\Domains\Marketing\Models\Campaign $campaign)
     {
         // New System: Use Campaign model
         $overrideCard = $campaign->signCard;
@@ -20,25 +20,27 @@ class NewsletterController extends Controller
     }
 
     // Legacy method - keeping for reference or unused routes, but safer to remove if conflicting
-    /* public function preview(\App\Models\NewsletterEmail $email) { ... } */
+    /* public function preview(\App\Domains\Marketing\Models\NewsletterEmail $email) { ... } */
 
-    public function unsubscribe(Request $request, int $subscriberId)
+    public function unsubscribe(Request $request, int $leadId)
     {
         if (!$request->hasValidSignature()) {
             abort(403);
         }
 
-        $subscriber = NewsletterSubscriber::findOrFail($subscriberId); // Changed to use imported model
-        $subscriber->update(['is_active' => false]);
+        $lead = Lead::findOrFail($leadId);
+        $lead->update(['status' => 'unsubscribed']); // Changed column/value
 
-        return view('newsletter.unsubscribe', compact('subscriber'));
+        // View likely expects $subscriber variable, passing as such for compatibility or refactor view
+        // Let's pass as 'subscriber' to avoid breaking view
+        return view('newsletter.unsubscribe', ['subscriber' => $lead]);
     }
 
-    public function resubscribe(Request $request, int $subscriberId)
+    public function resubscribe(Request $request, int $leadId)
     {
          // Optional: logic to reactivate
-         $subscriber = NewsletterSubscriber::findOrFail($subscriberId); // Changed to use imported model
-         $subscriber->update(['is_active' => true]);
+         $lead = Lead::findOrFail($leadId);
+         $lead->update(['status' => 'active']);
          
          return redirect()->route('shop.index')->with('success', 'Inscrição reativada!');
     }

@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\Product;
+use App\Domains\Catalog\Models\Product;
 use Livewire\Component;
 
 class ProductDetails extends Component

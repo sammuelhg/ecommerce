@@ -42,7 +42,7 @@ class UserManager extends Component
             ->findOrFail($userId);
 
         // Calculate Best Sellers for this user
-        $this->userBestSellers = \App\Models\OrderItem::whereHas('order', function ($q) use ($userId) {
+        $this->userBestSellers = \App\Domains\Sales\Models\OrderItem::whereHas('order', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
             ->selectRaw('product_id, sum(quantity) as total_qty, sum(quantity * unit_price) as total_spent')
@@ -86,8 +86,8 @@ class UserManager extends Component
         
         $query->withSum('orders', 'total_price');
 
-        $totalRev = \App\Models\Order::sum('total_price');
-        $totalOrders = \App\Models\Order::count();
+        $totalRev = \App\Domains\Sales\Models\Order::sum('total_price');
+        $totalOrders = \App\Domains\Sales\Models\Order::count();
         $storeAov = $totalOrders > 0 ? $totalRev / $totalOrders : 0;
 
         return view('livewire.admin.users.user-manager', [

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\StoreSetting;
+use App\Domains\Shared\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Services\Admin\StoreSettingService;
 use App\DTOs\Admin\StoreSettingsDTO;
@@ -133,11 +133,11 @@ class StoreSettingController extends Controller
                 ]);
                 
                 // Produtos de exemplo
-                $products = \App\Models\Product::inRandomOrder()->take(3)->get();
+                $products = \App\Domains\Catalog\Models\Product::inRandomOrder()->take(3)->get();
                 if ($products->isEmpty()) {
                     $products = collect([
-                        new \App\Models\Product(['name' => 'Produto Exemplo 1', 'price' => 99.90, 'slug' => 'produto-1', 'image' => '']),
-                        new \App\Models\Product(['name' => 'Produto Exemplo 2', 'price' => 149.90, 'slug' => 'produto-2', 'image' => '']),
+                        new \App\Domains\Catalog\Models\Product(['name' => 'Produto Exemplo 1', 'price' => 99.90, 'slug' => 'produto-1', 'image' => '']),
+                        new \App\Domains\Catalog\Models\Product(['name' => 'Produto Exemplo 2', 'price' => 149.90, 'slug' => 'produto-2', 'image' => '']),
                     ]);
                 }
 

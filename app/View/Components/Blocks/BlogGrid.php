@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\View\Components\Blocks;
 
 use App\DTOs\Blocks\BlogGridConfig;
-use App\Models\Post;
+use App\Domains\Content\Models\Post;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 use Illuminate\Database\Eloquent\Collection;

@@ -6,7 +6,7 @@ namespace App\Services\Auth;
 
 use App\DTOs\Auth\SocialUserDTO;
 use App\Models\User;
-use App\Services\BaseService;
+use App\Domains\Shared\Services\BaseService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;

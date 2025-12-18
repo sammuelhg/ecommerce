@@ -3,7 +3,7 @@
 namespace App\Livewire\Shop;
 
 use Livewire\Component;
-use App\Services\CartService;
+use App\Domains\Sales\Services\CartService;
 use Livewire\Attributes\On;
 
 class CartIcon extends Component

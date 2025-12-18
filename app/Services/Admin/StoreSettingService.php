@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\DTOs\Admin\StoreSettingsDTO;
-use App\Models\StoreSetting;
-use App\Services\BaseService;
+use App\Domains\Shared\Models\StoreSetting;
+use App\Domains\Shared\Services\BaseService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 

@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\ProductType;
-use App\Models\ProductModel;
-use App\Models\ProductMaterial;
+use App\Domains\Catalog\Models\Category;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Catalog\Models\ProductImage;
+use App\Domains\Catalog\Models\ProductType;
+use App\Domains\Catalog\Models\ProductModel;
+use App\Domains\Catalog\Models\ProductMaterial;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;

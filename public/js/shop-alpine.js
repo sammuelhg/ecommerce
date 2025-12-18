@@ -14,9 +14,18 @@ function shopApp() {
             this.loadFromStorage();
             this.setupWatchers();
             this.loadSearchHistory();
+
+            // Background sync for guests if localStorage has items but server doesn't
+            if (window.IS_GUEST && this.cart.length > 0 && (!window.SERVER_CART || window.SERVER_CART.length === 0)) {
+                this.syncWithServer(true); // silent sync
+            }
         },
         loadFromStorage() {
-            // Prioritize Server Cart if available and not empty (Source of Truth)
+            // Prioritize Server Cart if available and not empty (Source of Truth for logged users)
+            // For guests, if server is empty but local has items, use local
+            const storedCart = localStorage.getItem('myShopCart');
+            const hasStoredItems = storedCart && JSON.parse(storedCart).length > 0;
+
             if (window.SERVER_CART && window.SERVER_CART.length > 0) {
                 this.cart = window.SERVER_CART.map(item => {
                     // Ensure imageText is set if missing (compatibility)
@@ -25,16 +34,15 @@ function shopApp() {
                 });
                 // Sync localStorage with Server Cart
                 localStorage.setItem('myShopCart', JSON.stringify(this.cart));
+            } else if (window.IS_GUEST && hasStoredItems) {
+                // Fallback to localStorage if guest and server is empty
+                const parsedCart = JSON.parse(storedCart);
+                this.cart = parsedCart.map(item => {
+                    const fresh = this.products.find(p => p.id === item.id);
+                    return fresh ? { ...fresh, qty: item.qty } : item;
+                });
             } else {
-                // Fallback to localStorage (e.g. session expired but local data exists)
-                const storedCart = localStorage.getItem('myShopCart');
-                if (storedCart) {
-                    const parsedCart = JSON.parse(storedCart);
-                    this.cart = parsedCart.map(item => {
-                        const fresh = this.products.find(p => p.id === item.id);
-                        return fresh ? { ...fresh, qty: item.qty } : item;
-                    });
-                }
+                this.cart = [];
             }
 
             const storedWishlist = localStorage.getItem('myShopWishlist');
@@ -47,8 +55,33 @@ function shopApp() {
             }
         },
         setupWatchers() {
-            this.$watch('cart', v => localStorage.setItem('myShopCart', JSON.stringify(v)));
+            this.$watch('cart', v => {
+                localStorage.setItem('myShopCart', JSON.stringify(v));
+                // If it's a guest, we might want to sync with session periodically or on change?
+                // For now, let's keep it in sync for checkout button
+            });
             this.$watch('wishlist', v => localStorage.setItem('myShopWishlist', JSON.stringify(v)));
+        },
+        async syncWithServer(silent = false) {
+            if (this.cart.length === 0) return;
+
+            try {
+                await fetch('/loja/carrinho/sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ cart: this.cart, background: silent })
+                });
+
+                // If not silent, we might want to refresh Livewire components
+                if (!silent) {
+                    window.Livewire.dispatch('cartUpdated');
+                }
+            } catch (error) {
+                console.error('Error syncing cart:', error);
+            }
         },
         get cartTotalItems() { return this.cart.reduce((s, i) => s + i.qty, 0); },
         get cartSubtotal() { return this.cart.reduce((s, i) => s + (i.price * i.qty), 0); },

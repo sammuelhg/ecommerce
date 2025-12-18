@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Analytics;
 
-use App\Models\Campaign;
+use App\Domains\Marketing\Models\Campaign;
 
 class GetCampaignRoiReportAction
 {

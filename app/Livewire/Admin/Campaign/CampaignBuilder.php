@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Campaign;
 
-use App\Models\Campaign;
-use App\Models\Product;
-use App\Models\Form;
+use App\Domains\Marketing\Models\Campaign;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Marketing\Models\Form;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
 use Illuminate\Support\Collection;
-use App\Models\SignCard;
+use App\Domains\Content\Models\SignCard;
 
 #[Layout('layouts.admin')]
 class CampaignBuilder extends Component
@@ -152,14 +152,8 @@ class CampaignBuilder extends Component
         return Product::whereIn('id', $this->product_ids)->get();
     }
 
-    public function toggleProduct(int $productId): void
-    {
-        if (in_array($productId, $this->product_ids)) {
-            $this->product_ids = array_diff($this->product_ids, [$productId]);
-        } else {
-            $this->product_ids[] = $productId;
-        }
-    }
+    // Product selection is now handled on the client-side via Alpine.js 
+    // and synced with $product_ids via @entangle.
 
     // ... (Keep existing property getters like getAvailableProductsProperty) ...
 
@@ -291,12 +285,12 @@ class CampaignBuilder extends Component
 
     public function getTemplatesProperty()
     {
-        return \App\Models\EmailTemplate::all(['id', 'name', 'subject', 'body']);
+        return \App\Domains\Marketing\Models\EmailTemplate::all(['id', 'name', 'subject', 'body']);
     }
 
     public function applyTemplate(int $index, int $templateId): void
     {
-        $template = \App\Models\EmailTemplate::find($templateId);
+        $template = \App\Domains\Marketing\Models\EmailTemplate::find($templateId);
         if ($template) {
             $this->emails[$index]['subject'] = $template->subject;
             $this->emails[$index]['body'] = $template->body;

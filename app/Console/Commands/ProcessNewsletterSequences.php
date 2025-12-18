@@ -33,8 +33,8 @@ class ProcessNewsletterSequences extends Command
             ->get();
 
         foreach ($enrollments as $enrollment) {
-            $campaign = \App\Models\NewsletterCampaign::find($enrollment->newsletter_campaign_id);
-            $subscriber = \App\Models\NewsletterSubscriber::find($enrollment->newsletter_subscriber_id);
+            $campaign = \App\Domains\Marketing\Models\NewsletterCampaign::find($enrollment->newsletter_campaign_id);
+            $subscriber = \App\Domains\Marketing\Models\NewsletterSubscriber::find($enrollment->newsletter_subscriber_id);
 
             if (!$campaign || !$subscriber || !$subscriber->is_active) {
                 // Determine if we should mark complete or delete? For now skip.
@@ -61,7 +61,7 @@ class ProcessNewsletterSequences extends Command
                 }
             } else {
                 // Logic: Has processed at least one email. Look for next.
-                $currentEmail = \App\Models\NewsletterEmail::find($enrollment->current_email_id);
+                $currentEmail = \App\Domains\Marketing\Models\NewsletterEmail::find($enrollment->current_email_id);
                 if (!$currentEmail) {
                     // Current email deleted? Move next.
                     $targetEmail = $campaign->emails()->where('sort_order', '>', 0)->orderBy('sort_order')->first(); 

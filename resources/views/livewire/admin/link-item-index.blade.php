@@ -35,7 +35,7 @@
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <span><i class="bi bi-link-45deg me-2"></i>Links Cadastrados</span>
             <div>
-                <a href="{{ route('links') }}" target="_blank" class="btn btn-sm btn-outline-light me-2">
+                <a href="{{ route('links') }}" target="_blank" class="btn btn-sm btn-primary me-2">
                     <i class="bi bi-eye me-1"></i>Ver Página
                 </a>
                 <button wire:click="openCreateModal" class="btn btn-sm btn-success">

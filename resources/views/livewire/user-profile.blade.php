@@ -25,11 +25,11 @@
                             <div class="row g-3">
                                 <!-- Nome -->
                                 <div class="col-md-6">
-                                    <label for="name" class="form-label">Nome Completo *</label>
+                                    <label for="profile_name" class="form-label">Nome Completo *</label>
                                     <input type="text" 
                                            wire:model="name" 
                                            class="form-control bg-white @error('name') is-invalid @enderror" 
-                                           id="name">
+                                           id="profile_name">
                                     @error('name') 
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -37,22 +37,22 @@
 
                                 <!-- Email (readonly) -->
                                 <div class="col-md-6">
-                                    <label for="email" class="form-label">Email</label>
+                                    <label for="profile_email" class="form-label">Email</label>
                                     <input type="email" 
                                            value="{{ $email }}" 
                                            class="form-control bg-white" 
-                                           id="email" 
+                                           id="profile_email" 
                                            readonly>
                                     <small class="text-muted">O email não pode ser alterado</small>
                                 </div>
 
                                 <!-- Telefone -->
                                 <div class="col-md-6">
-                                    <label for="phone" class="form-label">Telefone</label>
+                                    <label for="profile_phone" class="form-label">Telefone</label>
                                     <input type="text" 
                                            wire:model="phone" 
                                            class="form-control bg-white @error('phone') is-invalid @enderror" 
-                                           id="phone"
+                                           id="profile_phone"
                                            placeholder="(00) 00000-0000">
                                     @error('phone') 
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -61,11 +61,11 @@
 
                                 <!-- Data de Nascimento -->
                                 <div class="col-md-6">
-                                    <label for="birth_date" class="form-label">Data de Nascimento</label>
+                                    <label for="profile_birth_date" class="form-label">Data de Nascimento</label>
                                     <input type="date" 
                                            wire:model="birth_date" 
                                            class="form-control bg-white @error('birth_date') is-invalid @enderror" 
-                                           id="birth_date">
+                                           id="profile_birth_date">
                                     @error('birth_date') 
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -73,10 +73,10 @@
 
                                 <!-- Endereço -->
                                 <div class="col-12">
-                                    <label for="address" class="form-label">Endereço Completo</label>
+                                    <label for="profile_address" class="form-label">Endereço Completo</label>
                                     <textarea wire:model="address" 
                                               class="form-control bg-white @error('address') is-invalid @enderror" 
-                                              id="address" 
+                                              id="profile_address" 
                                               rows="3"
                                               placeholder="Rua, Número, Complemento, Bairro, Cidade - UF, CEP"></textarea>
                                     @error('address') 

@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Flavor;
+use App\Domains\Catalog\Models\Flavor;
 use Livewire\Component;
 use Illuminate\Validation\Rule;
 

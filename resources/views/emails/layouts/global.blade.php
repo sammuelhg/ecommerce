@@ -198,14 +198,16 @@
         $showcaseIds = $emailConfig->getShowcaseProductIds();
         // If no specific IDs set, fallback to random active products
         if (!empty($showcaseIds)) {
-            $featuredProducts = \App\Models\Product::whereIn('id', $showcaseIds)->get();
+            $showcaseIds = array_slice($showcaseIds, 0, 3);
+            $featuredProducts = \App\Domains\Catalog\Models\Product::whereIn('id', $showcaseIds)->get();
         } else {
-            $featuredProducts = \App\Models\Product::where('is_active', true)->inRandomOrder()->take(3)->get();
+            // Fallback: 3 random active products if no specific showcased ones
+            $featuredProducts = \App\Domains\Catalog\Models\Product::where('is_active', true)->inRandomOrder()->take(3)->get();
         }
     }
 
     // Logo Logic
-    $storeLogo = \App\Models\StoreSetting::get('email_logo') ?? \App\Models\StoreSetting::get('store_logo');
+    $storeLogo = \App\Domains\Shared\Models\StoreSetting::get('email_logo') ?? \App\Domains\Shared\Models\StoreSetting::get('store_logo');
     if ($storeLogo) {
         $logoUrl = preg_match('/^http/', $storeLogo) ? $storeLogo : url($storeLogo);
     } else {

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Shop;
 
 use Livewire\Component;
-use App\Models\Product;
-use App\Services\CartService;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Sales\Services\CartService;
 use App\DTOs\Cart\CartItemDTO;
 use Illuminate\Contracts\View\View;
 

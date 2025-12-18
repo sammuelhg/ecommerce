@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Newsletter;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\EmailTemplate;
+use App\Domains\Marketing\Models\EmailTemplate;
 use Livewire\Attributes\Rule;
 use Livewire\Attributes\Layout;
 

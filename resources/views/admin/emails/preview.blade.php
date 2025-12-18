@@ -42,7 +42,7 @@
                     {!! nl2br(e($replyPreview['body'])) !!}
                 </div>
                 
-                @php $cardToUse = $defaultCard ?? \App\Models\EmailCard::getDefault(); @endphp
+                @php $cardToUse = $defaultCard ?? \App\Domains\Content\Models\SignCard::getDefault(); @endphp
                 @if($cardToUse)
                     <div class="mt-4 pt-4 border-top">
                         <x-email.digital-card :card="$cardToUse" :isEmail="true" />

@@ -6,7 +6,7 @@ namespace App\Services\Auth;
 
 use App\DTOs\Auth\RegisterUserDTO;
 use App\Models\User;
-use App\Services\BaseService;
+use App\Domains\Shared\Services\BaseService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Mail;

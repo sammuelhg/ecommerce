@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Admin\Grid;
 
-use App\Models\GridRule;
+use App\Domains\Catalog\Models\GridRule;
+use App\Domains\Marketing\Models\Form;
 use Livewire\Component;
 
 class GridManager extends Component
@@ -49,12 +50,12 @@ class GridManager extends Component
     public function mount()
     {
         $this->loadRules();
-        $this->availableForms = \App\Models\Form::where('is_active', true)->get();
+        $this->availableForms = \App\Domains\Marketing\Models\Form::where('is_active', true)->get();
     }
 
     public function loadRules()
     {
-        $this->rules = \App\Models\GridRule::orderBy('position')->get();
+        $this->rules = \App\Domains\Catalog\Models\GridRule::orderBy('position')->get();
     }
 
     // Product Search logic...
@@ -76,7 +77,7 @@ class GridManager extends Component
             return;
         }
 
-        $this->foundProducts = \App\Models\Product::where('name', 'like', '%' . $this->productSearch . '%')
+        $this->foundProducts = \App\Domains\Catalog\Models\Product::where('name', 'like', '%' . $this->productSearch . '%')
             ->where('is_active', true)
             ->take(5)
             ->get();
@@ -84,7 +85,7 @@ class GridManager extends Component
 
     public function selectProduct($id)
     {
-        $product = \App\Models\Product::find($id);
+        $product = \App\Domains\Catalog\Models\Product::find($id);
         if ($product) {
             $this->selectedProduct = $product;
             $this->formatted_config_product_id = $product->id;
@@ -265,7 +266,7 @@ class GridManager extends Component
 
     public function getCampaignsProperty()
     {
-        return \App\Models\NewsletterCampaign::orderBy('created_at', 'desc')->get();
+        return \App\Domains\Marketing\Models\NewsletterCampaign::orderBy('created_at', 'desc')->get();
     }
 
     public function render()

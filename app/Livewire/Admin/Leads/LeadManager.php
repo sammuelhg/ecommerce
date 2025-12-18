@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Leads;
 
-use App\Models\Lead;
+use App\Domains\Marketing\Models\Lead;
 use Livewire\Component;
 use Livewire\WithPagination;
 

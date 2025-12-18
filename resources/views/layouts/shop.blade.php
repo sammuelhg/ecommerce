@@ -47,7 +47,7 @@
     @include('shop.partials.toasts')
     
     <!-- Bootstrap Bundle JS (for Offcanvas and other components) - MUST load before Alpine -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Cleanup duplicate backdrops -->
     <script>
@@ -93,12 +93,13 @@
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Shop Alpine App Definition (must load before Alpine initializes) -->
-    <script src="{{ asset('js/shop-alpine.js') }}"></script>
+    <script defer src="{{ asset('js/shop-alpine.js') }}"></script>
     
     <!-- Server-Side Cart Data Injection -->
     @php
-        $dbProducts = \App\Models\Product::where('is_active', true)
+        $dbProducts = \App\Domains\Catalog\Models\Product::where('is_active', true)
             ->select(['id', 'name', 'price', 'image', 'is_offer', 'old_price'])
+            ->limit(50)
             ->get()
             ->map(function($p) {
                 return [
@@ -112,7 +113,8 @@
             });
     @endphp
     <script>
-        window.SERVER_CART = @json(array_values(app(\App\Services\CartService::class)->get()));
+        window.IS_GUEST = @json(auth()->guest());
+        window.SERVER_CART = @json(array_values(app(\App\Domains\Sales\Services\CartService::class)->get()));
         
         // Inject all active products for Alpine hydration (Wishlist/Cart sync)
         window.DB_PRODUCTS = @json($dbProducts);

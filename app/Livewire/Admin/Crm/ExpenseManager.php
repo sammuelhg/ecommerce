@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Crm;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\MarketingExpense;
+use App\Domains\Marketing\Models\MarketingExpense;
 
 class ExpenseManager extends Component
 {

@@ -4,18 +4,26 @@ declare(strict_types=1);
 
 namespace App\Actions\Shop;
 
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\SearchHighlight;
+use App\Domains\Catalog\Models\Category;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Content\Models\SearchHighlight;
 use Illuminate\Database\Eloquent\Collection;
 
 class GetSearchSuggestionsAction
 {
     public function execute(?string $query, ?string $categorySlug): array
     {
+        $start = microtime(true);
+        \Illuminate\Support\Facades\Log::info("GetSearchSuggestionsAction started", ['q' => $query, 'cat' => $categorySlug]);
+
         // CASE: Default Suggestions (Search Highlights)
         if (empty($query)) {
-            return $this->getHighlights($categorySlug);
+            $cacheKey = 'search_highlights_v2_' . ($categorySlug ?? 'all');
+            $res = \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function() use ($categorySlug) {
+                return $this->getHighlights($categorySlug);
+            });
+            \Illuminate\Support\Facades\Log::info("GetSearchSuggestionsAction finished (highlights)", ['time' => microtime(true) - $start]);
+            return $res;
         }
 
         // CASE: Active Typing Search
@@ -23,7 +31,13 @@ class GetSearchSuggestionsAction
             return ['products' => [], 'categories' => []];
         }
 
-        return $this->searchActive($query);
+        $cacheKey = 'search_active_v2_' . md5($query . ($categorySlug ?? 'all'));
+        $res = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60, function() use ($query, $categorySlug) {
+            return $this->searchActive($query, $categorySlug);
+        });
+
+        \Illuminate\Support\Facades\Log::info("GetSearchSuggestionsAction finished (search)", ['time' => microtime(true) - $start]);
+        return $res;
     }
 
     private function getHighlights(?string $categorySlug): array
@@ -31,40 +45,53 @@ class GetSearchSuggestionsAction
         $categoryId = null;
         
         if ($categorySlug && $categorySlug !== 'Todos') {
-            $category = Category::where('slug', $categorySlug)->first();
+            // Hotfix: if it passed as JSON string
+            if (str_starts_with($categorySlug, '{')) {
+                try {
+                   $obj = json_decode($categorySlug, true);
+                   $categorySlug = $obj['slug'] ?? $categorySlug;
+                } catch(\Exception $e) {}
+            }
+
+            $category = Category::where('slug', $categorySlug)->first(['id']);
             $categoryId = $category?->id;
         }
 
         // 1. Try to get configured highlights
-        $highlights = SearchHighlight::with('product')
+        $highlights = SearchHighlight::with(['product' => function($q) {
+            $q->select(['id', 'name', 'slug', 'image', 'price']);
+        }])
             ->where('category_id', $categoryId)
             ->limit(3)
             ->get()
-            ->pluck('product');
+            ->pluck('product')
+            ->filter();
 
         // 2. Fallback logic
         if ($highlights->count() < 3) {
             $needed = 3 - $highlights->count();
             $excludeIds = $highlights->pluck('id')->toArray();
             
-            $fillerQuery = Product::where('is_active', true)->whereNotIn('id', $excludeIds);
+            $fillerQuery = Product::query()
+                ->select(['id', 'name', 'slug', 'image', 'price'])
+                ->where('is_active', true)
+                ->whereNotIn('id', $excludeIds);
             
             if ($categoryId) {
-                $fillerQuery->where(function($q) use ($categoryId) {
-                    $q->where('category_id', $categoryId)
-                      ->orWhereHas('categories', function($sq) use ($categoryId) {
-                          $sq->where('categories.id', $categoryId);
-                      });
-                });
+                // Correct relationship is 'category_id' column or 'category' belongsTo.
+                // We don't have many-to-many highlights yet.
+                $fillerQuery->where('category_id', $categoryId);
             }
             
-            $fillers = $fillerQuery->inRandomOrder()->limit($needed)->get();
+            $fillers = $fillerQuery->latest()->limit($needed)->get();
             
             if ($highlights->count() + $fillers->count() < 3) {
                 $stillNeeded = 3 - ($highlights->count() + $fillers->count());
-                $globalFillers = Product::where('is_active', true)
+                $globalFillers = Product::query()
+                   ->select(['id', 'name', 'slug', 'image', 'price'])
+                   ->where('is_active', true)
                    ->whereNotIn('id', array_merge($excludeIds, $fillers->pluck('id')->toArray()))
-                   ->inRandomOrder()
+                   ->latest()
                    ->limit($stillNeeded)
                    ->get();
                 $fillers = $fillers->merge($globalFillers);
@@ -78,7 +105,8 @@ class GetSearchSuggestionsAction
                 'id' => $p->id,
                 'name' => $p->name,
                 'slug' => $p->slug,
-                'image' => $p->image
+                'image_url' => $p->image_url,
+                'price' => number_format((float)$p->price, 2, ',', '.')
             ];
         });
 
@@ -88,20 +116,48 @@ class GetSearchSuggestionsAction
         ];
     }
 
-    private function searchActive(string $query): array
+    private function searchActive(string $query, ?string $categorySlug = null): array
     {
-        $products = Product::where('name', 'like', "%{$query}%")
-            ->where('is_active', true)
-            ->limit(5)
-            ->get(['id', 'name', 'slug', 'image']);
+        $productQuery = Product::query()
+            ->select(['id', 'name', 'slug', 'image', 'price'])
+            ->where('name', 'like', "%{$query}%")
+            ->where('is_active', true);
 
-        $categories = Category::where('name', 'like', "%{$query}%")
+        if ($categorySlug && $categorySlug !== 'Todos') {
+            // Handle JSON string if passed
+            if (str_starts_with($categorySlug, '{')) {
+                try {
+                   $obj = json_decode($categorySlug, true);
+                   $categorySlug = $obj['slug'] ?? $categorySlug;
+                } catch(\Exception $e) {}
+            }
+            
+            $category = Category::where('slug', $categorySlug)->first(['id']);
+            if ($category) {
+                $productQuery->where('category_id', $category->id);
+            }
+        }
+
+        $products = $productQuery->limit(5)->get();
+
+        $formattedProducts = $products->map(function($p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'image_url' => $p->image_url,
+                'price' => number_format((float)$p->price, 2, ',', '.')
+            ];
+        });
+
+        $categories = Category::query()
+            ->where('name', 'like', "%{$query}%")
             ->where('is_active', true)
             ->limit(3)
             ->get(['id', 'name', 'slug']);
 
         return [
-            'products' => $products,
+            'products' => $formattedProducts,
             'categories' => $categories
         ];
     }

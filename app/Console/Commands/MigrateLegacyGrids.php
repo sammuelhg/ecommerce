@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Campaign;
-use App\Models\Form;
-use App\Models\GridRule;
+use App\Domains\Marketing\Models\Campaign;
+use App\Domains\Marketing\Models\Form;
+use App\Domains\Catalog\Models\GridRule;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 

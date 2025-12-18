@@ -7,7 +7,7 @@ namespace App\Livewire\Integrations;
 use Livewire\Component;
 use App\DTOs\Integrations\GoogleConnectData;
 use App\Actions\Integrations\UpsertGoogleIntegrationAction;
-use App\Models\Integration;
+use App\Domains\Shared\Models\Integration;
 use Exception;
 
 class GoogleSettings extends Component

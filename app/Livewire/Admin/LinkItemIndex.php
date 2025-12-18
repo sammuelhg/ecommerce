@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\LinkItem;
-use App\Models\StoreSetting;
+use App\Domains\Content\Models\LinkItem;
+use App\Domains\Shared\Models\StoreSetting;
 use Livewire\Component;
 
 class LinkItemIndex extends Component

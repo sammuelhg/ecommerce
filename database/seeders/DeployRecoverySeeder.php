@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\SignCard;
+use App\Domains\Content\Models\SignCard;
 use App\Models\StoreSetting;
 use App\Models\GridRule;
 use Illuminate\Support\Facades\DB;

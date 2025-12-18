@@ -3,16 +3,16 @@
 namespace App\Livewire\Cms;
 
 use Livewire\Component;
-use App\Models\Form;
-use App\Models\Lead;
+use App\Domains\Marketing\Models\Form;
+use App\Domains\Marketing\Models\Lead;
 use App\Enums\LeadStatus;
 use App\DTOs\LeadData;
 use App\Actions\Leads\CreateLeadAction;
 use Illuminate\Support\Facades\Request;
 
 // use Illuminate\Support\Facades\Mail;
-// use App\Models\NewsletterCampaign;
-// use App\Models\NewsletterEmail;
+// use App\Domains\Marketing\Models\NewsletterCampaign;
+// use App\Domains\Marketing\Models\NewsletterEmail;
 // use App\Mail\CampaignMail;
 
 class UniversalForm extends Component

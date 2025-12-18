@@ -3,8 +3,8 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
-use App\Models\ProductImage;
-use App\Services\ProductImageService;
+use App\Domains\Catalog\Models\ProductImage;
+use App\Domains\Catalog\Services\ProductImageService;
 
 class ProductImageItem extends Component
 {

@@ -2,8 +2,8 @@
 
 namespace App\Actions\Cms;
 
-use App\Models\Page;
-use App\Models\StoreSetting;
+use App\Domains\Content\Models\Page;
+use App\Domains\Shared\Models\StoreSetting;
 use App\Cms\Blocks\HeroBlock;
 use App\Cms\Blocks\TextBlock;
 use App\Cms\Blocks\ContactBlock;

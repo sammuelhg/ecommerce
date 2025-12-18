@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Campaign;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Campaign;
+use App\Domains\Marketing\Models\Campaign;
 use Livewire\Attributes\Layout;
 
 #[Layout('layouts.admin')]

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Domains\Content\Models\SignCard;
 
 class EmailPreviewController extends Controller
 {
@@ -71,7 +72,7 @@ class EmailPreviewController extends Controller
                 return view('emails.highlights', compact('data'));
 
             case 'cards':
-                $cards = \App\Models\EmailCard::all();
+                $cards = SignCard::all();
                 return view('admin.emails.preview', compact('cards'));
 
             case 'reply':
@@ -80,8 +81,8 @@ class EmailPreviewController extends Controller
                     'body' => "Olá Maria,\n\nObrigado pelo seu contato. Verifiquei aqui e seu pedido já foi despachado.\nO código de rastreio é: BR123456789.\n\nQualquer dúvida, estou à disposição.",
                 ];
                 
-                // Get Default Card for the Preview
-                $defaultCard = \App\Models\EmailCard::getDefault();
+                // Get Default Card for the Preview (assuming first one is default or just taking first)
+                $defaultCard = SignCard::where('is_active', true)->first();
 
                 return view('admin.emails.preview', [
                     'cards' => [],
@@ -105,7 +106,7 @@ class EmailPreviewController extends Controller
                     'cards' => [],
                     'unsubScenarios' => $unsubScenarios,
                     'showUnsubscribe' => true,
-                    'defaultCard' => \App\Models\EmailCard::getDefault()
+                    'defaultCard' => SignCard::where('is_active', true)->first()
                 ]);
 
             default:

@@ -7,7 +7,7 @@ namespace App\Livewire\Integrations;
 use Livewire\Component;
 use App\DTOs\Integrations\TikTokConnectData;
 use App\Actions\Integrations\UpsertTikTokIntegrationAction;
-use App\Models\Integration;
+use App\Domains\Shared\Models\Integration;
 use Exception;
 
 class TikTokSettings extends Component

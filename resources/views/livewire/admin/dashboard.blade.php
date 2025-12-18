@@ -37,6 +37,11 @@
                     <h6 class="card-subtitle mb-3 text-muted">Atributos do Produto</h6>
                     <div class="row text-center g-2">
                         <div class="col-4">
+                            <a href="{{ route('admin.colors.index') }}" class="btn btn-white w-100 py-3 border shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-palette fs-2 text-primary mb-1"></i> <span class="small fw-bold">Cores</span>
+                            </a>
+                        </div>
+                        <div class="col-4">
                             <a href="{{ route('admin.types.index') }}" class="btn btn-white w-100 py-3 border shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
                                 <i class="bi bi-tags fs-2 text-info mb-1"></i> <span class="small fw-bold">Tipos</span>
                             </a>
@@ -136,6 +141,17 @@
                         <i class="bi bi-chat-left-text fs-1 mb-3 text-info"></i>
                         <h5 class="card-title fw-bold">Contatos</h5>
                         <small class="text-muted">Lista da Newsletter</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+             <a href="{{ route('admin.marketing.dashboard') }}" class="text-decoration-none">
+                <div class="card text-center h-100 shadow-sm hover-card border-danger-subtle">
+                    <div class="card-body py-4">
+                        <i class="bi bi-pie-chart-fill fs-1 mb-3 text-warning"></i>
+                        <h5 class="card-title fw-bold">Métricas de Email</h5>
+                        <small class="text-muted">Aberturas & Cliques</small>
                     </div>
                 </div>
             </a>

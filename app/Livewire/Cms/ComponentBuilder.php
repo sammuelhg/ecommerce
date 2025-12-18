@@ -3,7 +3,7 @@
 namespace App\Livewire\Cms;
 
 use App\DTOs\Blocks\BlogGridConfig;
-use App\Models\CmsComponent;
+use App\Domains\Content\Models\CmsComponent;
 use Livewire\Component;
 
 class ComponentBuilder extends Component

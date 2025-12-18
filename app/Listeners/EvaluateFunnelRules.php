@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Events\OrderPaid;
-use App\Models\FunnelAutomation;
-use App\Models\Lead;
+use App\Domains\Marketing\Models\FunnelAutomation;
+use App\Domains\Marketing\Models\Lead;
 use App\Enums\FunnelTriggerEnum;
 use App\Enums\FunnelActionEnum;
 use App\Enums\LeadStatus;

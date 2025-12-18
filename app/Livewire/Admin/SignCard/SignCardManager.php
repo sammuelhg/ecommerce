@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\SignCard;
 
-use App\Models\SignCard;
+use App\Domains\Content\Models\SignCard;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Layout;

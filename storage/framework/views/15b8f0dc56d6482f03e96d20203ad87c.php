@@ -153,6 +153,15 @@
                     </span>
                 </button>
 
+                <!-- Busca (Mobile Icon) -->
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center me-2" 
+                        type="button" 
+                        @click="showMobileSearch = !showMobileSearch"
+                        aria-label="Abrir Busca"
+                        style="width: 40px; height: 40px;">
+                    <i class="bi bi-search"></i>
+                </button>
+
                 <!-- Menu Hambúrguer (Mobile) -->
                 <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center" 
                         type="button" 
@@ -235,15 +244,26 @@
          x-transition:enter-start="opacity-0 -translate-y-2"
          x-transition:enter-end="opacity-100 translate-y-0"
          style="display: none;">
-        <form class="d-flex" @submit.prevent="performSearch()">
-            <input class="form-control bg-white me-2" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
-            <button class="btn" type="button" @click="performSearch()" style="background-color: #ffc107; color: #1a1a1a;">
-                <i class="bi bi-search"></i>
-            </button>
-            <button class="btn btn-link text-white ms-2" type="button" @click="showMobileSearch = false">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </form>
+        <?php if (isset($component)) { $__componentOriginal901916e66f76643cea530aa9f8bff40c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal901916e66f76643cea530aa9f8bff40c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.shop.header-search','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('shop.header-search'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $attributes = $__attributesOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__attributesOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $component = $__componentOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__componentOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
     </div>
 
     <!-- Offcanvas Menu Mobile -->
@@ -256,6 +276,30 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
+            <!-- Barra de Busca no Offcanvas -->
+            <div class="mb-4 d-lg-none">
+                <?php if (isset($component)) { $__componentOriginal901916e66f76643cea530aa9f8bff40c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal901916e66f76643cea530aa9f8bff40c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.shop.header-search','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('shop.header-search'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $attributes = $__attributesOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__attributesOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal901916e66f76643cea530aa9f8bff40c)): ?>
+<?php $component = $__componentOriginal901916e66f76643cea530aa9f8bff40c; ?>
+<?php unset($__componentOriginal901916e66f76643cea530aa9f8bff40c); ?>
+<?php endif; ?>
+            </div>
+
             <ul class="navbar-nav">
                 <!-- Links Principais -->
                 <li class="nav-item">
@@ -276,7 +320,7 @@
 
                 <!-- Categorias -->
                 <?php
-                    $categories = \App\Models\Category::where('is_active', true)->get();
+                    $categories = \App\Domains\Catalog\Models\Category::where('is_active', true)->get();
                 ?>
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($categories->count() > 0): ?>
                     <li class="nav-item border-top mt-3 pt-3">

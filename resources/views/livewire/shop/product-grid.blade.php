@@ -19,7 +19,7 @@
                          {{-- Renderiza Form (Legacy Support) --}}
                          <x-cards.newsletter_form :data="$item['content']" :cols="$item['col_span'] ?? 1" />
                         
-                    @elseif(isset($item['content']) && $item['content'] instanceof \App\Models\Product)
+                    @elseif(isset($item['content']) && $item['content'] instanceof \App\Domains\Catalog\Models\Product)
                         {{-- Renderiza Produto --}}
                         @livewire('shop.product-card', ['product' => $item['content']], key('prod-'.$item['content']->id))
                         
@@ -32,7 +32,7 @@
                         {{-- Fallback de Debug (Só aparece se algo estiver estranho) --}}
                         {{-- <div class="alert alert-warning">Item desconhecido no Grid</div> --}}
                         {{-- Silent Fallback: if product structure matches --}}
-                         @if(isset($item['content']) && $item['content'] instanceof \App\Models\Product)
+                         @if(isset($item['content']) && $item['content'] instanceof \App\Domains\Catalog\Models\Product)
                             @livewire('shop.product-card', ['product' => $item['content']], key('prod-fallback-'.$item['content']->id))
                          @endif
                     @endif

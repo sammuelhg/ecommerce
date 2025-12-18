@@ -17,8 +17,8 @@ class CampaignEmail extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        public \App\Models\NewsletterEmail $email,
-        public \App\Models\NewsletterSubscriber $subscriber
+        public \App\Domains\Marketing\Models\NewsletterEmail $email,
+        public \App\Domains\Marketing\Models\Lead $lead // Renamed from subscriber
     ) {}
 
     /**
@@ -26,7 +26,7 @@ class CampaignEmail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $prefix = \App\Models\StoreSetting::get('email_subject_prefix', '[LosFit]');
+        $prefix = \App\Domains\Shared\Models\StoreSetting::get('email_subject_prefix', '[LosFit]');
         // Use Email subject, fallback to Campaign subject
         $subject = $this->email->subject ?? $this->email->campaign->subject ?? 'Novidades LosFit';
         
@@ -50,9 +50,9 @@ class CampaignEmail extends Mailable
         
         // 2. Parse Variables (Manual Blade-like interpolation)
         // Replaces {{ $user->name }} or {{$user->name}} with subscriber name
-        $name = $this->subscriber->name ?? 'Cliente';
+        $name = $this->lead->name ?? 'Cliente';
         $body = preg_replace('/\{\{\s*\$user->name\s*\}\}/', $name, $body);
-        $body = preg_replace('/\{\{\s*\$user->email\s*\}\}/', $this->subscriber->email, $body);
+        $body = preg_replace('/\{\{\s*\$user->email\s*\}\}/', $this->lead->email, $body);
         
         // 3. Fetch Products
         $products = $this->email->products; // Relationship
@@ -64,11 +64,11 @@ class CampaignEmail extends Mailable
             view: 'emails.newsletter.campaign',
             with: [
                 'content' => $body,
-                'trackingUrl' => route('tracking.open', ['campaign' => $this->email->campaign->id, 'lead' => $this->subscriber->id], true),
+                'trackingUrl' => route('tracking.open', ['campaign' => $this->email->campaign->id, 'lead' => $this->lead->id], true),
                 'overrideProducts' => $products->count() > 0 ? $products : null,
                 'overrideCard' => $card,
-                // Pass subscriber for unsubscribe link
-                'subscriber' => $this->subscriber,
+                // Pass subscriber for unsubscribe link (view likely uses 'subscriber' variable)
+                'subscriber' => $this->lead,
             ]
         );
     }

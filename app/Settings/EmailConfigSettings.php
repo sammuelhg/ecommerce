@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Settings;
 
-use App\Models\StoreSetting;
+use App\Domains\Shared\Models\StoreSetting;
 use Illuminate\Support\Facades\Config;
 
 class EmailConfigSettings
@@ -33,8 +33,8 @@ class EmailConfigSettings
         return StoreSetting::get('email_subject_prefix', '[LosFit]');
     }
 
-    public function getDefaultEmailCard(): ?\App\Models\SignCard
+    public function getDefaultEmailCard(): ?\App\Domains\Content\Models\SignCard
     {
-        return \App\Models\SignCard::first();
+        return \App\Domains\Content\Models\SignCard::first();
     }
 }

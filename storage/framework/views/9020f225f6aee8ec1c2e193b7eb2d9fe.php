@@ -9,11 +9,19 @@
     <?php echo $__env->yieldContent('meta'); ?>
     
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"></noscript>
+    
     <!-- Custom CSS -->
-    <link href="<?php echo e(asset('css/shop.css')); ?>" rel="stylesheet">
-    <link href="<?php echo e(asset('css/product.css')); ?>" rel="stylesheet">
-    <link href="<?php echo e(asset('css/card-styles.css')); ?>" rel="stylesheet">
+    <link href="<?php echo e(asset('css/shop.css')); ?>" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="<?php echo e(asset('css/shop.css')); ?>" rel="stylesheet"></noscript>
+
+    <link href="<?php echo e(asset('css/product.css')); ?>" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="<?php echo e(asset('css/product.css')); ?>" rel="stylesheet"></noscript>
+
+    <link href="<?php echo e(asset('css/card-styles.css')); ?>" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="<?php echo e(asset('css/card-styles.css')); ?>" rel="stylesheet"></noscript>
     
     <!-- Vite Assets (Bootstrap + Custom Theme) -->
     <?php echo app('Illuminate\Foundation\Vite')(['resources/sass/app.scss', 'resources/js/app.js']); ?>
@@ -41,7 +49,7 @@
     <?php echo $__env->make('shop.partials.toasts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     
     <!-- Bootstrap Bundle JS (for Offcanvas and other components) - MUST load before Alpine -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Cleanup duplicate backdrops -->
     <script>
@@ -87,12 +95,13 @@
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Shop Alpine App Definition (must load before Alpine initializes) -->
-    <script src="<?php echo e(asset('js/shop-alpine.js')); ?>"></script>
+    <script defer src="<?php echo e(asset('js/shop-alpine.js')); ?>"></script>
     
     <!-- Server-Side Cart Data Injection -->
     <?php
-        $dbProducts = \App\Models\Product::where('is_active', true)
+        $dbProducts = \App\Domains\Catalog\Models\Product::where('is_active', true)
             ->select(['id', 'name', 'price', 'image', 'is_offer', 'old_price'])
+            ->limit(50)
             ->get()
             ->map(function($p) {
                 return [
@@ -106,7 +115,8 @@
             });
     ?>
     <script>
-        window.SERVER_CART = <?php echo json_encode(array_values(app(\App\Services\CartService::class)->get()), 15, 512) ?>;
+        window.IS_GUEST = <?php echo json_encode(auth()->guest(), 15, 512) ?>;
+        window.SERVER_CART = <?php echo json_encode(array_values(app(\App\Domains\Sales\Services\CartService::class)->get()), 15, 512) ?>;
         
         // Inject all active products for Alpine hydration (Wishlist/Cart sync)
         window.DB_PRODUCTS = <?php echo json_encode($dbProducts, 15, 512) ?>;

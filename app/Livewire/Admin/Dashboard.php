@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
-use App\Models\Lead;
-use App\Models\Form;
+use App\Domains\Marketing\Models\Lead;
+use App\Domains\Marketing\Models\Form;
 use Livewire\Attributes\Layout;
 
 #[Layout('layouts.admin')]
@@ -23,14 +23,21 @@ class Dashboard extends Component
 
     public function refreshStats(): void
     {
-        $this->totalLeads = Lead::count();
-        $this->totalForms = Form::where('is_active', true)->count();
-        
-        $this->recentLeads = Lead::with('form')
-            ->latest()
-            ->take(5)
-            ->get()
-            ->toArray();
+        try {
+            $this->totalLeads = \App\Domains\Marketing\Models\Lead::count();
+            $this->totalForms = \App\Domains\Marketing\Models\Form::where('is_active', true)->count();
+            
+            $this->recentLeads = \App\Domains\Marketing\Models\Lead::with('form')
+                ->latest()
+                ->take(5)
+                ->get()
+                ->toArray();
+        } catch (\Exception $e) {
+            // Fallback for missing tables during migration/deploy
+            $this->totalLeads = 0;
+            $this->totalForms = 0;
+            $this->recentLeads = [];
+        }
     }
 
     public function render()

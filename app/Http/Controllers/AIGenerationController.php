@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AiContentService;
+use App\Domains\Content\Services\AiContentService;
 use Illuminate\Http\Request;
 
 class AIGenerationController extends Controller

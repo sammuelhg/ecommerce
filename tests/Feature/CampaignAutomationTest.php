@@ -7,7 +7,7 @@ use App\Jobs\ProcessCampaignAutomation;
 use App\Models\Campaign;
 use App\Models\Form;
 use App\Models\Lead;
-use App\Models\SignCard;
+use App\Domains\Content\Models\SignCard;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;

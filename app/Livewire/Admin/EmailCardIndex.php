@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\EmailCard;
+use App\Domains\Content\Models\SignCard;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -46,7 +46,7 @@ class EmailCardIndex extends Component
 
     public function loadCards()
     {
-        $this->cards = EmailCard::orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
+        $this->cards = SignCard::orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
     }
 
     public function openCreateModal()
@@ -58,7 +58,7 @@ class EmailCardIndex extends Component
 
     public function openEditModal($id)
     {
-        $card = EmailCard::findOrFail($id);
+        $card = SignCard::findOrFail($id);
         $this->cardId = $card->id;
         $this->name = $card->name;
         $this->sender_name = $card->sender_name;
@@ -98,11 +98,11 @@ class EmailCardIndex extends Component
         }
 
         if ($this->editMode) {
-            $card = EmailCard::findOrFail($this->cardId);
+            $card = SignCard::findOrFail($this->cardId);
             $card->update($data);
             session()->flash('success', 'Card atualizado com sucesso!');
         } else {
-            EmailCard::create($data);
+            SignCard::create($data);
             session()->flash('success', 'Card criado com sucesso!');
         }
 
@@ -113,7 +113,7 @@ class EmailCardIndex extends Component
     public function removePhoto()
     {
         if ($this->editMode && $this->cardId) {
-            $card = EmailCard::findOrFail($this->cardId);
+            $card = SignCard::findOrFail($this->cardId);
             if ($card->photo && file_exists(public_path($card->photo))) {
                 unlink(public_path($card->photo));
             }
@@ -125,7 +125,7 @@ class EmailCardIndex extends Component
 
     public function setAsDefault($id)
     {
-        $card = EmailCard::findOrFail($id);
+        $card = SignCard::findOrFail($id);
         $card->setAsDefault();
         $this->loadCards();
         session()->flash('success', 'Card definido como padrão!');
@@ -133,7 +133,7 @@ class EmailCardIndex extends Component
 
     public function delete($id)
     {
-        $card = EmailCard::findOrFail($id);
+        $card = SignCard::findOrFail($id);
         if ($card->photo && file_exists(public_path($card->photo))) {
             unlink(public_path($card->photo));
         }

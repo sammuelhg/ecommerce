@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Actions\Analytics;
 
-use App\Models\Order;
-use App\Models\Campaign;
+use App\Domains\Sales\Models\Order;
+use App\Domains\Marketing\Models\Campaign;
 use App\DTOs\Analytics\ConversionEventDTO;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Actions\Integrations\SendConversionEventToMetaAction;
 
 /**
  * Objetivo: Ligar uma venda (Order) a uma origem de tráfego (Campaign/Source).
@@ -16,6 +17,10 @@ use Illuminate\Support\Facades\DB;
  */
 class AttributeConversionAction
 {
+    public function __construct(
+        protected SendConversionEventToMetaAction $sendMetaEvent
+    ) {}
+
     public function execute(ConversionEventDTO $data): void
     {
         // 1. Validação de Integridade
@@ -62,7 +67,7 @@ class AttributeConversionAction
             }
 
             // 5. Integração com AdTech (Se veio do Meta/Google, dispara o evento de API)
-            // 🏗️ TODO: Chamar SendConversionEventToMetaAction aqui.
+            $this->sendMetaEvent->execute($data);
         });
     }
 }

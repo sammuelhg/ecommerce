@@ -3,10 +3,10 @@
 namespace App\Livewire\Admin\Crm;
 
 use Livewire\Component;
-use App\Models\Order;
+use App\Domains\Sales\Models\Order;
 use App\Models\User;
-use App\Models\MarketingExpense;
-use App\Models\OrderItem;
+use App\Domains\Marketing\Models\MarketingExpense;
+use App\Domains\Sales\Models\OrderItem;
 use Carbon\Carbon;
 
 class FinancialReport extends Component

@@ -28,8 +28,8 @@
             <form wire:submit="submit">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                           id="name" wire:model.blur="name" placeholder="Seu Nome">
-                    <label for="name">Nome Completo</label>
+                           id="contact_name" wire:model.blur="name" placeholder="Seu Nome">
+                    <label for="contact_name">Nome Completo</label>
                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
@@ -37,17 +37,17 @@
                     <div class="col-md-6">
                         <div class="form-floating">
                             <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                   id="email" wire:model.blur="email" placeholder="nome@exemplo.com">
-                            <label for="email">E-mail</label>
+                                   id="contact_email" wire:model.blur="email" placeholder="nome@exemplo.com">
+                            <label for="contact_email">E-mail</label>
                             @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
                             <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
-                                   id="phone" wire:model.blur="phone" placeholder="(11) 99999-9999"
+                                   id="contact_phone" wire:model.blur="phone" placeholder="(11) 99999-9999"
                                    x-mask="(99) 99999-9999">
-                            <label for="phone">Telefone / WhatsApp</label>
+                            <label for="contact_phone">Telefone / WhatsApp</label>
                             @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
@@ -55,9 +55,9 @@
 
                 <div class="form-floating mb-4">
                     <textarea class="form-control @error('message') is-invalid @enderror" 
-                              id="message" wire:model.blur="message" placeholder="Sua mensagem"
+                              id="contact_message" wire:model.blur="message" placeholder="Sua mensagem"
                               style="height: 120px"></textarea>
-                    <label for="message">Como podemos ajudar?</label>
+                    <label for="contact_message">Como podemos ajudar?</label>
                     @error('message') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 

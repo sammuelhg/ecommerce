@@ -252,7 +252,7 @@
             <!-- Right: CEO Card -->
             <div class="col-lg-5">
                 @php
-                    $ceoCard = \App\Models\SignCard::first();
+                    $ceoCard = \App\Domains\Content\Models\SignCard::first();
                 @endphp
                 
                 @if($ceoCard)

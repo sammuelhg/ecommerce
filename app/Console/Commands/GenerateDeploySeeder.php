@@ -5,9 +5,9 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use App\Models\SignCard;
-use App\Models\StoreSetting;
-use App\Models\GridRule;
+use App\Domains\Content\Models\SignCard;
+use App\Domains\Shared\Models\StoreSetting;
+use App\Domains\Catalog\Models\GridRule;
 
 class GenerateDeploySeeder extends Command
 {
@@ -165,9 +165,9 @@ class GenerateDeploySeeder extends Command
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\SignCard;
-use App\Models\StoreSetting;
-use App\Models\GridRule;
+use App\Domains\Content\Models\SignCard;
+use App\Domains\Shared\Models\StoreSetting;
+use App\Domains\Catalog\Models\GridRule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 

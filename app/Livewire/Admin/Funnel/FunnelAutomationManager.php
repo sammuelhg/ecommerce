@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\Funnel;
 
 use Livewire\Component;
-use App\Models\FunnelAutomation;
+use App\Domains\Marketing\Models\FunnelAutomation;
 use App\Enums\FunnelTriggerEnum;
 use App\Enums\FunnelActionEnum;
 use App\Enums\LeadStatus;

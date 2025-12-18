@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Integrations;
 
 use App\DTOs\Integrations\MetaConnectData;
-use App\Models\Integration;
+use App\Domains\Shared\Models\Integration;
 use App\Services\AdNetworks\MetaAdsService;
 use Exception;
 

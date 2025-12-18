@@ -153,6 +153,15 @@
                     </span>
                 </button>
 
+                <!-- Busca (Mobile Icon) -->
+                <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center me-2" 
+                        type="button" 
+                        @click="showMobileSearch = !showMobileSearch"
+                        aria-label="Abrir Busca"
+                        style="width: 40px; height: 40px;">
+                    <i class="bi bi-search"></i>
+                </button>
+
                 <!-- Menu Hambúrguer (Mobile) -->
                 <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center" 
                         type="button" 
@@ -197,15 +206,7 @@
          x-transition:enter-start="opacity-0 -translate-y-2"
          x-transition:enter-end="opacity-100 translate-y-0"
          style="display: none;">
-        <form class="d-flex" @submit.prevent="performSearch()">
-            <input class="form-control bg-white me-2" type="search" placeholder="Buscar produtos..." x-model="searchQuery" style="border: 1px solid #dee2e6 !important; color: #333 !important;">
-            <button class="btn" type="button" @click="performSearch()" style="background-color: #ffc107; color: #1a1a1a;">
-                <i class="bi bi-search"></i>
-            </button>
-            <button class="btn btn-link text-white ms-2" type="button" @click="showMobileSearch = false">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </form>
+        <x-shop.header-search />
     </div>
 
     <!-- Offcanvas Menu Mobile -->
@@ -218,6 +219,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
+            <!-- Barra de Busca no Offcanvas -->
+            <div class="mb-4 d-lg-none">
+                <x-shop.header-search />
+            </div>
+
             <ul class="navbar-nav">
                 <!-- Links Principais -->
                 <li class="nav-item">
@@ -238,7 +244,7 @@
 
                 <!-- Categorias -->
                 @php
-                    $categories = \App\Models\Category::where('is_active', true)->get();
+                    $categories = \App\Domains\Catalog\Models\Category::where('is_active', true)->get();
                 @endphp
                 @if($categories->count() > 0)
                     <li class="nav-item border-top mt-3 pt-3">

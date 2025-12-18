@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
+use App\Domains\Catalog\Models\Product;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -70,8 +70,8 @@ class LoginController extends Controller
      */
     protected function authenticated(\Illuminate\Http\Request $request, $user)
     {
-        app(\App\Services\CartService::class)->mergeSessionToDatabase();
-        app(\App\Services\WishlistService::class)->mergeSessionToDatabase();
+        app(\App\Domains\Sales\Services\CartService::class)->mergeSessionToDatabase();
+        app(\App\Domains\Customer\Services\WishlistService::class)->mergeSessionToDatabase();
         
         session()->flash('success', 'Bem-vindo de volta, ' . $user->name . '!');
     }

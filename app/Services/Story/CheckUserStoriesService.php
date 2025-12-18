@@ -13,7 +13,7 @@ class CheckUserStoriesService
     {
         // Verifica se existem stories ativos no sistema
         // Get collection to find max updated_at for cache busting/unseen logic
-        $activeStories = \App\Models\Story::where('is_active', true)
+        $activeStories = \App\Domains\Content\Models\Story::where('is_active', true)
             ->where('expires_at', '>', now())
             ->get();
 

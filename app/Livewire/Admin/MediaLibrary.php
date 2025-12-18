@@ -23,7 +23,7 @@ class MediaLibrary extends Component
     public function loadMediaLibrary()
     {
         try {
-            $this->mediaLibrary = app(\App\Services\ProductImageService::class)
+            $this->mediaLibrary = app(\App\Domains\Catalog\Services\ProductImageService::class)
                 ->getLibraryImages($this->librarySearch);
         } catch (\Exception $e) {
             \Log::error('Failed to load media library', ['error' => $e->getMessage()]);

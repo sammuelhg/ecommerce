@@ -32,18 +32,18 @@
 
 @php
     // Get settings
-    $emailSettings = \App\Models\StoreSetting::all()->pluck('value', 'key');
+    $emailSettings = \App\Domains\Shared\Models\StoreSetting::all()->pluck('value', 'key');
     
     // Get selected card from settings, or default card
     $selectedCardId = $emailSettings['email_card_id'] ?? null;
     $emailCard = $selectedCardId 
-        ? \App\Models\EmailCard::find($selectedCardId) 
-        : \App\Models\EmailCard::getDefault();
+        ? \App\Domains\Content\Models\SignCard::find($selectedCardId) 
+        : \App\Domains\Content\Models\SignCard::getDefault();
     
     // Use card data or fallback
     if ($emailCard) {
-        $senderName = $emailCard->sender_name;
-        $senderRole = $emailCard->sender_role;
+        $senderName = $emailCard->name;
+        $senderRole = $emailCard->role;
         $instagram = $emailCard->instagram;
         $website = $emailCard->website;
         $slogan = $emailCard->slogan;
@@ -58,7 +58,7 @@
     // Base URL for email assets
     
     // Get featured products for all emails
-    $featuredProducts = $products ?? \App\Models\Product::where('is_active', true)->inRandomOrder()->take(3)->get();
+    $featuredProducts = $products ?? \App\Domains\Catalog\Models\Product::where('is_active', true)->inRandomOrder()->take(3)->get();
 
     // Determine Logo URL
     $storeLogo = $emailSettings['store_logo'] ?? null;

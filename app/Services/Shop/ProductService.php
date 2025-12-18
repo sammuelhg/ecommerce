@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Shop;
 
 use App\DTOs\Shop\ProductFilterDTO;
-use App\Models\Product;
-use App\Models\Category;
-use App\Services\BaseService;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Catalog\Models\Category;
+use App\Domains\Shared\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;

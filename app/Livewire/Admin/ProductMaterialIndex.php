@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\ProductMaterial;
+use App\Domains\Catalog\Models\ProductMaterial;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -61,7 +61,7 @@ class ProductMaterialIndex extends Component
     public function render()
     {
         return view('livewire.admin.product-material-index', [
-            'materials' => \App\Models\ProductMaterial::where('name', 'like', '%' . $this->search . '%')
+            'materials' => \App\Domains\Catalog\Models\ProductMaterial::where('name', 'like', '%' . $this->search . '%')
                 ->paginate(10)
                 ->withPath(route('admin.materials.index')),
         ]);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Leads;
 
 use App\DTOs\LeadData;
-use App\Models\Lead;
+use App\Domains\Marketing\Models\Lead;
 use Illuminate\Support\Facades\Log;
 
 class CreateLeadAction

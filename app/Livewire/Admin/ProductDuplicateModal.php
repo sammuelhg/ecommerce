@@ -3,10 +3,10 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
-use App\Models\Product;
-use App\Models\ProductColor;
-use App\Models\ProductSize;
-use App\Services\SkuGeneratorService;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Catalog\Models\ProductColor;
+use App\Domains\Catalog\Models\ProductSize;
+use App\Domains\Catalog\Services\SkuGeneratorService;
 
 class ProductDuplicateModal extends Component
 {
@@ -81,17 +81,17 @@ class ProductDuplicateModal extends Component
         $parts = [];
         
         if ($newProduct->product_type_id) {
-            $type = \App\Models\ProductType::find($newProduct->product_type_id);
+            $type = \App\Domains\Catalog\Models\ProductType::find($newProduct->product_type_id);
             if ($type) $parts[] = $type->name;
         }
         
         if ($newProduct->product_model_id) {
-            $model = \App\Models\ProductModel::find($newProduct->product_model_id);
+            $model = \App\Domains\Catalog\Models\ProductModel::find($newProduct->product_model_id);
             if ($model) $parts[] = $model->name;
         }
         
         if ($newProduct->product_material_id) {
-            $material = \App\Models\ProductMaterial::find($newProduct->product_material_id);
+            $material = \App\Domains\Catalog\Models\ProductMaterial::find($newProduct->product_material_id);
             if ($material) $parts[] = "em {$material->name}";
         }
         
@@ -127,7 +127,7 @@ class ProductDuplicateModal extends Component
         // Generate new SKU
         $category = $this->originalProduct->category->name ?? null;
         $type = $newProduct->product_type_id 
-            ? \App\Models\ProductType::find($newProduct->product_type_id)?->name 
+            ? \App\Domains\Catalog\Models\ProductType::find($newProduct->product_type_id)?->name 
             : null;
         
         if ($category && $type) {

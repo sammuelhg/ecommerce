@@ -6,7 +6,7 @@ namespace App\Livewire\Integrations;
 
 use Livewire\Component;
 use Livewire\Attributes\Validate;
-use App\Models\Integration;
+use App\Domains\Shared\Models\Integration;
 use App\DTOs\Integrations\MetaConnectData;
 use App\Actions\Integrations\UpsertMetaIntegrationAction;
 

@@ -2,7 +2,7 @@
 
 namespace App\Actions\Cms;
 
-use App\Models\Page;
+use App\Domains\Content\Models\Page;
 use App\Cms\BlockFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

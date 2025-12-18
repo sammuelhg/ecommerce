@@ -31,7 +31,7 @@ class WelcomeEmail extends Mailable
         $this->siteName = config('app.name');
         
         // Busca 3 produtos em oferta ou recentes
-        $this->products = \App\Models\Product::where('is_active', true)
+        $this->products = \App\Domains\Catalog\Models\Product::where('is_active', true)
             ->where('stock', '>', 0)
             ->inRandomOrder()
             ->take(3)

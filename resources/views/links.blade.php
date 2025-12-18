@@ -158,9 +158,9 @@
              class="profile-img">
 
         @php
-            $pageTitle = \App\Models\StoreSetting::get('links_page_title', 'LosFit 1000');
-            $pageSubtitle = \App\Models\StoreSetting::get('links_page_subtitle', 'Performance & Lifestyle');
-            $links = \App\Models\LinkItem::active()->ordered()->get();
+            $pageTitle = \App\Domains\Shared\Models\StoreSetting::get('links_page_title', 'LosFit 1000');
+            $pageSubtitle = \App\Domains\Shared\Models\StoreSetting::get('links_page_subtitle', 'Performance & Lifestyle');
+            $links = \App\Domains\Content\Models\LinkItem::active()->ordered()->get();
         @endphp
 
         <h1 class="title">{{ $pageTitle }}</h1>

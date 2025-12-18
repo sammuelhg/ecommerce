@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\LinkItem;
+use App\Domains\Content\Models\LinkItem;
 
 class LinkItemSeeder extends Seeder
 {

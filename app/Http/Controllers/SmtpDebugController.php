@@ -27,8 +27,8 @@ class SmtpDebugController extends Controller
         try {
             return [
                 'status' => 'info',
-                'count' => \App\Models\NewsletterCampaign::count(),
-                'items' => \App\Models\NewsletterCampaign::withCount('emails')->get()->map(function($c) {
+                'count' => \App\Domains\Marketing\Models\NewsletterCampaign::count(),
+                'items' => \App\Domains\Marketing\Models\NewsletterCampaign::withCount('emails')->get()->map(function($c) {
                     return [
                         'id' => $c->id,
                         'name' => $c->name,

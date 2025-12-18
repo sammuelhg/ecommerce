@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Contacts;
 
 use App\DTOs\ContactDTO;
-use App\Models\Contact;
+use App\Domains\Customer\Models\Contact;
 
 final class CreateContactAction
 {

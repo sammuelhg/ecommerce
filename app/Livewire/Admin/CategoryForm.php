@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Category;
+use App\Domains\Catalog\Models\Category;
 use Livewire\Component;
 
 class CategoryForm extends Component

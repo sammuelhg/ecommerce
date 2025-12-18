@@ -25,7 +25,7 @@ Route::get('/loja/checkout', [App\Http\Controllers\CartController::class, 'check
 
 // Stories API (Public)
 Route::get('/api/stories', function () {
-    $stories = \App\Models\Story::where('is_active', true)
+    $stories = \App\Domains\Content\Models\Story::where('is_active', true)
         ->where('expires_at', '>', now())
         ->orderBy('created_at', 'desc')
         ->get()
@@ -68,124 +68,8 @@ Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', \App\Livewire\Admin\Dashboard::class)->name('dashboard');
-    Route::get('/forms/new', \App\Livewire\Forms\FormBuilder::class)->name('forms.create');
-    Route::view('/products', 'admin.products.index')->name('products.index');
-    Route::view('/products/create', 'admin.products.create')->name('products.create');
-    Route::get('/products/{product}', function ($product) {
-        // Try to find by ID first, then by slug
-        $productModel = is_numeric($product) 
-            ? \App\Models\Product::findOrFail($product)
-            : \App\Models\Product::where('slug', $product)->firstOrFail();
-        
-        return view('admin.products.edit', ['product' => $productModel]);
-    })->name('products.edit');
-    Route::view('/categories', 'admin.categories.index')->name('categories.index');
-    Route::view('/orders', 'admin.orders.index')->name('orders.index');
-    
-    // Product Attributes
-    Route::view('/types', 'admin.types.index')->name('types.index');
-    Route::view('/materials', 'admin.materials.index')->name('materials.index');
-    Route::view('/models', 'admin.models.index')->name('models.index');
-    Route::view('/colors', 'admin.colors.index')->name('colors.index');
-    Route::view('/sizes', 'admin.sizes.index')->name('sizes.index');
-    Route::view('/flavors', 'admin.flavors.index')->name('flavors.index');
-
-    // Users
-    Route::view('/users', 'admin.users.index')->name('users.index');
-
-    // Store Settings
-    Route::get('/settings/{tab?}', [App\Http\Controllers\Admin\StoreSettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [App\Http\Controllers\Admin\StoreSettingController::class, 'update'])->name('settings.update');
-    Route::post('/settings/reset-prompts', [App\Http\Controllers\Admin\StoreSettingController::class, 'resetAiPrompts'])->name('settings.reset-prompts');
-    Route::post('/settings/remove-certificate', [App\Http\Controllers\Admin\StoreSettingController::class, 'removeCertificate'])->name('settings.remove-certificate');
-    Route::get('/settings/team', [App\Http\Controllers\Admin\StoreSettingController::class, 'index'])->name('settings.team'); // Reuse index with 'team' tab logic if possible, or new method
-    Route::get('/settings/billing', [App\Http\Controllers\Admin\StoreSettingController::class, 'index'])->name('settings.billing'); // Reuse index with 'billing' tab logic
-    
-    // Email Previews
-    // Link to Preview Dashboard (Handled below)
-    Route::get('/emails/preview', [App\Http\Controllers\Admin\EmailPreviewController::class, 'index'])->name('emails.preview.dashboard');
-    Route::get('/emails/preview/{type}', [App\Http\Controllers\Admin\EmailPreviewController::class, 'previewType'])->name('emails.preview.type');
-
-    
-    // Email Cards
-    // Route::view('/email-cards', 'admin.email-cards.index')->name('email-cards.index'); // Deprecated, use sign-cards
-    
-    // Links Bio
-    Route::view('/links', 'admin.links.index')->name('links.index');
-    
-    // Integrações
-    Route::view('/integrations', 'admin.integrations.index')->name('integrations.index');
-    
-    // Sign Card Manager
-    Route::get('/sign-cards', \App\Livewire\Admin\SignCard\SignCardManager::class)->name('sign-cards');
-
-    // Funnel Intelligence (Phase 11)
-    Route::get('/funnel', \App\Livewire\Admin\Leads\LeadKanban::class)->name('funnel.index'); // User Request: "More Funnel Here"
-    Route::get('/funnel/automations', \App\Livewire\Admin\Funnel\FunnelAutomationManager::class)->name('funnel.automations');
-    // Route::get('/grid', \App\Livewire\Admin\Grid\GridManager::class)->name('grid.index'); // Replaced by Livewire route below
-
-    // Newsletter/Campaigns Legacy & Unified
-    Route::prefix('marketing')->name('marketing.')->group(function () {
-        // Dashboard Stats
-        Route::get('/', \App\Livewire\Admin\Newsletter\NewsletterDashboard::class)->name('dashboard');
-        // Subscribers Manager
-        Route::get('/contacts', \App\Livewire\Admin\Newsletter\ContactManager::class)->name('contacts');
-    });
-
-    // New Campaign Domain (Phase 2 Refactor)
-    Route::prefix('campaigns')->name('campaigns.')->group(function () {
-        Route::get('/', \App\Livewire\Admin\Campaign\CampaignIndex::class)->name('index');
-         Route::get('/builder/{campaign?}', \App\Livewire\Admin\Campaign\CampaignBuilder::class)->name('builder');
-        Route::get('/identities', \App\Livewire\Admin\SignCard\SignCardManager::class)->name('identities'); // Phase 4
-    });
-
-    // Marketing
-    Route::get('/grid', App\Livewire\Admin\Grid\GridManager::class)->name('grid.index');
-    Route::get('/marketing/search', App\Livewire\Admin\Marketing\SearchHighlights::class)->name('marketing.search');
-
-    // Leads
-    Route::get('/leads', App\Livewire\Admin\Leads\LeadManager::class)->name('leads.index');
-    Route::get('/leads/kanban', \App\Livewire\Admin\Leads\LeadKanban::class)->name('leads.kanban');
-
-    // CRM / Unified Audience
-    Route::prefix('crm')->name('crm.')->group(function() {
-        Route::get('/audience', \App\Livewire\Admin\Crm\AudienceIndex::class)->name('audience');
-        
-        Route::get('/traffic/organic', function() {
-            return view('admin.crm.placeholder', ['title' => 'Tráfego Orgânico', 'feature' => 'Análise de Tráfego Orgânico']);
-        })->name('organic-traffic');
-
-        // Paid Traffic (Ads) - Uses ExpenseManager but we will eventually filter/tabulate it
-        Route::get('/traffic/paid', \App\Livewire\Admin\Crm\ExpenseManager::class)->name('paid-traffic');
-        
-        // General Expenses (Other) - Fixed Source View
-        Route::get('/expenses/general', \App\Livewire\Admin\Crm\ExpenseManager::class)
-            ->defaults('fixedSource', 'other')
-            ->name('expenses.general');
-
-        Route::get('/reports', \App\Livewire\Admin\Crm\FinancialReport::class)->name('reports');
-
-        Route::get('/forms/builder', \App\Livewire\Forms\FormBuilder::class)->name('forms.builder');
-    });
-
-    // CMS / Page Builder
-    Route::prefix('cms')->name('cms.')->group(function () {
-        // Pages
-        Route::get('/pages', \App\Livewire\Cms\PageIndex::class)->name('pages.index');
-        Route::get('/pages/builder/{page?}', \App\Livewire\Cms\PageBuilder::class)->name('pages.builder');
-        
-        // Components
-        Route::get('/components', \App\Livewire\Cms\ComponentIndex::class)->name('components.index');
-        Route::get('/components/builder/{component?}', \App\Livewire\Cms\ComponentBuilder::class)->name('components.builder');
-    });
-
-    // Stories (History)
-    Route::resource('stories', App\Http\Controllers\Admin\StoryController::class)->only(['index', 'store', 'update']);
-    Route::delete('/stories/{id}', [App\Http\Controllers\Admin\StoryController::class, 'destroy'])->name('stories.destroy');
-    Route::patch('/stories/{id}/toggle', [App\Http\Controllers\Admin\StoryController::class, 'toggleStatus'])->name('stories.toggle');
-});
+// Admin Routes are now loaded via App\Domains\Admin\Providers\AdminServiceProvider
+// located in app/Domains/Admin/Routes/web.php
 
 // Public Newsletter Routes
 // Public Campaign Routes (Renamed from Newsletter)
@@ -197,26 +81,7 @@ Route::post('/campaign/resubscribe/{subscriber}', [\App\Http\Controllers\Newslet
 
 
 
-// Route::get('/teste-main', function () {
-//     $dbProducts = App\Models\Product::all();
-//    
-//     $productsJson = $dbProducts->isEmpty() 
-//         ? json_encode([]) 
-//         : $dbProducts->map(fn($p) => [
-//             'id' => $p->id,
-//             'name' => $p->name,
-//             'price' => (float) $p->price,
-//             'imageText' => $p->image,
-//             'isOffer' => (bool) $p->is_offer,
-//             'oldPrice' => $p->old_price ? (float) $p->old_price : null,
-//         ])->toJson();
-//    
-//     return view('shop', compact('productsJson'));
-// })->name('shop.test');
 
-// Route::get('/test-livewire', function () {
-//     return view('test_livewire');
-// });
 
 // Email Logs & Test Routes (Local Only)
 if (app()->isLocal()) {
@@ -232,9 +97,7 @@ if (app()->isLocal()) {
 // Standard Contact Form Route
 Route::post('/contact', [App\Http\Controllers\Shop\ContactController::class, 'store'])->name('shop.contact.store');
 
-// Route::get('/test-buttons', function () {
-//     return view('test-buttons');
-// });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -249,7 +112,10 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return redirect()->route('admin.dashboard'); // Redirect to existing admin dashboard
+    if (auth()->user()->is_admin) {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('user.orders');
 })->middleware(['auth', 'verified']);
 
 // Add route to force run seeder.

@@ -1,0 +1,175 @@
+<?php
+
+namespace App\Domains\Catalog\Models;
+
+use App\Domains\Customer\Models\WishlistItem;
+use App\Domains\Customer\Services\WishlistService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    protected $fillable = [
+        'category_id',
+        'name',
+        'slug',
+        'sku',
+        'description',
+        'marketing_description',
+        'price',
+        'stock',
+        'is_active',
+        'image',
+        'product_type_id',
+        'product_model_id',
+        'product_material_id',
+        'product_color_id',
+        'product_size_id',
+        'product_flavor_id',
+        'variant_type',
+        'color',
+        'attribute',
+        'size',
+        'compare_at_price',
+        'cost_price',
+        'card_type',
+    ];
+
+    protected $appends = ['image', 'is_favorite'];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function productType()
+    {
+        return $this->belongsTo(ProductType::class);
+    }
+
+    public function productModel()
+    {
+        return $this->belongsTo(ProductModel::class);
+    }
+
+    public function productMaterial()
+    {
+        return $this->belongsTo(ProductMaterial::class);
+    }
+
+    public function productColor()
+    {
+        return $this->belongsTo(ProductColor::class);
+    }
+
+    public function flavor()
+    {
+        return $this->belongsTo(Flavor::class, 'product_flavor_id');
+    }
+
+    public function productSize()
+    {
+        return $this->belongsTo(ProductSize::class);
+    }
+
+    /**
+     * Get the items included in this product (if it is a kit).
+     */
+    public function bundleItems()
+    {
+        return $this->belongsToMany(Product::class, 'product_bundles', 'kit_id', 'product_id')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Check if the product is a kit.
+     */
+    public function isKit()
+    {
+        // Check if product_type_id exists and matches KIT
+        if (!$this->product_type_id) {
+            return false;
+        }
+
+        // If relationship is loaded, use it
+        if ($this->relationLoaded('productType')) {
+            return $this->productType && $this->productType->code === 'KIT';
+        }
+
+        // Otherwise, query the type directly
+        $type = ProductType::find($this->product_type_id);
+        return $type && $type->code === 'KIT';
+    }
+
+    public function variations()
+    {
+        return $this->hasMany(ProductVariation::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('order');
+    }
+
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    /**
+     * Get the product image.
+     * Fallback to the first image in product_images table if the main image column is empty.
+     */
+    public function getImageAttribute($value)
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+
+        // Try to get from relationship if loaded, otherwise query
+        $image = $this->relationLoaded('images') 
+            ? $this->images->first() 
+            : $this->images()->orderBy('order')->first();
+
+        return $image ? $image->path : null;
+    }
+    /**
+     * Get the full product image URL.
+     */
+    public function getImageUrlAttribute()
+    {
+        $image = $this->image;
+        
+        if (!$image) {
+            return 'https://placehold.co/400x400/f3f4f6/6c757d?text=' . urlencode('Sem Imagem');
+        }
+
+        // Fast check: if it's already a full URL or starts with data:
+        if (str_contains($image, '://') || str_starts_with($image, 'data:')) {
+            return $image;
+        }
+
+        return asset('storage/' . ltrim($image, '/'));
+    }
+
+    /**
+     * Check if product is in wishlist for current user/session.
+     */
+    public function getIsFavoriteAttribute()
+    {
+        // Use the Service to check existence
+        // We act like a singleton helper here
+        // Ideally checking specific user relation is better for DB performance handling, 
+        // but Service handles Session fallback which Model relationship can't easily do.
+        
+        $service = app(WishlistService::class);
+        return $service->has($this->id);
+    }
+}

@@ -2,13 +2,13 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Product;
-use App\Services\AiContentService;
-use App\Models\Category;
-use App\Models\ProductType;
-use App\Models\ProductModel;
-use App\Models\ProductMaterial;
-use App\Services\SkuGeneratorService;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Content\Services\AiContentService;
+use App\Domains\Catalog\Models\Category;
+use App\Domains\Catalog\Models\ProductType;
+use App\Domains\Catalog\Models\ProductModel;
+use App\Domains\Catalog\Models\ProductMaterial;
+use App\Domains\Catalog\Services\SkuGeneratorService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -135,19 +135,19 @@ class ProductForm extends Component
         
         $colorName = '';
         if ($this->product_color_id) {
-            $colorName = \App\Models\ProductColor::find($this->product_color_id)->name ?? '';
+            $colorName = \App\Domains\Catalog\Models\ProductColor::find($this->product_color_id)->name ?? '';
         } elseif ($this->color) {
             $colorName = $this->color;
         }
 
         $flavorName = '';
         if ($this->product_flavor_id) {
-            $flavorName = \App\Models\Flavor::find($this->product_flavor_id)->name ?? '';
+            $flavorName = \App\Domains\Catalog\Models\Flavor::find($this->product_flavor_id)->name ?? '';
         }
         
         $sizeName = '';
         if ($this->product_size_id) {
-            $sizeName = \App\Models\ProductSize::find($this->product_size_id)->name ?? '';
+            $sizeName = \App\Domains\Catalog\Models\ProductSize::find($this->product_size_id)->name ?? '';
         } elseif ($this->size) {
             $sizeName = $this->size;
         }
@@ -257,7 +257,7 @@ class ProductForm extends Component
         
         // Migration for legacy image: if gallery is empty but product has main image
         if ($this->existingImages->isEmpty() && $product->image) {
-            \App\Models\ProductImage::create([
+            \App\Domains\Catalog\Models\ProductImage::create([
                 'product_id' => $product->id,
                 'path' => $product->image,
                 'is_main' => true,
@@ -333,14 +333,14 @@ class ProductForm extends Component
         
         if ($this->variant_type === 'color') {
             if ($this->product_color_id) {
-                $color = \App\Models\ProductColor::find($this->product_color_id);
+                $color = \App\Domains\Catalog\Models\ProductColor::find($this->product_color_id);
                 $colorName = $color ? $color->name : '';
             } elseif ($this->color) {
                 $colorName = $this->color;
             }
         } elseif ($this->variant_type === 'flavor') {
             if ($this->product_flavor_id) {
-                $flavor = \App\Models\Flavor::find($this->product_flavor_id);
+                $flavor = \App\Domains\Catalog\Models\Flavor::find($this->product_flavor_id);
                 // We use colorName variable but fill it with flavor name for title generation
                 // ProductTitleService might interpret it as color/variant
                 $colorName = $flavor ? $flavor->name : '';
@@ -348,14 +348,14 @@ class ProductForm extends Component
         }
         
         if ($this->product_size_id) {
-            $size = \App\Models\ProductSize::find($this->product_size_id);
+            $size = \App\Domains\Catalog\Models\ProductSize::find($this->product_size_id);
             $sizeName = $size ? $size->name : '';
         } elseif ($this->size) {
             // Fallback to legacy text field
             $sizeName = $this->size;
         }
         
-        $this->name = app(\App\Services\ProductTitleService::class)->generateTitle(
+        $this->name = app(\App\Domains\Catalog\Services\ProductTitleService::class)->generateTitle(
             $this->product_type_id,
             $this->product_model_id,
             $this->product_material_id,
@@ -404,14 +404,14 @@ class ProductForm extends Component
         $colorCode = 'STD';
         if ($this->variant_type === 'color') {
             if ($this->product_color_id) {
-                $color = \App\Models\ProductColor::find($this->product_color_id);
+                $color = \App\Domains\Catalog\Models\ProductColor::find($this->product_color_id);
                 $colorCode = $color && $color->code ? $color->code : 'STD';
             } elseif ($this->color) {
                 $colorCode = $this->color;
             }
         } elseif ($this->variant_type === 'flavor') {
             if ($this->product_flavor_id) {
-                $flavor = \App\Models\Flavor::find($this->product_flavor_id);
+                $flavor = \App\Domains\Catalog\Models\Flavor::find($this->product_flavor_id);
                 // Use slug or name as code for flavor, maybe slug is safer
                 $colorCode = $flavor ? strtoupper(substr($flavor->slug, 0, 3)) : 'SAB';
             }
@@ -420,13 +420,13 @@ class ProductForm extends Component
         // Get size code
         $sizeCode = 'U';
         if ($this->product_size_id) {
-            $size = \App\Models\ProductSize::find($this->product_size_id);
+            $size = \App\Domains\Catalog\Models\ProductSize::find($this->product_size_id);
             $sizeCode = $size && $size->code ? $size->code : 'U';
         } elseif ($this->size) {
             $sizeCode = $this->size;
         }
 
-        $this->sku = app(\App\Services\SkuGeneratorService::class)->generate(
+        $this->sku = app(\App\Domains\Catalog\Services\SkuGeneratorService::class)->generate(
             $category->name,
             $type->name,
             $colorCode,
@@ -571,7 +571,7 @@ class ProductForm extends Component
             }
 
             if (!empty($imagesToUpload)) {
-                app(\App\Services\ProductImageService::class)->handleUploads($product, $imagesToUpload, $this->newMainImageIndex);
+                app(\App\Domains\Catalog\Services\ProductImageService::class)->handleUploads($product, $imagesToUpload, $this->newMainImageIndex);
                 
                 // Cleanup temp images
                 foreach ($this->tempImages as $tempPath) {
@@ -603,7 +603,7 @@ class ProductForm extends Component
     {
         if ($this->productId) {
             // Directly query to avoid any caching issues
-            $this->existingImages = \App\Models\ProductImage::where('product_id', $this->productId)
+            $this->existingImages = \App\Domains\Catalog\Models\ProductImage::where('product_id', $this->productId)
                 ->orderBy('is_main', 'desc') // Main image first
                 ->orderBy('created_at', 'desc') // Then newest first
                 ->get();
@@ -618,7 +618,7 @@ class ProductForm extends Component
     public function deleteImage($imageId)
     {
         \Log::info('ProductForm: Deleting image', ['imageId' => $imageId, 'productId' => $this->productId]);
-        $success = app(\App\Services\ProductImageService::class)->deleteImage($imageId, $this->productId);
+        $success = app(\App\Domains\Catalog\Services\ProductImageService::class)->deleteImage($imageId, $this->productId);
         
         if ($success) {
             \Log::info('ProductForm: Image deleted successfully');
@@ -631,7 +631,7 @@ class ProductForm extends Component
 
     public function setMainImage($imageId)
     {
-        $success = app(\App\Services\ProductImageService::class)->setMainImage($imageId, $this->productId);
+        $success = app(\App\Domains\Catalog\Services\ProductImageService::class)->setMainImage($imageId, $this->productId);
         
         if ($success) {
             $this->refreshImages();
@@ -789,7 +789,7 @@ class ProductForm extends Component
         $newIndex = count($this->tempImages) - 1;
 
         // Check if original image was main
-        $originalImage = \App\Models\ProductImage::find($existingImageId);
+        $originalImage = \App\Domains\Catalog\Models\ProductImage::find($existingImageId);
         if ($originalImage && $originalImage->is_main) {
             $this->newMainImageIndex = $newIndex;
             session()->flash('success', 'Imagem recortada criada e definida como nova capa.');
@@ -827,9 +827,9 @@ class ProductForm extends Component
         $types = ProductType::where('is_active', true)->get();
         $models = ProductModel::where('is_active', true)->get();
         $materials = ProductMaterial::where('is_active', true)->get();
-        $colors = \App\Models\ProductColor::where('is_active', true)->get();
-        $flavors = \App\Models\Flavor::where('is_active', true)->get();
-        $sizes = \App\Models\ProductSize::where('is_active', true)->get();
+        $colors = \App\Domains\Catalog\Models\ProductColor::where('is_active', true)->get();
+        $flavors = \App\Domains\Catalog\Models\Flavor::where('is_active', true)->get();
+        $sizes = \App\Domains\Catalog\Models\ProductSize::where('is_active', true)->get();
 
         // Carregar categorias para o select (hierarquia simples para visualização)
         $categories = Category::with('parent')->get()->map(function($category) {

@@ -19,8 +19,8 @@ class SendEmailJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public \App\Models\NewsletterEmail $email,
-        public \App\Models\NewsletterSubscriber $subscriber
+        public \App\Domains\Marketing\Models\NewsletterEmail $email,
+        public \App\Domains\Marketing\Models\NewsletterSubscriber $subscriber
     ) {}
 
     /**
@@ -36,7 +36,7 @@ class SendEmailJob implements ShouldQueue
                 ->send(new \App\Mail\CampaignEmail($this->email, $this->subscriber));
             
             // Optional: Log success or update counters
-            // \App\Models\CampaignOpen::create([...]) ? No, that's for opens.
+            // \App\Domains\Marketing\Models\CampaignOpen::create([...]) ? No, that's for opens.
             // Maybe Increment campaign sent_count if we add that column.
 
         } catch (\Exception $e) {

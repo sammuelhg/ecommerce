@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Leads;
 
 
 use Livewire\Component;
-use App\Models\Lead;
+use App\Domains\Marketing\Models\Lead;
 use App\Enums\LeadStatus;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Crm\LeadHotMail;

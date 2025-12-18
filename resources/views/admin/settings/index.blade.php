@@ -40,11 +40,7 @@
                                 <i class="bi bi-shield-check me-2"></i>Segurança
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $activeTab == 'email' ? 'active' : '' }}" href="{{ route('admin.settings.index', 'email') }}">
-                                <i class="bi bi-envelope me-2"></i>Emails
-                            </a>
-                        </li>
+
                     </ul>
 
                     <!-- Content Area -->
@@ -370,74 +366,7 @@
                         </form>
                         @endif
 
-                        <!-- Emails -->
-                        @if($activeTab == 'email')
-                            <h5 class="mb-4 text-primary border-bottom pb-2">Configuração Global</h5>
-                            <div class="row mb-4">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Prefixo do Assunto</label>
-                                    <input type="text" class="form-control bg-white" name="email_subject_prefix" value="{{ $settings['email_subject_prefix'] ?? '[LosFit]' }}">
-                                    <div class="form-text">Ex: [LosFit] Bem-vindo...</div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Produtos em Destaque (IDs)</label>
-                                    <input type="text" class="form-control bg-white" name="global_showcase_products" value="{{ is_array($settings['global_showcase_products'] ?? null) ? implode(',', $settings['global_showcase_products']) : ($settings['global_showcase_products'] ?? '') }}" placeholder="1, 5, 12">
-                                    <div class="form-text">IDs dos produtos exibidos no rodapé dos emails (separados por vírgula).</div>
-                                </div>
-                            </div>
 
-                            <!-- Card Config Removed (Managed via Cards > Default) -->
-                            <div class="row mb-4">
-                                <div class="col-md-12 mb-3">
-                                    <h5 class="mb-2 text-primary border-bottom pb-2">Card de Assinatura</h5>
-                                    <p class="text-muted">
-                                        O card utilizado nos emails é o definido como <strong>Padrão (Favorito)</strong> na galeria.
-                                    </p>
-                                    <a href="{{ route('admin.email-cards.index') }}" class="btn btn-outline-secondary">
-                                        <i class="bi bi-gear me-2"></i>Gerenciar Cards & Definir Padrão
-                                    </a>
-                                </div>
-                            </div>
-
-                            <h5 class="mb-4 text-danger border-bottom pb-2"><i class="bi bi-hdd-network me-2"></i>Configuração SMTP (Avançado)</h5>
-                            <div class="alert alert-warning">
-                                <i class="bi bi-exclamation-triangle me-2"></i> <strong>Cuidado:</strong> Altere estas configurações apenas se quiser usar um servidor de email diferente do padrão (.env). Deixe em branco para usar o padrão.
-                            </div>
-                            <div class="row mb-4 p-3 bg-light rounded border mx-1">
-                                <div class="col-md-8 mb-3">
-                                    <label class="form-label">Host SMTP</label>
-                                    <input type="text" class="form-control" name="smtp_host" value="{{ $settings['smtp_host'] ?? '' }}" placeholder="Ex: smtp.hostinger.com">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Porta</label>
-                                    <input type="text" class="form-control" name="smtp_port" value="{{ $settings['smtp_port'] ?? '' }}" placeholder="465">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Usuário</label>
-                                    <input type="text" class="form-control" name="smtp_username" value="{{ $settings['smtp_username'] ?? '' }}" placeholder="email@dominio.com">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Senha</label>
-                                    <input type="password" class="form-control" name="smtp_password" value="{{ $settings['smtp_password'] ?? '' }}" placeholder="••••••••">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Criptografia</label>
-                                    <select name="smtp_encryption" class="form-select">
-                                        <option value="" {{ ($settings['smtp_encryption'] ?? '') == '' ? 'selected' : '' }}>Automático / Padrão</option>
-                                        <option value="ssl" {{ ($settings['smtp_encryption'] ?? '') == 'ssl' ? 'selected' : '' }}>SSL</option>
-                                        <option value="tls" {{ ($settings['smtp_encryption'] ?? '') == 'tls' ? 'selected' : '' }}>TLS</option>
-                                        <option value="null" {{ ($settings['smtp_encryption'] ?? '') == 'null' ? 'selected' : '' }}>Nenhuma</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-2"></i>Salvar Emails</button>
-                            </div>
-                        </form>
-
-
-                        @endif
 
                     </div>
                 </div>

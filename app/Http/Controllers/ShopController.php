@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\Category;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Catalog\Models\Category;
 use Illuminate\Http\Request;
 use App\Services\Shop\ProductService;
 use App\DTOs\Shop\ProductFilterDTO;

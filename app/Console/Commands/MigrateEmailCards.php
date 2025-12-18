@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\EmailCard;
-use App\Models\SignCard;
+use App\Domains\Content\Models\SignCard;
 
 class MigrateEmailCards extends Command
 {

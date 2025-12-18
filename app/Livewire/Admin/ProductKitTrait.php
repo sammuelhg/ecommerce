@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Product;
-use App\Models\ProductType;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Catalog\Models\ProductType;
 
 trait ProductKitTrait
 {

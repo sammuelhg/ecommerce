@@ -19,12 +19,12 @@ class SearchHighlights extends Component
         $categoryId = $this->selectedCategory === 'global' ? null : $this->selectedCategory;
 
         // Check if already exists
-        $exists = \App\Models\SearchHighlight::where('category_id', $categoryId)
+        $exists = \App\Domains\Content\Models\SearchHighlight::where('category_id', $categoryId)
             ->where('product_id', $productId)
             ->exists();
 
         if (!$exists) {
-            \App\Models\SearchHighlight::create([
+            \App\Domains\Content\Models\SearchHighlight::create([
                 'category_id' => $categoryId,
                 'product_id' => $productId,
             ]);
@@ -35,16 +35,16 @@ class SearchHighlights extends Component
 
     public function removeHighlight($id)
     {
-        \App\Models\SearchHighlight::destroy($id);
+        \App\Domains\Content\Models\SearchHighlight::destroy($id);
     }
 
     public function render()
     {
-        $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+        $categories = \App\Domains\Catalog\Models\Category::where('is_active', true)->orderBy('name')->get();
         
         $categoryId = $this->selectedCategory === 'global' ? null : $this->selectedCategory;
 
-        $highlights = \App\Models\SearchHighlight::with('product')
+        $highlights = \App\Domains\Content\Models\SearchHighlight::with('product')
             ->where('category_id', $categoryId)
             ->latest()
             ->get();
@@ -53,7 +53,7 @@ class SearchHighlights extends Component
         if (strlen($this->searchProduct) > 2) {
             $existingIds = $highlights->pluck('product_id')->toArray();
             
-            $searchResults = \App\Models\Product::where('is_active', true)
+            $searchResults = \App\Domains\Catalog\Models\Product::where('is_active', true)
                 ->where('name', 'like', '%' . $this->searchProduct . '%')
                 ->whereNotIn('id', $existingIds)
                 ->take(10)

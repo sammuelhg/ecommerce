@@ -15,28 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create admin user
-        // Create admin user
-        User::create([
-            'name' => 'Admin LosFit',
-            'email' => 'admin@losfit.com',
-            'password' => bcrypt('password'),
-            'email_verified_at' => now(),
-            'is_admin' => true,
-        ]);
-
-        // Seed categories and attributes
+        // Production Mirror Seeding
         $this->call([
-            CategoriesSeeder::class,
-            ProductAttributesSeeder::class,
-            SampleProductsSeeder::class,
-            LinkItemSeeder::class,
-            EmailCardSeeder::class,
-            NewsletterCampaignSeeder::class,
+            ProductionUsersSeeder::class,
+            ProductionCategoriesSeeder::class,
+            ProductionProductsSeeder::class,
+            ProductionSignCardsSeeder::class,
+            ProductionSettingsSeeder::class,
+            ProductionGridRulesSeeder::class,
+            ProductionCampaignsSeeder::class,
         ]);
 
         $this->command->info('');
-        $this->command->info('🎉 Database seeding completed!');
-        $this->command->info('📧 Admin: admin@losfit.com | Password: password');
+        $this->command->info('🎉 Production Mirror seeding completed!');
+        $this->command->info('🚀 Use this data for valid deployment.');
     }
 }

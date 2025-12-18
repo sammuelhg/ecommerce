@@ -17,10 +17,10 @@ class AudienceIndex extends Component
         $usersQuery = \App\Models\User::selectRaw("email, name, 'user' as type, created_at")
             ->whereNotNull('email');
         
-        $leadsQuery = \App\Models\Lead::selectRaw("email, name, 'lead' as type, created_at")
+        $leadsQuery = \App\Domains\Marketing\Models\Lead::selectRaw("email, name, 'lead' as type, created_at")
             ->whereNotNull('email');
             
-        $contactsQuery = \App\Models\Contact::selectRaw("email, name, 'contato' as type, created_at")
+        $contactsQuery = \App\Domains\Customer\Models\Contact::selectRaw("email, name, 'contato' as type, created_at")
             ->whereNotNull('email');
 
         // Apply Search
@@ -72,8 +72,8 @@ class AudienceIndex extends Component
     protected function buildUnifiedProfile($email, $baseData)
     {
         $user = \App\Models\User::where('email', $email)->first();
-        $lead = \App\Models\Lead::where('email', $email)->first();
-        $contacts = \App\Models\Contact::where('email', $email)->orderBy('created_at', 'desc')->get();
+        $lead = \App\Domains\Marketing\Models\Lead::where('email', $email)->first();
+        $contacts = \App\Domains\Customer\Models\Contact::where('email', $email)->orderBy('created_at', 'desc')->get();
 
         $isCustomer = $user && $user->orders()->exists();
 

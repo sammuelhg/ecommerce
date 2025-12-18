@@ -2,13 +2,13 @@
 
 namespace App\Livewire;
 
-use App\Models\Product;
-use App\Services\GridComposer;
+use App\Domains\Catalog\Models\Product;
+use App\Domains\Catalog\Services\GridComposer;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\DTOs\Cart\CartItemDTO;
-use App\Services\CartService;
+use App\Domains\Sales\Services\CartService;
 use App\Actions\Shop\ListStoreFrontProductsAction;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -27,7 +27,7 @@ class ProductGrid extends Component
         // Find a featured campaign (latest active with promo image)
         // Using 'sending' or 'sent' or 'draft'? Usually 'active' or 'sent'. 
         // Assuming 'sent' means it's live/running.
-        // $campaign = \App\Models\NewsletterCampaign::where('status', \App\Enums\CampaignStatus::SENT) 
+        // $campaign = \App\Domains\Marketing\Models\NewsletterCampaign::where('status', \App\Enums\CampaignStatus::SENT) 
         //    ->whereNotNull('promo_image_url')
         //    ->latest()
         //    ->first();
@@ -51,7 +51,7 @@ class ProductGrid extends Component
         GridComposer $composer
     ): View {
         // 1. Busca os dados brutos via Action
-        $products = $listProducts->execute(20);
+        $products = $listProducts->execute(16);
 
         // 2. Diagnóstico de Grid
         Log::info("ProductGrid: Enviando " . $products->count() . " produtos para o GridComposer.");

@@ -12,7 +12,7 @@
                         @endif
                     @endif
                 </h5>
-                <button wire:click="create" class="btn btn-light btn-sm">
+                <button wire:click="create" class="btn btn-light btn-sm text-primary d-inline-flex align-items-center gap-1">
                     <i class="bi bi-plus-lg"></i> Adicionar Despesa
                 </button>
             </div>

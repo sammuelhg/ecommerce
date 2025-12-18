@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Domains\Marketing\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Form extends Model
+{
+    protected $fillable = [
+        'user_id',
+        'title',
+        'slug',
+        'description',
+        'settings',
+        'is_active',
+        'campaign_id',
+    ];
+
+    protected $casts = [
+        'settings' => 'array',
+        'is_active' => 'boolean',
+    ];
+
+    public function leads(): HasMany
+    {
+        return $this->hasMany(Lead::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(Campaign::class);
+    }
+}

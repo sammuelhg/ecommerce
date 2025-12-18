@@ -35,7 +35,7 @@
 @php
     // Updated to use Unified Data Source (SignCard)
     // Was: $cards = \App\Models\EmailCard::active()->get();
-    $cards = \App\Models\SignCard::all(); 
+    $cards = \App\Domains\Content\Models\SignCard::all(); 
 @endphp
 
 @if($cards->count() > 0)

@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\ProductModel;
+use App\Domains\Catalog\Models\ProductModel;
 use Livewire\Component;
 
 class ProductModelForm extends Component

@@ -6,8 +6,8 @@ namespace App\Livewire\Admin\Newsletter;
 
 use App\Actions\Newsletter\SaveCampaignAction;
 use App\DTOs\CampaignDTO;
-use App\Models\NewsletterCampaign;
-use App\Models\NewsletterEmail;
+use App\Domains\Marketing\Models\NewsletterCampaign;
+use App\Domains\Marketing\Models\NewsletterEmail;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
@@ -94,7 +94,7 @@ class CampaignBuilder extends Component
 
     public function importTemplate(int $templateId): void
     {
-        $template = \App\Models\EmailTemplate::find($templateId);
+        $template = \App\Domains\Marketing\Models\EmailTemplate::find($templateId);
         if ($template) {
             $this->body = $template->body ?? '';
             $this->subject = $template->subject ?? $this->subject; // Optional: overwrite subject or keep? Let's overwrite if present.
@@ -107,7 +107,7 @@ class CampaignBuilder extends Component
 
     public function getTemplatesProperty()
     {
-        return \App\Models\EmailTemplate::where('name', 'like', '%' . $this->templateSearch . '%')
+        return \App\Domains\Marketing\Models\EmailTemplate::where('name', 'like', '%' . $this->templateSearch . '%')
             ->orderBy('created_at', 'desc')
             ->take(20)
             ->get();
@@ -175,7 +175,7 @@ class CampaignBuilder extends Component
     public function setActiveEmail(int $emailId): void
     {
         $this->activeEmailId = $emailId;
-        $this->activeEmail = \App\Models\NewsletterEmail::findOrFail($emailId);
+        $this->activeEmail = \App\Domains\Marketing\Models\NewsletterEmail::findOrFail($emailId);
         
         // Load Form
         $this->subject = $this->activeEmail->subject ?? $this->campaign->subject; // Fallback
@@ -209,7 +209,7 @@ class CampaignBuilder extends Component
              return;
         }
 
-        $email = \App\Models\NewsletterEmail::findOrFail($emailId);
+        $email = \App\Domains\Marketing\Models\NewsletterEmail::findOrFail($emailId);
         if ($email->newsletter_campaign_id === $this->campaign->id) {
             $email->delete();
         }
@@ -230,12 +230,12 @@ class CampaignBuilder extends Component
 
     public function getEmailCardsProperty()
     {
-        return \App\Models\EmailCard::where('is_active', true)->get();
+        return \App\Domains\Content\Models\SignCard::where('is_active', true)->get();
     }
 
     public function getAvailableProductsProperty()
     {
-        return \App\Models\Product::where('is_active', true)
+        return \App\Domains\Catalog\Models\Product::where('is_active', true)
             ->where('name', 'like', '%' . $this->productSearch . '%')
             ->take(20)
             ->get();
@@ -272,8 +272,8 @@ class CampaignBuilder extends Component
         try {
              $user = new \App\Models\User(['name' => 'Cliente Teste', 'email' => 'cliente@teste.com']);
              
-             $previewCard = \App\Models\EmailCard::find($this->selectedCard);
-             $previewProducts = \App\Models\Product::whereIn('id', $this->selectedProducts)->get();
+             $previewCard = \App\Domains\Content\Models\SignCard::find($this->selectedCard);
+             $previewProducts = \App\Domains\Catalog\Models\Product::whereIn('id', $this->selectedProducts)->get();
              
              $this->previewHtml = \Illuminate\Support\Facades\Blade::render(
                  '@extends("emails.layouts.global") 

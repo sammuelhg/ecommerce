@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Forms;
 
 use Livewire\Component;
-use App\Models\Form;
+use App\Domains\Marketing\Models\Form;
 
 use Livewire\Attributes\Layout;
 
@@ -41,7 +41,7 @@ class FormBuilder extends Component
     {
         $this->forms = Form::latest()->get();
         // Fetch Strategy Campaigns (New Architecture)
-        $this->campaigns = \App\Models\Campaign::with('signCard')->latest()->get();
+        $this->campaigns = \App\Domains\Marketing\Models\Campaign::with('signCard')->latest()->get();
     }
 
     public function create()

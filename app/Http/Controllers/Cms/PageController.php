@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Cms;
 
 use App\Http\Controllers\Controller;
-use App\Models\Page;
+use App\Domains\Content\Models\Page;
 use Illuminate\Http\Request;
 
 use App\Cms\BlockFactory;

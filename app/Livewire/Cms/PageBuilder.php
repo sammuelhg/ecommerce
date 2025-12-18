@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Cms;
 
-use App\Models\Page;
+use App\Domains\Content\Models\Page;
 use App\Actions\Cms\UpdatePageContentAction;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -21,10 +21,10 @@ class PageBuilder extends Component
     // Blocks
     public $blocks = []; // Array of ['id' => ..., 'type' => ..., 'data' => ...]
 
-    public function mount($page = null)
+    public function mount($pageIdentifier = null)
     {
-        if ($page) {
-            $this->page = Page::where('id', $page)->orWhere('slug', $page)->first();
+        if ($pageIdentifier) {
+            $this->page = Page::where('id', $pageIdentifier)->orWhere('slug', $pageIdentifier)->first();
             
             if (!$this->page) {
                 // If ID/Slug passed but not found, abort or redirect.

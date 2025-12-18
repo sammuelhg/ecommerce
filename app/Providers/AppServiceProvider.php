@@ -41,10 +41,11 @@ class AppServiceProvider extends ServiceProvider
 
             if ($settings === null) {
                 try {
-                    // Direct DB fetch to avoid Cache locking issues on Windows/File driver
-                    // Also reduced memory usage by not caching the entire collection structure if it's large
-                    $settings = \App\Models\StoreSetting::all()->mapWithKeys(function ($item) {
-                           return [$item->key => $item->value];
+                    // Optimized: Use Cache to store settings for 1 hour
+                    $settings = \Illuminate\Support\Facades\Cache::remember('store_settings_optimized', 3600, function () {
+                        return \App\Domains\Shared\Models\StoreSetting::all()->mapWithKeys(function ($item) {
+                            return [$item->key => $item->value];
+                        });
                     });
                 } catch (\Throwable $e) {
                     $settings = collect();

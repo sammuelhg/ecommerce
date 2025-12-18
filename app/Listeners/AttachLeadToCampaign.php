@@ -6,7 +6,7 @@ namespace App\Listeners;
 
 use App\Events\LeadCaptured;
 use App\Jobs\ProcessCampaignAutomation;
-use App\Models\Campaign;
+use App\Domains\Marketing\Models\Campaign;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class AttachLeadToCampaign implements ShouldQueue
@@ -25,7 +25,7 @@ class AttachLeadToCampaign implements ShouldQueue
         
         // BRIDGE: Support for Legacy Newsletter Campaigns
         if (!$campaign) {
-            $newsletterCampaign = \App\Models\NewsletterCampaign::find($form->campaign_id);
+            $newsletterCampaign = \App\Domains\Marketing\Models\NewsletterCampaign::find($form->campaign_id);
             if ($newsletterCampaign && $newsletterCampaign->is_active) {
                  // Send the first email of the sequence immediately
                  $firstEmail = $newsletterCampaign->emails()->orderBy('step_order')->first();

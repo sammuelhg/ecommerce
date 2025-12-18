@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Newsletter;
 
-use App\Models\NewsletterCampaign;
+use App\Domains\Marketing\Models\NewsletterCampaign;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
 use Livewire\Component;

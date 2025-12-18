@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\DTOs\Admin\StoryDTO;
-use App\Models\Story;
+use App\Domains\Content\Models\Story;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 

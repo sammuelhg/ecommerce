@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\CartService;
-use App\Models\Product;
+use App\Domains\Sales\Services\CartService;
+use App\Domains\Catalog\Models\Product;
 
 class CartController extends Controller
 {
@@ -22,6 +22,7 @@ class CartController extends Controller
             'cart' => 'required|array',
             'cart.*.id' => 'required|integer|exists:products,id',
             'cart.*.qty' => 'required|integer|min:1',
+            'background' => 'nullable|boolean'
         ]);
 
         $items = array_map(function ($item) {
@@ -32,6 +33,13 @@ class CartController extends Controller
         }, $request->cart);
 
         $cartService->sync($items);
+
+        if ($request->background) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Carrinho sincronizado em segundo plano.'
+            ]);
+        }
 
         // Return success and redirect URL
         return response()->json([

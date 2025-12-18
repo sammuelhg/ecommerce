@@ -6,7 +6,7 @@ use Livewire\Component;
 use App\Actions\Leads\CreateLeadAction;
 use App\DTOs\LeadData;
 use App\Enums\LeadStatus;
-use App\Services\UtmExtractorService;
+use App\Domains\Marketing\Services\UtmExtractorService;
 use Illuminate\Support\Facades\Request;
 
 class LeadCapture extends Component

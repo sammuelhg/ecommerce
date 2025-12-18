@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Actions\Campaign\SendCampaignEmailAction;
-use App\Models\Campaign;
-use App\Models\Lead;
+use App\Domains\Marketing\Models\Campaign;
+use App\Domains\Marketing\Models\Lead;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

@@ -10,7 +10,7 @@ use App\Services\Auth\RegistrationService;
 use App\DTOs\Auth\RegisterUserDTO;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
-use App\Models\Product;
+use App\Domains\Catalog\Models\Product;
 use Illuminate\View\View;
 
 class RegisterController extends Controller

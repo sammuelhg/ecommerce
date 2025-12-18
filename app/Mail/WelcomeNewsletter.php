@@ -17,7 +17,7 @@ class WelcomeNewsletter extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        public \App\Models\NewsletterSubscriber $subscriber
+        public \App\Domains\Marketing\Models\Lead $subscriber
     ) {}
 
     /**
@@ -25,7 +25,7 @@ class WelcomeNewsletter extends Mailable
      */
     public function envelope(): Envelope
     {
-        $prefix = \App\Models\StoreSetting::get('email_subject_prefix', '[LosFit]');
+        $prefix = \App\Domains\Shared\Models\StoreSetting::get('email_subject_prefix', '[LosFit]');
         return new Envelope(
             subject: $prefix . ' Bem-vindo à LosFit! 🎁',
         );

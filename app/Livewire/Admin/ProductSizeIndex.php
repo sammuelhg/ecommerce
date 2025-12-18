@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\ProductSize;
+use App\Domains\Catalog\Models\ProductSize;
 use Livewire\Component;
 use Livewire\WithPagination;
 

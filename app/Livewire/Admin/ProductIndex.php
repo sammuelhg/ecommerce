@@ -4,7 +4,7 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Product;
+use App\Domains\Catalog\Models\Product;
 
 use Livewire\Attributes\On;
 
@@ -93,7 +93,7 @@ class ProductIndex extends Component
 
     private function buildPreviewPrompt(array $data): string
     {
-        $template = \App\Models\StoreSetting::get('ai_image_prompt_template', 
+        $template = \App\Domains\Shared\Models\StoreSetting::get('ai_image_prompt_template', 
             'Professional e-commerce product photography of {product_name}, {category} category product, {type} type, {model} model, {size} size, {flavor} flavor, {material} packaging. Studio lighting, clean white background, product centered, front view, label visible and readable, high resolution, professional packshot, 8k quality, photorealistic'
         );
 
@@ -128,7 +128,7 @@ class ProductIndex extends Component
             $product = Product::findOrFail($productId);
             
             // Use the edited prompt directly
-            $imageService = app(\App\Services\GeminiImageService::class);
+            $imageService = app(\App\Domains\Content\Services\GeminiImageService::class);
             
             // We need to modify the service to accept a direct prompt or pass it via data
             // Since we can't easily change the service signature without checking it, 

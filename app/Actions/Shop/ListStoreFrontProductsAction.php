@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Shop;
 
-use App\Models\Product;
+use App\Domains\Catalog\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 

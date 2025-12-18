@@ -13,7 +13,7 @@ class SendCampaignJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public \App\Models\NewsletterCampaign $campaign
+        public \App\Domains\Marketing\Models\NewsletterCampaign $campaign
     ) {}
 
     /**
@@ -38,7 +38,7 @@ class SendCampaignJob implements ShouldQueue
             return;
         }
 
-        \App\Models\NewsletterSubscriber::where('is_active', true)
+        \App\Domains\Marketing\Models\NewsletterSubscriber::where('is_active', true)
             ->chunk(100, function ($subscribers) use ($email) {
                 foreach ($subscribers as $subscriber) {
                     // Dispatch individual email job

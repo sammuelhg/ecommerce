@@ -19,7 +19,7 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3">
-            <h5 class="mb-0 fw-bold">Lista de Cores</h5>
+            <h5 class="mb-0 fw-bold"><i class="bi bi-palette me-2 text-primary"></i> Lista de Cores</h5>
         </div>
         <div class="card-body p-0">
             <!-- Desktop Table -->

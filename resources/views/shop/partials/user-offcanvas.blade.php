@@ -147,7 +147,7 @@
                     @if(isset($storeSettings['profile_logo']))
                         <img src="{{ $storeSettings['profile_logo'] }}" alt="Logo Perfil" class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;">
                     @else
-                        <i class="bi bi-person-circle text-muted" style="font-size: 64px;"></i>
+                        <i class="bi bi-person-circle text-muted" style="font-size: 64px; width: 64px; height: 64px;"></i>
                     @endif
                     <p class="text-muted mt-3">Faça login para acessar sua conta e aproveitar todos os benefícios.</p>
                 </div>
@@ -190,14 +190,14 @@
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
                             <div class="mb-3">
-                                <label for="email" class="form-label">E-mail</label>
-                                <input type="email" class="form-control bg-white" id="email" name="email"
-                                       placeholder="seu@email.com" required autofocus>
+                                <label for="login_email" class="form-label">E-mail</label>
+                                <input type="email" class="form-control bg-white" id="login_email" name="email"
+                                       placeholder="seu@email.com" required autofocus autocomplete="username">
                             </div>
                             <div class="mb-3">
-                                <label for="password" class="form-label">Senha</label>
-                                <input type="password" class="form-control bg-white" id="password" name="password"
-                                       placeholder="••••••••" required>
+                                <label for="login_password" class="form-label">Senha</label>
+                                <input type="password" class="form-control bg-white" id="login_password" name="password"
+                                       placeholder="••••••••" required autocomplete="current-password">
                             </div>
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" id="remember" name="remember">
@@ -226,17 +226,17 @@
                             <div class="mb-3">
                                 <label for="reg_email" class="form-label">E-mail</label>
                                 <input type="email" class="form-control bg-white" id="reg_email" name="email"
-                                       placeholder="seu@email.com" required>
+                                       placeholder="seu@email.com" required autocomplete="username">
                             </div>
                             <div class="mb-3">
                                 <label for="reg_password" class="form-label">Senha</label>
                                 <input type="password" class="form-control bg-white" id="reg_password" name="password"
-                                       placeholder="••••••••" required>
+                                       placeholder="••••••••" required autocomplete="new-password">
                             </div>
                             <div class="mb-3">
                                 <label for="reg_password_confirmation" class="form-label">Confirmar Senha</label>
                                 <input type="password" class="form-control bg-white" id="reg_password_confirmation"
-                                       name="password_confirmation" placeholder="••••••••" required>
+                                       name="password_confirmation" placeholder="••••••••" required autocomplete="new-password">
                             </div>
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" id="terms" required>

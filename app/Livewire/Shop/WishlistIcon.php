@@ -3,7 +3,7 @@
 namespace App\Livewire\Shop;
 
 use Livewire\Component;
-use App\Services\WishlistService;
+use App\Domains\Customer\Services\WishlistService;
 use Livewire\Attributes\On;
 
 class WishlistIcon extends Component

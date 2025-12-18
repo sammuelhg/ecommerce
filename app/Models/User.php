@@ -70,7 +70,7 @@ class User extends Authenticatable
         }
 
         // Check for Store Profile Logo
-        $profileLogo = \App\Models\StoreSetting::get('profile_logo');
+        $profileLogo = \App\Domains\Shared\Models\StoreSetting::get('profile_logo');
         if ($profileLogo) {
             return $profileLogo;
         }
@@ -92,11 +92,11 @@ class User extends Authenticatable
 
     public function orders()
     {
-        return $this->hasMany(\App\Models\Order::class);
+        return $this->hasMany(\App\Domains\Sales\Models\Order::class);
     }
 
     public function campaigns(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(\App\Models\Campaign::class);
+        return $this->hasMany(\App\Domains\Marketing\Models\Campaign::class);
     }
 }
