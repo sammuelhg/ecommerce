@@ -1,0 +1,100 @@
+name: Deploy main1 to Hostinger
+
+on:
+  push:
+    branches: [ main1 ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: 🚀 Deploy main1 (Clean Slate)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: 🔨 Build Assets
+      run: |
+        npm ci
+        npm run build
+
+    - name: 📦 Create Deployment Artifact
+      run: |
+        tar -czf deploy_main1.tar.gz \
+          --exclude=.git \
+          --exclude=.github \
+          --exclude=node_modules \
+          --exclude=tests \
+          --exclude=maintenance \
+          --exclude=.env \
+          --exclude=*.zip \
+          --exclude=*.tar.gz \
+          --exclude=storage/logs \
+          --exclude=storage/framework/sessions \
+          .
+
+    - name: 📤 Transfer to Server
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOSTINGER_IP }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        key: ${{ secrets.HOSTINGER_SSH_KEY }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        source: "deploy_main1.tar.gz"
+        target: ${{ secrets.TARGET_DIRECTORY }}
+
+    - name: 🚀 Remote Setup & Cleanup
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOSTINGER_IP }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        key: ${{ secrets.HOSTINGER_SSH_KEY }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        script: |
+          TARGET_DIR="${{ secrets.TARGET_DIRECTORY }}"
+          PHP_BIN="/opt/alt/php84/usr/bin/php"
+          COMPOSER_BIN="/usr/local/bin/composer"
+
+          echo "--- Starting Clean Deploy of main1 ---"
+          cd $TARGET_DIR
+          
+          # Backup critical files
+          [ -f .env ] && cp .env .env.bak
+          [ -f .htaccess ] && cp .htaccess .htaccess.bak
+          
+          echo "1. Deleting all existing files..."
+          # Delete everything except backups and the new package
+          find . -maxdepth 1 ! -name '.env.bak' ! -name '.htaccess.bak' ! -name 'deploy_main1.tar.gz' ! -name '.' ! -name '..' -exec rm -rf {} +
+          
+          echo "2. Extracting new code..."
+          tar -xzf deploy_main1.tar.gz
+          rm deploy_main1.tar.gz
+          
+          # Restore critical files
+          [ -f .env.bak ] && mv .env.bak .env
+          [ -f .htaccess.bak ] && mv .htaccess.bak .htaccess
+          
+          echo "3. Installing dependencies..."
+          $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
+          
+          echo "4. Running Migrations (Empty DB)..."
+          # Running migrate --force. Since the user wants empty DB, if it was empty it will create tables.
+          # If they wanted migrate:fresh they should specify, but migrate is safer.
+          $PHP_BIN artisan migrate --force
+          
+          echo "5. Optimizing and Permissions..."
+          $PHP_BIN artisan optimize:clear
+          $PHP_BIN artisan storage:link
+          
+          chmod -R 775 storage bootstrap/cache
+          find . -type d -exec chmod 755 {} \;
+          find . -type f -exec chmod 644 {} \;
+          chmod -R 777 storage bootstrap/cache
+
+          echo "--- DEPLOY main1 COMPLETED SUCCESSFULLY ---"
