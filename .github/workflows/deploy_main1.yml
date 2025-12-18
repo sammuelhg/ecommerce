@@ -82,8 +82,8 @@ jobs:
           echo "3. Synchronizing Database..."
           if [ -f backup_losfit.sql ]; then
               echo "Importing backup_losfit.sql (52 tables)..."
-              # Using 127.0.0.1 and --force to handle existing tables
-              mysql -h 127.0.0.1 -u u488238372_losfit -p'!Sa002125' u488238372_losfit --force < backup_losfit.sql > mysql_import.log 2>&1
+              # Using --binary-mode=1 and utf8mb4 for robust import
+              mysql -h 127.0.0.1 -u u488238372_losfit -p'!Sa002125' u488238372_losfit --force --binary-mode=1 --default-character-set=utf8mb4 < backup_losfit.sql > mysql_import.log 2>&1
               if [ $? -eq 0 ]; then
                   echo "✅ Database import command finished."
                   TABLE_COUNT=$(mysql -h 127.0.0.1 -u u488238372_losfit -p'!Sa002125' -e "SHOW TABLES" u488238372_losfit | wc -l)
