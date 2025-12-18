@@ -50,11 +50,11 @@ foreach ($directories as $name => $path) {
 // 4. Teste de Conexão com Banco de Dados (Lendo do .env)
 echo "<h2>4. Conexão com Banco de Dados</h2>";
 if (file_exists($basePath . '/.env')) {
-    $env = file_get_contents($basePath . '/.env');
-    preg_match('/DB_HOST=(.*)/', $env, $host);
-    preg_match('/DB_DATABASE=(.*)/', $env, $db);
-    preg_match('/DB_USERNAME=(.*)/', $env, $user);
-    preg_match('/DB_PASSWORD=(.*)/', $env, $pass);
+    $env_content = file_get_contents($basePath . '/.env');
+    preg_match('/DB_HOST=(.*)/', $env_content, $host);
+    preg_match('/DB_DATABASE=(.*)/', $env_content, $db);
+    preg_match('/DB_USERNAME=(.*)/', $env_content, $user);
+    preg_match('/DB_PASSWORD=(.*)/', $env_content, $pass);
 
     $db_host = trim($host[1] ?? '127.0.0.1');
     $db_name = trim($db[1] ?? '');
@@ -74,6 +74,12 @@ if (file_exists($basePath . '/.env')) {
             $count = $res->num_rows;
             echo "📊 Total de Tabelas Encontradas: <strong>$count</strong><br>";
             
+            // Verificação de Charset/Collation
+            $res_charset = $conn->query("SELECT @@character_set_database, @@collation_database");
+            $row_charset = $res_charset->fetch_assoc();
+            echo "🔤 Charset do Banco: <strong>" . $row_charset['@@character_set_database'] . "</strong><br>";
+            echo "🔡 Collation do Banco: <strong>" . $row_charset['@@collation_database'] . "</strong><br>";
+
             if ($count < 50) {
                 echo "⚠️ Atenção: Menos de 50 tabelas encontradas. O banco pode estar incompleto.<br>";
             }
@@ -94,8 +100,8 @@ foreach ($required_extensions as $ext) {
     echo "$ext: " . (extension_loaded($ext) ? "✅ OK" : "❌ FALTANDO") . "<br>";
 }
 
-// 6. Teste de Boot do Laravel e Página Inicial
-echo "<h2>6. Teste de Boot do Laravel e Página Inicial</h2>";
+// 6. Teste de Boot do Laravel e Páginas
+echo "<h2>6. Teste de Boot do Laravel e Requisições</h2>";
 try {
     echo "Tentando bootar o Laravel...<br>";
     if (file_exists($basePath . '/vendor/autoload.php') && file_exists($basePath . '/bootstrap/app.php')) {
@@ -107,7 +113,7 @@ try {
         echo "✅ Boot Framework OK!<br>";
         
         $app_key = env('APP_KEY');
-        echo "APP_KEY: " . ($app_key ? "✅ Configurada" : "❌ NÃO ENCONTRADA NO .env") . "<br>";
+        echo "APP_KEY: " . ($app_key ? "✅ Configurada" : "❌ NÃO ENCONTRADA") . "<br>";
         
         ob_end_clean();
     }
@@ -116,32 +122,40 @@ try {
     echo "Arquivo: " . $e->getFile() . " (Linha " . $e->getLine() . ")<br>";
 }
 
-// Teste de requisição na home
-$url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
-echo "Testando requisição em $url...<br>";
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
+// Teste de requisições
+$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+$routes_to_test = [
+    'Página Inicial' => $baseUrl . '/',
+    'Página de Login' => $baseUrl . '/login',
+    'Dashboard Admin' => $baseUrl . '/admin'
+];
 
-if ($httpCode >= 200 && $httpCode < 300) {
-    echo "✅ Página Inicial: Status $httpCode (OK)<br>";
-} else {
-    echo "❌ Página Inicial: Status $httpCode (ERRO)<br>";
+foreach ($routes_to_test as $name => $url) {
+    echo "Testando $name ($url)... ";
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false); // Não segue redirecionamento para testar o código real
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode >= 200 && $httpCode < 400) {
+        echo "✅ Status $httpCode<br>";
+    } else {
+        echo "❌ Status $httpCode (ERRO)<br>";
+    }
 }
 
 // 7. Logs do Laravel
 echo "<h2>7. Últimas linhas do log (Laravel)</h2>";
 $logPath = $basePath . '/storage/logs/laravel.log';
 if (file_exists($logPath)) {
-    $logContent = array_slice(file($logPath), -20);
-    echo "<pre style='background: #f4f4f4; padding: 10px;'>" . htmlspecialchars(implode("", $logContent)) . "</pre>";
+    $logContent = array_slice(file($logPath), -40); // 40 linhas agora
+    echo "<pre style='background: #f4f4f4; padding: 10px; font-size: 11px; overflow: auto; max-height: 400px;'>" . htmlspecialchars(implode("", $logContent)) . "</pre>";
 } else {
     echo "Log do Laravel não encontrado.";
 }
 
-echo "<hr><p>Remova este arquivo do servidor após terminar o debug. v2.1</p>";
+echo "<hr><p>Remova este arquivo do servidor após terminar o debug. v2.5</p>";
 
