@@ -115,12 +115,12 @@
                                 </a>
                             </li>
                         @endif
-                        <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
+                        {{-- Removido duplicidade de título no breadcrumb --}}
                     </ol>
                 </nav>
 
                 <!-- Título e Avaliação -->
-                <h1 class="h3 fw-bold mb-1">{{ $product->name }}</h1>
+                <h1 class="fs-3 fw-bold mb-1">{{ $product->name }}</h1>
                 <div class="text-warning mb-3">
                     <i class="bi bi-star-fill"></i>
                     <i class="bi bi-star-fill"></i>

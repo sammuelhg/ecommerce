@@ -57,8 +57,11 @@ jobs:
         port: ${{ secrets.HOSTINGER_PORT }}
         script: |
           TARGET_DIR="domains/losfit.com.br/public_html"
+          # Exact path for PHP 8.4 on Hostinger as per diagnostic
           PHP_BIN="/opt/alt/php84/usr/bin/php"
           COMPOSER_BIN="/usr/local/bin/composer"
+          
+          echo "Using PHP: $($PHP_BIN -v | head -n 1)"
 
           echo "--- Starting Clean Deploy of main1 ---"
           cd $TARGET_DIR
@@ -107,7 +110,15 @@ jobs:
           fi
 
           echo "5. Installing dependencies..."
-          $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
+          # Increased robustness with prefer-dist and retry
+          $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction --prefer-dist || $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
+          
+          if [ ! -d "vendor/laravel/framework" ]; then
+              echo "❌ CRITICAL ERROR: vendor folder is incomplete! Deploying may fail."
+              # Force a cleaner install if missing
+              rm -rf vendor composer.lock
+              $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
+          fi
           
           echo "6. Running Migrations..."
           $PHP_BIN artisan migrate --force
