@@ -81,9 +81,18 @@ jobs:
           
           echo "3. Synchronizing Database..."
           if [ -f backup_losfit.sql ]; then
-              mysql -h 127.0.0.1 -u u488238372_losfit -p'!Sa002125' u488238372_losfit < backup_losfit.sql
-              rm backup_losfit.sql
-              echo "Database imported successfully."
+              echo "Importing backup_losfit.sql..."
+              mysql -h localhost -u u488238372_losfit -p'!Sa002125' u488238372_losfit < backup_losfit.sql > mysql_import.log 2>&1
+              if [ $? -eq 0 ]; then
+                  echo "✅ Database imported successfully."
+                  rm backup_losfit.sql
+                  rm mysql_import.log
+              else
+                  echo "❌ Database import FAILED. Check mysql_import.log for details."
+                  cat mysql_import.log
+              fi
+          else
+              echo "⚠️ backup_losfit.sql not found in root."
           fi
 
           echo "4. Synchronizing Images..."

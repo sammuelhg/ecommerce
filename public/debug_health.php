@@ -69,6 +69,15 @@ if (file_exists($basePath . '/.env')) {
             echo "❌ FALHA NA CONEXÃO: " . $conn->connect_error;
         } else {
             echo "✅ CONEXÃO COM BANCO OK!<br>";
+            
+            $res = $conn->query("SHOW TABLES");
+            $count = $res->num_rows;
+            echo "📊 Total de Tabelas Encontradas: <strong>$count</strong><br>";
+            
+            if ($count < 50) {
+                echo "⚠️ Atenção: Menos de 50 tabelas encontradas. O banco pode estar incompleto.<br>";
+            }
+            
             $conn->close();
         }
     } catch (Exception $e) {
