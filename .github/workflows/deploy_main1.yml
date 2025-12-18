@@ -26,7 +26,7 @@ jobs:
 
     - name: 📦 Create Deployment Artifact
       run: |
-        tar --warning=no-file-changed -czf deploy_main1.tar.gz \
+        tar --ignore-failed-read --warning=no-file-changed -czf deploy_main1.tar.gz \
           --exclude=.git \
           --exclude=.github \
           --exclude=node_modules \
