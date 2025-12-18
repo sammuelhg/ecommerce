@@ -33,8 +33,7 @@ jobs:
           --exclude=tests \
           --exclude=maintenance \
           --exclude=.env \
-          --exclude=*.zip \
-          --exclude=*.tar.gz \
+          --exclude=deploy_main1.tar.gz \
           --exclude=storage/logs \
           --exclude=storage/framework/sessions \
           .
@@ -47,7 +46,7 @@ jobs:
         key: ${{ secrets.HOSTINGER_SSH_KEY }}
         port: ${{ secrets.HOSTINGER_PORT }}
         source: "deploy_main1.tar.gz"
-        target: ${{ secrets.TARGET_DIRECTORY }}
+        target: "domains/losfit.com.br/public_html"
 
     - name: 🚀 Remote Setup & Cleanup
       uses: appleboy/ssh-action@master
@@ -80,15 +79,28 @@ jobs:
           [ -f .env.bak ] && mv .env.bak .env
           [ -f .htaccess.bak ] && mv .htaccess.bak .htaccess
           
-          echo "3. Installing dependencies..."
+          echo "3. Synchronizing Database..."
+          if [ -f backup_losfit.sql ]; then
+              mysql -h 127.0.0.1 -u u488238372_losfit -p'!Sa002125' u488238372_losfit < backup_losfit.sql
+              rm backup_losfit.sql
+              echo "Database imported successfully."
+          fi
+
+          echo "4. Synchronizing Images..."
+          if [ -f imagens_losfit.zip ]; then
+              mkdir -p storage/app/public
+              unzip -o imagens_losfit.zip -d storage/app/public
+              rm imagens_losfit.zip
+              echo "Images extracted successfully."
+          fi
+
+          echo "5. Installing dependencies..."
           $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
           
-          echo "4. Running Migrations (Empty DB)..."
-          # Running migrate --force. Since the user wants empty DB, if it was empty it will create tables.
-          # If they wanted migrate:fresh they should specify, but migrate is safer.
+          echo "6. Running Migrations..."
           $PHP_BIN artisan migrate --force
           
-          echo "5. Optimizing and Permissions..."
+          echo "7. Optimizing and Permissions..."
           $PHP_BIN artisan optimize:clear
           $PHP_BIN artisan storage:link
           
