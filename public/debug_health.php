@@ -99,6 +99,7 @@ echo "<h2>6. Teste de Boot do Laravel e Página Inicial</h2>";
 try {
     echo "Tentando bootar o Laravel...<br>";
     if (file_exists($basePath . '/vendor/autoload.php') && file_exists($basePath . '/bootstrap/app.php')) {
+        require_once $basePath . '/vendor/autoload.php';
         // Tenta capturar a saída do boot
         ob_start();
         $test_app = require_once $basePath . '/bootstrap/app.php';
