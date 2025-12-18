@@ -57,7 +57,7 @@ jobs:
         key: ${{ secrets.HOSTINGER_SSH_KEY }}
         port: ${{ secrets.HOSTINGER_PORT }}
         script: |
-          TARGET_DIR="${{ secrets.TARGET_DIRECTORY }}"
+          TARGET_DIR="domains/losfit.com.br/public_html"
           PHP_BIN="/opt/alt/php84/usr/bin/php"
           COMPOSER_BIN="/usr/local/bin/composer"
 
