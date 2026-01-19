@@ -7,6 +7,8 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use App\Notifications\PasswordSetNotification;
 
 class Edit extends Component
 {
@@ -72,23 +74,50 @@ class Edit extends Component
             'password' => 'required|min:8|confirmed',
         ]);
 
-        $user = auth()->user();
-        $user->update(['password' => Hash::make($this->password)]);
-        
-        $this->hasPassword = true;
-        
-        // Dispatch event to close modal via JS
-        $this->dispatch('password-set');
-        
-        $this->dispatch('toast', [
-            'title' => 'Sucesso!',
-            'text'  => 'Senha definida com sucesso. Agora você pode fazer login com email e senha.',
-            'icon'  => 'success'
-        ]);
-        
-        // Reset password fields
-        $this->password = '';
-        $this->password_confirmation = '';
+        try {
+            $user = auth()->user();
+            
+            $user->password = Hash::make($this->password);
+            $saved = $user->save();
+            
+            if ($saved) {
+                $this->hasPassword = true;
+                
+                // Dispatch event to close modal via JS
+                $this->dispatch('password-set');
+                
+                $this->dispatch('toast', [
+                    'title' => 'Sucesso!',
+                    'text'  => 'Senha definida com sucesso. Agora você pode fazer login com email e senha.',
+                    'icon'  => 'success'
+                ]);
+                
+                // Trigger async email sending via frontend
+                $this->dispatch('trigger-email-sending');
+                
+                // Reset password fields
+                $this->password = '';
+                $this->password_confirmation = '';
+            } else {
+                Log::error('setPassword: Falha ao salvar no banco de dados.');
+                $this->addError('password', 'Erro interno ao salvar senha via save().');
+            }
+        } catch (\Exception $e) {
+            Log::error('setPassword: Exception: ' . $e->getMessage());
+            $this->addError('password', 'Erro ao salvar senha: ' . $e->getMessage());
+        }
+    }
+
+    public function sendConfirmationEmail()
+    {
+        try {
+            $user = auth()->user();
+            Log::info('sendConfirmationEmail: Tentando enviar email async...');
+            $user->notify(new PasswordSetNotification());
+            Log::info('sendConfirmationEmail: Email enviado com sucesso.');
+        } catch (\Throwable $e) {
+            Log::error('sendConfirmationEmail: Erro ao enviar: ' . $e->getMessage());
+        }
     }
 
     public function updatedAvatar()
@@ -112,9 +141,10 @@ class Edit extends Component
             'taxvat'=> $this->taxvat,
         ];
 
-        if ($this->password) {
-            $data['password'] = Hash::make($this->password);
-        }
+        // Password update is decoupled and handled by setPassword() modal interactions only.
+        // if ($this->password) {
+        //    $data['password'] = Hash::make($this->password);
+        // }
 
         if ($this->avatar) {
             if ($user->avatar) Storage::disk('public')->delete($user->avatar);

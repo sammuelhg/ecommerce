@@ -1,4 +1,4 @@
-<div class="container py-4">
+<div class="container py-4" x-data="profileForm()">
     <div class="row">
         <!-- Sidebar Navigation -->
         <x-account-sidebar />
@@ -10,7 +10,7 @@
                     <h5 class="mb-0 fw-bold"><i class="bi bi-person-circle me-2"></i> Editar Perfil</h5>
                 </div>
                 <div class="card-body p-4">
-                    <form wire:submit.prevent="save" x-data="profileForm()">
+                    <form wire:submit.prevent="save">
                         <div class="row g-4">
                             <!-- Avatar Upload Section -->
                             <div class="col-12 d-flex align-items-center mb-2">
@@ -51,7 +51,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">E-mail</label>
-                                <input type="email" wire:model.live="email" 
+                                <input type="email" wire:model.blur="email" 
                                        class="form-control @error('email') is-invalid @enderror"
                                        @if($socialProvider) disabled @endif>
                                 @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -67,14 +67,14 @@
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Telefone</label>
-                                <input type="text" x-mask="(99) 99999-9999" wire:model.live="phone"
+                                <input type="text" x-mask="(99) 99999-9999" wire:model.blur="phone"
                                        class="form-control @error('phone') is-invalid @enderror" placeholder="(99) 99999-9999">
                                 @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">CPF</label>
-                                <input type="text" x-mask="999.999.999-99" wire:model.live="taxvat"
+                                <input type="text" x-mask="999.999.999-99" wire:model.blur="taxvat"
                                        class="form-control @error('taxvat') is-invalid @enderror" placeholder="000.000.000-00">
                                 @error('taxvat') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
@@ -84,22 +84,17 @@
                             </div>
 
                             @if($hasPassword)
-                                <!-- User has password - can change it -->
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Nova Senha</label>
-                                    <div class="input-group">
-                                        <input :type="showPass ? 'text' : 'password'" wire:model="password" class="form-control @error('password') is-invalid @enderror">
-                                        <button type="button" class="btn btn-outline-secondary" @click="showPass = !showPass">
-                                            <i :class="showPass ? 'bi-eye-slash' : 'bi-eye'"></i>
+                                <!-- User has password - can change it via modal -->
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-light">
+                                        <div>
+                                            <h6 class="fw-bold mb-1"><i class="bi bi-shield-lock me-2"></i>Senha de Acesso</h6>
+                                            <p class="mb-0 small text-muted">Sua senha está definida. Você pode alterá-la se necessário.</p>
+                                        </div>
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#passwordModal" class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil-square me-2"></i>Alterar Senha
                                         </button>
-                                        @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
-                                    <small class="text-muted">Deixe em branco para manter a atual.</small>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Confirmar Senha</label>
-                                    <input type="password" wire:model="password_confirmation" class="form-control">
                                 </div>
                             @else
                                 <!-- User doesn't have password - show button to set one -->
@@ -190,6 +185,8 @@
 @endpush
 
 @push('scripts')
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Cropper.js Script -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 @endpush
@@ -199,6 +196,11 @@
     $wire.on('password-set', () => {
         const modal = bootstrap.Modal.getInstance(document.getElementById('passwordModal'));
         modal.hide();
+    });
+
+    $wire.on('trigger-email-sending', () => {
+        // Asynchronously trigger email sending
+        $wire.sendConfirmationEmail();
     });
 </script>
 @endscript

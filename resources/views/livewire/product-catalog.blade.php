@@ -46,7 +46,7 @@
     <!-- Grid de Produtos -->
     <div class="row g-4">
         @forelse($products as $product)
-            <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="col-sm-6 col-md-4 col-lg-3" wire:key="product-{{ $product->id }}">
                 <div class="card h-100 shadow-sm hover-shadow transition">
                     <!-- Imagem do Produto -->
                     <div class="position-relative overflow-hidden" style="height: 200px;">

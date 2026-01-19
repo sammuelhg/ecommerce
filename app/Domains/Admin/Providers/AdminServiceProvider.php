@@ -14,7 +14,7 @@ class AdminServiceProvider extends ServiceProvider
 
     protected function registerRoutes(): void
     {
-        Route::middleware(['web', 'auth'])
+        Route::middleware(['web', 'auth', \App\Http\Middleware\EnsureAdminAccess::class])
             ->prefix('admin')
             ->name('admin.')
             ->group(__DIR__ . '/../Routes/web.php');

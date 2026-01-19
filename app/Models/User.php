@@ -17,6 +17,13 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    /**
+     * The attributes that are mass assignable.
+     * NOTE: 'is_admin' is intentionally NOT included to prevent privilege escalation.
+     * Admin status can only be set directly in database or via seeder.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'email',
@@ -24,7 +31,6 @@ class User extends Authenticatable
         'phone',
         'address',
         'birth_date',
-        'is_admin',
         'google_id',
         'facebook_id',
         'avatar',
@@ -65,7 +71,13 @@ class User extends Authenticatable
             if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
                 return $this->avatar;
             }
-            // Otherwise it's a local file
+            
+            // If it already starts with 'storage/', just asset() it
+            if (str_starts_with($this->avatar, 'storage/')) {
+                 return asset($this->avatar);
+            }
+
+            // Otherwise, use Storage facade to get the URL
             return \Illuminate\Support\Facades\Storage::url($this->avatar);
         }
 

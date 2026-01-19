@@ -1,7 +1,7 @@
 <div>
     <div class="row mb-4">
         <div class="col-md-6">
-            <input wire:model.live="search" type="text" class="form-control form-control-lg bg-white" placeholder="🔍 Buscar produtos...">
+            <input wire:model.live.debounce.500ms="search" type="text" class="form-control form-control-lg bg-white" placeholder="🔍 Buscar produtos...">
         </div>
         <div class="col-md-6 text-end">
             <a href="{{ route('admin.products.create') }}" class="btn btn-primary btn-lg">

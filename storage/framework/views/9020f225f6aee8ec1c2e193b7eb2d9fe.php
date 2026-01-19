@@ -99,20 +99,28 @@
     
     <!-- Server-Side Cart Data Injection -->
     <?php
-        $dbProducts = \App\Domains\Catalog\Models\Product::where('is_active', true)
-            ->select(['id', 'name', 'price', 'image', 'is_offer', 'old_price'])
-            ->limit(50)
-            ->get()
-            ->map(function($p) {
-                return [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'price' => (float) $p->price,
-                    'image' => $p->image,
-                    'isOffer' => (bool) $p->is_offer,
-                    'oldPrice' => $p->old_price ? (float) $p->old_price : null,
-                ];
-            });
+        // Prevent loading heavy product data on Profile/Account pages to save performance
+        $shouldLoadProducts = !request()->is('conta*') && !request()->is('admin*');
+        
+        $dbProducts = collect([]);
+        
+        if ($shouldLoadProducts) {
+             $dbProducts = \App\Domains\Catalog\Models\Product::where('is_active', true)
+                ->select(['id', 'name', 'price', 'image', 'is_offer', 'old_price'])
+                ->limit(50)
+                ->get()
+                ->map(function($p) {
+                    return [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'price' => (float) $p->price,
+                        // Fix 404s: Use absolute URL
+                        'image' => $p->image ? \Illuminate\Support\Facades\Storage::url($p->image) : null,
+                        'isOffer' => (bool) $p->is_offer,
+                        'oldPrice' => $p->old_price ? (float) $p->old_price : null,
+                    ];
+                });
+        }
     ?>
     <script>
         window.IS_GUEST = <?php echo json_encode(auth()->guest(), 15, 512) ?>;

@@ -3,7 +3,7 @@ echo --- Exportando Banco de Dados Local (LosFit) ---
 echo.
 
 set MYSQL_PATH=c:\xampp\mysql\bin\mysqldump.exe
-set DB_NAME=ecommerce
+set DB_NAME=ecommerce_hp
 set OUTPUT_FILE=backup_losfit.sql
 
 if not exist "%MYSQL_PATH%" (
@@ -13,11 +13,11 @@ if not exist "%MYSQL_PATH%" (
     exit /b
 )
 
-echo Tentando exportar o banco '%DB_NAME%'...
+echo Tentando exportar o banco '%DB_NAME%' na porta 3307...
 echo (Se pedir senha e voce nao tiver configurado, apenas aperte ENTER)
 echo.
 
-"%MYSQL_PATH%" -u root -p %DB_NAME% > %OUTPUT_FILE%
+"%MYSQL_PATH%" -u root -p -P 3307 --default-character-set=utf8mb4 --hex-blob --result-file=%OUTPUT_FILE% %DB_NAME%
 
 if %ERRORLEVEL% equ 0 (
     echo.
