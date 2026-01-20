@@ -153,15 +153,6 @@
                     </span>
                 </button>
 
-                <!-- Busca (Mobile Icon) -->
-                <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center me-2" 
-                        type="button" 
-                        @click="showMobileSearch = !showMobileSearch"
-                        aria-label="Abrir Busca"
-                        style="width: 40px; height: 40px;">
-                    <i class="bi bi-search"></i>
-                </button>
-
                 <!-- Menu Hambúrguer (Mobile) -->
                 <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center" 
                         type="button" 
@@ -199,15 +190,7 @@
         </div>
     </nav>
 
-    <!-- Barra de Busca Mobile -->
-    <div class="p-3 border-bottom d-lg-none" style="background-color: #1a1a1a; border-bottom: 1px solid #333 !important;" 
-         x-show="showMobileSearch" 
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 -translate-y-2"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         style="display: none;">
-        <x-shop.header-search />
-    </div>
+    <!-- Barra de Busca Mobile (REMOVIDA: Agora no Offcanvas) -->
 
     <!-- Offcanvas Menu Mobile -->
     <div class="offcanvas offcanvas-end bg-white" tabindex="-1" id="offcanvasNav" 
@@ -221,7 +204,7 @@
         <div class="offcanvas-body">
             <!-- Barra de Busca no Offcanvas -->
             <div class="mb-4 d-lg-none">
-                <x-shop.header-search />
+                @include('shop.partials.search-bar')
             </div>
 
             <ul class="navbar-nav">

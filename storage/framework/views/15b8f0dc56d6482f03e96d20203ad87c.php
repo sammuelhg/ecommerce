@@ -153,15 +153,6 @@
                     </span>
                 </button>
 
-                <!-- Busca (Mobile Icon) -->
-                <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center me-2" 
-                        type="button" 
-                        @click="showMobileSearch = !showMobileSearch"
-                        aria-label="Abrir Busca"
-                        style="width: 40px; height: 40px;">
-                    <i class="bi bi-search"></i>
-                </button>
-
                 <!-- Menu Hambúrguer (Mobile) -->
                 <button class="btn btn-outline-warning btn-icon-shape rounded-circle d-lg-none d-flex align-items-center justify-content-center" 
                         type="button" 
@@ -237,34 +228,7 @@
         </div>
     </nav>
 
-    <!-- Barra de Busca Mobile -->
-    <div class="p-3 border-bottom d-lg-none" style="background-color: #1a1a1a; border-bottom: 1px solid #333 !important;" 
-         x-show="showMobileSearch" 
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 -translate-y-2"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         style="display: none;">
-        <?php if (isset($component)) { $__componentOriginal901916e66f76643cea530aa9f8bff40c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal901916e66f76643cea530aa9f8bff40c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.shop.header-search','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('shop.header-search'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal901916e66f76643cea530aa9f8bff40c)): ?>
-<?php $attributes = $__attributesOriginal901916e66f76643cea530aa9f8bff40c; ?>
-<?php unset($__attributesOriginal901916e66f76643cea530aa9f8bff40c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal901916e66f76643cea530aa9f8bff40c)): ?>
-<?php $component = $__componentOriginal901916e66f76643cea530aa9f8bff40c; ?>
-<?php unset($__componentOriginal901916e66f76643cea530aa9f8bff40c); ?>
-<?php endif; ?>
-    </div>
+    <!-- Barra de Busca Mobile (REMOVIDA: Agora no Offcanvas) -->
 
     <!-- Offcanvas Menu Mobile -->
     <div class="offcanvas offcanvas-end bg-white" tabindex="-1" id="offcanvasNav" 
@@ -278,26 +242,7 @@
         <div class="offcanvas-body">
             <!-- Barra de Busca no Offcanvas -->
             <div class="mb-4 d-lg-none">
-                <?php if (isset($component)) { $__componentOriginal901916e66f76643cea530aa9f8bff40c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal901916e66f76643cea530aa9f8bff40c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.shop.header-search','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('shop.header-search'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal901916e66f76643cea530aa9f8bff40c)): ?>
-<?php $attributes = $__attributesOriginal901916e66f76643cea530aa9f8bff40c; ?>
-<?php unset($__attributesOriginal901916e66f76643cea530aa9f8bff40c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal901916e66f76643cea530aa9f8bff40c)): ?>
-<?php $component = $__componentOriginal901916e66f76643cea530aa9f8bff40c; ?>
-<?php unset($__componentOriginal901916e66f76643cea530aa9f8bff40c); ?>
-<?php endif; ?>
+                <?php echo $__env->make('shop.partials.search-bar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             </div>
 
             <ul class="navbar-nav">
