@@ -69,23 +69,27 @@ foreach ($tables as $tbl) {
                      $fixed = str_replace("\xEF\xBF\xBD", ' - ', $fixed);
                 }
 
-                // 3. Fix "Macramê  Branco" and other Dash patterns
-                // Double space where dash should be
-                if (strpos($fixed, 'Macramê  Branco') !== false) {
-                    $fixed = str_replace('Macramê  Branco', 'Macramê - Branco', $fixed);
+                // 3. Fix "Macramê  Branco" (variable spaces)
+                // Using Regex for robustness with spaces and RepChar ("\xEF\xBF\xBD")
+                $fixed = preg_replace('/Macramê\s+' . "\xEF\xBF\xBD" . '\s+Branco/u', 'Macramê - Branco', $fixed);
+                $fixed = preg_replace('/Macramê\s+Branco/u', 'Macramê - Branco', $fixed); 
+
+                // "Legging... Brilhe  Verde" (Generic Word  Word)
+                $fixed = preg_replace('/\s' . "\xEF\xBF\xBD" . '\s/u', ' - ', $fixed);
+
+                // 4. Fix "Tamanho nico" -> "Tamanho Único"
+                // Match "Tamanho", optional spaces, RepChar, optional spaces, "nico"
+                if (strpos($fixed, 'nico') !== false) {
+                     // Debug logging failure points
+                     $fixed = preg_replace('/Tamanho\s*' . "\xEF\xBF\xBD" . '\s*nico/u', 'Tamanho Único', $fixed);
+                     // Fallback for isolated RepChar + nico
+                     $fixed = preg_replace('/' . "\xEF\xBF\xBD" . '\s*nico/u', 'Único', $fixed);
                 }
                 
-                // Fix "Legging... Brilhe  Verde" pattern
-                // Generic: "Word  Word" -> "Word - Word"
-                // Match space-RepChar-space
-                $fixed = str_replace(" \xEF\xBF\xBD ", ' - ', $fixed);
-                
-                // 4. Fix "Tamanho nico" -> "Tamanho Único"
-                // Pattern: "Tamanho nico"
-                $fixed = str_replace('Tamanho ' . "\xEF\xBF\xBD" . 'nico', 'Tamanho Único', $fixed);
-                
-                // Fallback for just "nico" if needed
-                $fixed = str_replace("\xEF\xBF\xBD" . 'nico', 'Único', $fixed);
+                // Final cleanup of any remaining RepChar to Dash
+                if (strpos($fixed, "\xEF\xBF\xBD") !== false) {
+                     $fixed = str_replace("\xEF\xBF\xBD", '-', $fixed);
+                }
 
                 if ($fixed !== $original) {
                     $updates[$col] = $fixed;
