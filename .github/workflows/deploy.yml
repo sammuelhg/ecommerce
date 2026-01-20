@@ -24,8 +24,10 @@ jobs:
         # Ideally, we should do 'composer install' here and upload vendor if we want immutable builds,
         # but for this specific "Fix" request matching the manual script strategy:
         
-        zip -r deploy_package.zip app bootstrap config public resources routes storage/framework/views artisan composer.json
-        
+          
+          # Include scripts directory for DB fixes
+          zip -r deploy_package.zip app bootstrap config public resources routes scripts storage/framework/views artisan composer.json
+          
         # Note: We are NOT including vendor. 
         # If new dependencies were added, we would need to run 'composer install' on the server or include vendor here.
         # Given this is a UI/JS fix, excluding vendor speeds up upload significantly.
@@ -55,4 +57,8 @@ jobs:
           php artisan view:clear
           php artisan config:clear
           php artisan route:clear
-          echo "Deployment Finished Successfully!"
+          
+          # Run DB Encoding Fix
+          php scripts/fix_hostinger_encoding.php
+          
+          echo "Deployment and DB Fix Finished Successfully!"
