@@ -69,15 +69,23 @@ foreach ($tables as $tbl) {
                      $fixed = str_replace("\xEF\xBF\xBD", ' - ', $fixed);
                 }
 
-                // 3. Fix "Macramê  Branco" (Lost Dash pattern)
+                // 3. Fix "Macramê  Branco" and other Dash patterns
                 // Double space where dash should be
                 if (strpos($fixed, 'Macramê  Branco') !== false) {
                     $fixed = str_replace('Macramê  Branco', 'Macramê - Branco', $fixed);
                 }
-                // Missing dash entirely
-                else if (strpos($fixed, 'Macramê Branco') !== false && strpos($fixed, 'Macramê - Branco') === false) {
-                     $fixed = str_replace('Macramê Branco', 'Macramê - Branco', $fixed);
-                }
+                
+                // Fix "Legging... Brilhe  Verde" pattern
+                // Generic: "Word  Word" -> "Word - Word"
+                // Match space-RepChar-space
+                $fixed = str_replace(" \xEF\xBF\xBD ", ' - ', $fixed);
+                
+                // 4. Fix "Tamanho nico" -> "Tamanho Único"
+                // Pattern: "Tamanho nico"
+                $fixed = str_replace('Tamanho ' . "\xEF\xBF\xBD" . 'nico', 'Tamanho Único', $fixed);
+                
+                // Fallback for just "nico" if needed
+                $fixed = str_replace("\xEF\xBF\xBD" . 'nico', 'Único', $fixed);
 
                 if ($fixed !== $original) {
                     $updates[$col] = $fixed;
