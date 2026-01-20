@@ -1,0 +1,58 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ "main", "main1", "master" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Create Deployment Artifact
+      run: |
+        # Create a zip file excluding dev files and vendor (assuming vendor exists on server or is not managed here)
+        # For a patch deploy, we usually just want app code. 
+        # Ideally, we should do 'composer install' here and upload vendor if we want immutable builds,
+        # but for this specific "Fix" request matching the manual script strategy:
+        
+        zip -r deploy_package.zip app bootstrap config public resources routes storage/framework/views artisan composer.json
+        
+        # Note: We are NOT including vendor. 
+        # If new dependencies were added, we would need to run 'composer install' on the server or include vendor here.
+        # Given this is a UI/JS fix, excluding vendor speeds up upload significantly.
+
+    - name: Copy Files via SCP
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOSTINGER_HOST }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        source: "deploy_package.zip"
+        target: "/home/${{ secrets.HOSTINGER_USER }}/public_html"
+        timeout: 120s
+
+    - name: Execute Remote Deployment Commands
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOSTINGER_HOST }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        script: |
+          cd /home/${{ secrets.HOSTINGER_USER }}/public_html
+          unzip -o deploy_package.zip
+          rm deploy_package.zip
+          php artisan view:clear
+          php artisan config:clear
+          php artisan route:clear
+          echo "Deployment Finished Successfully!"
