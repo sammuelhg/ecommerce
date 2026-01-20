@@ -34,7 +34,7 @@
     </div>
 
     <!-- Dropdown de Sugestões / Resultados -->
-    <div class="search-suggestions-dropdown shadow-lg border-0 rounded-3 mt-2" 
+    <div class="search-suggestions-dropdown shadow-lg border-0 rounded-3 mt-2 d-none d-lg-block" 
          x-show="focused && ((searchQuery.length > 0) || (category !== 'Todos') || isQueryEmpty)" 
          x-transition.opacity.duration.200ms
          @click.outside="focused = false"

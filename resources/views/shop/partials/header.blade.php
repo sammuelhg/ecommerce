@@ -35,7 +35,7 @@
             </a>
 
             <!-- Ícones de Ação -->
-            <div class="d-flex order-lg-3 me-2">
+            <div class="d-flex order-lg-3 me-2 align-items-center">
                 <!-- Conta -->
                 <!-- Conta (Story Ring / Avatar Button) -->
                 <div class="nav-item me-2 position-relative" 
@@ -145,7 +145,7 @@
                         data-bs-target="#offcanvasWishlist"
                         aria-label="Lista de Desejos"
                         style="width: 40px; height: 40px;">
-                    <i class="bi" :class="wishlist.length > 0 ? 'bi-heart-fill' : 'bi-heart'"></i>
+                    <i class="bi bi-heart" :class="{ 'bi-heart-fill': wishlist.length > 0, 'bi-heart': wishlist.length === 0 }"></i>
                     <span class="notification-badge" 
                           x-show="wishlist.length > 0" 
                           x-text="wishlist.length"
