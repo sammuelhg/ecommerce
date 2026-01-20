@@ -1,66 +1,95 @@
 <?php
 // scripts/fix_hostinger_encoding.php
-// Fixes "CP850 interpreted as UTF-8" artifacts (Mojibake) in Production DB
-// artifacts: ÔÇô (–), ├¬ (ê), ├ú (ã), etc.
+// ROBUST Production Encoding & Content Fixer
+// Can be run via SSH/Deploy to fix existing data without re-importing
 
 require __DIR__ . '/../vendor/autoload.php';
-
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
 use Illuminate\Support\Facades\DB;
 
-echo "--- Starting Production Encoding Repair ---\n";
+echo "=== STARTING PRODUCTION DATABASE REPAIR ===\n";
 
-// Fetch all products (chunked to save memory)
-DB::table('products')->orderBy('id')->chunk(50, function ($products) {
-    foreach ($products as $p) {
-        $original = $p->name;
-        $fixed = $original;
-        $needsUpdate = false;
+// Tables to check
+$tables = ['products', 'campaigns'];
+$columns = ['name', 'description', 'email_content_body'];
 
-        // Detect common artifacts: 
-        // ├ (C3 in CP850 -> start of many UTF-8 2-byte seqs like Ã, ê, í...)
-        // ÔÇô (En-dash)
-        if (strpos($original, 'ÔÇô') !== false || strpos($original, '├') !== false || strpos($original, 'Ã') !== false) {
-             // Attempt standard repair: Treat current UTF-8 string as if it were CP850 bytes
-             $attempt = @iconv('UTF-8', 'CP850//IGNORE', $original);
-             
-             if ($attempt && strlen($attempt) < strlen($original)) {
-                 // Heuristic: If it got shorter and looks cleaner, it's likely the fix.
-                 // Also specific check for known broken strings
-                 if (strpos($original, 'ModaCroch├¬') !== false) {
-                     $fixed = str_replace('ModaCroch├¬', 'ModaCrochê', $original); // Safe manual replacement for brand
-                     $needsUpdate = true;
-                 } else {
-                     $fixed = $attempt;
-                     $needsUpdate = true;
-                 }
-             }
-        }
-        
-        // Also apply the En-dash to Hyphen sanitization (User liked this locally)
-        // Repairing 'ÔÇô' via iconv gives '–' (En-dash). We might want '-' (Hyphen).
-        if ($needsUpdate && strpos($fixed, '–') !== false) {
-             $fixed = str_replace('–', '-', $fixed);
-        } elseif (strpos($fixed, '–') !== false) {
-             // Even if encoding was fine, replace En-dash with Hyphen for consistency
-             $fixed = str_replace('–', '-', $fixed);
-             $needsUpdate = true;
-        }
+foreach ($tables as $tbl) {
+    if (!DB::schema()->hasTable($tbl)) continue;
 
-        // Apply Update
-        if ($needsUpdate && $fixed !== $original) {
-            DB::table('products')
-                ->where('id', $p->id)
-                ->update([
-                    'name' => $fixed,
-                    // We should also fix description/slug if needed, but name is priority 1
-                ]);
-            echo "Fixed ID {$p->id}: $original -> $fixed\n";
+    echo "Processing table '$tbl'...\n";
+    
+    // Get columns that exist
+    $valid_cols = [];
+    foreach ($columns as $col) {
+        if (DB::schema()->hasColumn($tbl, $col)) {
+            $valid_cols[] = $col;
         }
     }
-});
 
-echo "--- Repair Complete ---\n";
+    DB::table($tbl)->orderBy('id')->chunk(50, function ($rows) use ($tbl, $valid_cols) {
+        foreach ($rows as $row) {
+            $updates = [];
+            foreach ($valid_cols as $col) {
+                $val = $row->{$col};
+                if (!$val) continue;
+
+                $original = $val;
+                $fixed = $val;
+
+                // 1. Fix Mojibake (Double Encoded UTF-8)
+                // Check for common artifacts like "Ãª" or "Ã£"
+                if (preg_match('/[\xc2-\xdf][\x80-\xbf]/', $fixed)) {
+                    // Try to reverse double-encoding
+                    // Convert from UTF-8 to CP1252 (bytes), then back to UTF-8
+                    // e.g. "Ãª" (C3 AA) -> bytes C3 AA -> interpret as "ê"
+                    $attempt = @mb_convert_encoding($fixed, 'CP1252', 'UTF-8');
+                    // Check if the result is valid UTF-8
+                    if ($attempt && mb_check_encoding($attempt, 'UTF-8')) {
+                        // Validate heuristic: "ModaCrochÃª" -> "ModaCrochê"
+                        if (strpos($fixed, 'ModaCrochÃª') !== false && strpos($attempt, 'ModaCrochê') !== false) {
+                             $fixed = $attempt;
+                        }
+                        // Broader check: if length reduced considerably (char count), it's likely a fix
+                        // "Ãª" is 2 chars, "ê" is 1 char.
+                        else if (mb_strlen($attempt) < mb_strlen($fixed)) {
+                             // Be conservative: only apply if we see known artifacts
+                             if (strpos($fixed, 'Ã') !== false) {
+                                  $fixed = $attempt;
+                             }
+                        }
+                    }
+                }
+
+                // 2. Fix Replacement Character (U+FFFD) artifacts
+                // "\xEF\xBF\xBD"
+                if (strpos($fixed, "\xEF\xBF\xBD") !== false) {
+                     $fixed = str_replace("\xEF\xBF\xBD", ' - ', $fixed);
+                }
+
+                // 3. Fix "Macramê  Branco" (Lost Dash pattern)
+                // Double space where dash should be
+                if (strpos($fixed, 'Macramê  Branco') !== false) {
+                    $fixed = str_replace('Macramê  Branco', 'Macramê - Branco', $fixed);
+                }
+                // Missing dash entirely
+                else if (strpos($fixed, 'Macramê Branco') !== false && strpos($fixed, 'Macramê - Branco') === false) {
+                     $fixed = str_replace('Macramê Branco', 'Macramê - Branco', $fixed);
+                }
+
+                if ($fixed !== $original) {
+                    $updates[$col] = $fixed;
+                }
+            }
+
+            if (!empty($updates)) {
+                DB::table($tbl)->where('id', $row->id)->update($updates);
+                echo "   Fixed ID {$row->id}\n";
+            }
+        }
+    });
+}
+
+echo "=== REPAIR COMPLETE ===\n";
